@@ -1,0 +1,219 @@
+{
+    "Hero": {
+        "title": "Find Your Next Holiday Home.",
+        "where": "Where",
+        "checkIn": "Check in",
+        "checkOut": "Check out",
+        "who": "Who",
+        "search": "Search",
+        "searchDestinations": "Search destinations...",
+        "addDate": "Add Date",
+        "addGuests": "Add Guests",
+        "guests": "Guests",
+        "adults": "Adults",
+        "children": "Children",
+        "adultsBubble": "Ages 13 or above",
+        "childrenBubble": "Ages 2-12",
+        "done": "Done",
+        "dubai": "Dubai",
+        "areas": {
+            "downtown-dubai": "Downtown Dubai",
+            "palm-jumeirah": "Palm Jumeirah",
+            "jbr": "JBR - Jumeirah Beach Residence",
+            "business-bay": "Business Bay",
+            "dubai-hills": "Dubai Hills",
+            "jvc": "Jumeirah Village Circle",
+            "difc": "DIFC",
+            "creek-harbour": "Creek Harbour",
+            "al-barsha": "Al Barsha",
+            "meydan": "Meydan",
+            "sports-city": "Sports City",
+            "silicon-oasis": "Silicon Oasis"
+        }
+    },
+    "Navbar": {
+        "login": "Log in or sign up",
+        "ownersPortal": "Owner's Portal",
+        "listProperty": "List Your Property",
+        "becomeHost": "Become a host",
+        "furnish": "Furnish your space",
+        "buyProperty": "Buy property in UAE",
+        "manage": "Manage your properties",
+        "contact": "Contact us",
+        "logout": "Sign out",
+        "menu": "Menu",
+        "explore": "Explore Glory Vacation",
+        "currency": "Currency",
+        "accessProfile": "Access your profile and bookings",
+        "startJourney": "Start your journey"
+    },
+    "Categories": {
+        "all": "All",
+        "studio": "Studio",
+        "1br": "1 Bedroom",
+        "2br": "2 Bedrooms",
+        "3br": "3 Bedrooms",
+        "villa": "Villa",
+        "townhouse": "Townhouse",
+        "penthouse": "Penthouse",
+        "pool": "Pool",
+        "filter": "Filter"
+    },
+    "PropertyCard": {
+        "guests": "Guests",
+        "studio": "Studio",
+        "oneBedroom": "1 Bedroom",
+        "bedrooms": "{count} Bedrooms",
+        "from": "From",
+        "night": "/ night",
+        "new": "New",
+        "pool": "Pool"
+    },
+    "Listing": {
+        "loadMore": "Load More Properties"
+    },
+    "Footer": {
+        "explore": "Explore",
+        "company": "Company",
+        "support": "Support",
+        "becomeHost": "Become a Host",
+        "ownersPortal": "Owner's Portal",
+        "trustSafety": "Trust & Safety",
+        "blogs": "Travel Blogs",
+        "newsletter": "Subscribe to Newsletter",
+        "about": "About Us",
+        "terms": "Terms & Conditions",
+        "privacy": "Privacy Policy",
+        "cancellation": "Cancellation Policy",
+        "faq": "FAQs",
+        "contact": "Contact Us",
+        "description": "Discover premium holiday homes in Dubai. Experience luxury living with our curated collection of DTCM licensed and verified properties.",
+        "dubai": "Dubai, United Arab Emirates",
+        "rights": "All rights reserved.",
+        "licensed": "DTCM Licensed",
+        "rated": "Rated"
+    },
+    "Destinations": {
+        "title": "Explore Destinations in Dubai",
+        "properties": "{count} Properties",
+        "downtown": "Downtown Dubai",
+        "marina": "Dubai Marina",
+        "jvc": "Dubai JVC",
+        "palm": "Palm Jumeirah",
+        "jbr": "JBR",
+        "business-bay": "Business Bay"
+    },
+    "Services": {
+        "title": "Our Services",
+        "verified": "Verified Properties",
+        "support": "24/7 Support",
+        "premium": "Premium Stays",
+        "rates": "Best Rates",
+        "clean": "Clean & Safe",
+        "trusted": "Trusted Hosts"
+    },
+    "Properties": {
+        "1": {
+            "title": "Cozy Studio Stay in Meydan"
+        },
+        "2": {
+            "title": "Modern 1BR with Balcony & City View"
+        },
+        "3": {
+            "title": "Elegant 1-Bedroom Apartment with Balcony"
+        },
+        "4": {
+            "title": "Luxury 3BR+M with Dubai Eye View, JBR"
+        },
+        "5": {
+            "title": "Chic Studio Escape in Dubai Sports City"
+        },
+        "6": {
+            "title": "Chic 2-Bedroom with Dubai Skyline View"
+        },
+        "7": {
+            "title": "Stylish Studio with Dubai Skyline View"
+        },
+        "8": {
+            "title": "Stylish 2BR w/ City View in Sobha Creek"
+        },
+        "9": {
+            "title": "Luxury 5BR Villa on Palm Jumeirah"
+        },
+        "10": {
+            "title": "Modern 3BR Townhouse in Arabian Ranches"
+        }
+    },
+    "Newsletter": {
+        "title": "Subscribe to the Glory Vacation newsletter!",
+        "description": "Stay updated with the latest news, offers, and travel inspiration.",
+        "placeholder": "Enter your email",
+        "subscribe": "Subscribe",
+        "subscribed": "Subscribed!"
+    },
+    "HostCTA": {
+        "title1": "Empty space?",
+        "title2": "We make it pay!",
+        "description": "Hand over your empty property, and we'll transform it, and rent it out on your behalf.",
+        "listProperty": "List your property",
+        "manageProperty": "Manage your properties"
+    },
+    "MobileApp": {
+        "logoText": "GV",
+        "appName": "Glory Vacation",
+        "slogan": "Your home away from home",
+        "badge": "Coming Soon",
+        "title1": "Full control",
+        "title2": "coming soon!",
+        "description": "Our mobile app is just around the corner. Get ready to manage your bookings, explore properties, and more - all from your pocket.",
+        "download": "Download on the",
+        "appStore": "App Store",
+        "getIt": "Get it on",
+        "googlePlay": "Google Play"
+    },
+    "Testimonials": {
+        "title": "What our guests say",
+        "1": {
+            "title": "Cozy, Clean, and Convenient",
+            "text": "The property was spotless and beautifully furnished. We had everything we needed for a stress-free stay. It really felt like a home away from home.",
+            "author": "Sarah M."
+        },
+        "2": {
+            "title": "Perfect Location",
+            "text": "Great location and very comfortable. The host was very responsive and helpful.",
+            "author": "Ahmed K."
+        },
+        "3": {
+            "title": "Amazing Experience",
+            "text": "Absolutely loved our stay! The amenities were top-notch and the view was stunning.",
+            "author": "Michael R."
+        },
+        "4": {
+            "title": "Great Experience",
+            "text": "Absolutely loved our stay! The amenities were top-notch and the view was stunning.",
+            "author": "Emma L."
+        },
+        "5": {
+            "title": "Great Getaway",
+            "text": "The property was spotless and beautifully furnished. We had everything we needed for a stress-free stay. It really felt like a home away from home.",
+            "author": "David P."
+        }
+    },
+    "Blogs": {
+        "title": "Travel Blogs",
+        "seeMore": "See More",
+        "badge": "Glory Vacation",
+        "1": {
+            "title": "Romantic Escapes: Booking Luxury Stays for Couples in Dubai",
+            "excerpt": "Planning a romantic escape to Dubai? Discover luxury villas with private pools on Palm Jumeirah, beachfront properties, and stunning Downtown apartments."
+        },
+        "2": {
+            "title": "Family-Oriented Expat Rentals: Finding Your Perfect 3 BHK Villa",
+            "excerpt": "Stay Near History: Holiday Homes Perfect for Dubai Heritage Tours and family adventures."
+        },
+        "3": {
+            "title": "Al Barsha Holiday Apartments: Your Central Hub Near Shopping",
+            "excerpt": "Downtown Dubai Serviced Apartments: Wake Up to the World's Best View every morning."
+        }
+    }
+}
