@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Calendar, Search, Filter, Download, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Search, Filter, Download, Eye, CheckCircle, XCircle, Trash } from "lucide-react";
 
 interface Booking {
     _id: string;
@@ -64,6 +64,26 @@ export default function BookingsPage() {
             }
         } catch (error) {
             console.error("Failed to update booking", error);
+        }
+    };
+
+    const handleDeleteBooking = async (bookingId: string) => {
+        if (!confirm('Delete this booking?')) return;
+        try {
+            const res = await fetch('/api/admin/bookings/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookingId }),
+            });
+            if (res.ok) {
+                setBookings((prev) => prev.filter((b) => b._id !== bookingId));
+            } else {
+                const data = await res.json();
+                console.error('Delete booking failed', data);
+                alert('Failed to delete booking: ' + (data?.message || res.status));
+            }
+        } catch (error) {
+            console.error('Failed to delete booking', error);
         }
     };
 
@@ -193,6 +213,13 @@ export default function BookingsPage() {
                                                     )}
                                                     <button className="p-1.5 text-primary hover:bg-primary/5 rounded-lg transition-colors" title="View">
                                                         <Eye className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteBooking(booking._id)}
+                                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash className="w-5 h-5" />
                                                     </button>
                                                 </div>
                                             </td>

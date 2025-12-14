@@ -52,6 +52,26 @@ export default function UsersPage() {
         }
     };
 
+    const handleDelete = async (userId: string) => {
+        if (!confirm('Delete this user and related data?')) return;
+        try {
+            const res = await fetch('/api/admin/users/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            if (res.ok) {
+                setUsers((prev) => prev.filter((u) => u._id !== userId));
+            } else {
+                const data = await res.json();
+                console.error('Delete failed', data);
+                alert('Failed to delete user: ' + (data?.message || res.status));
+            }
+        } catch (error) {
+            console.error('Failed to delete user', error);
+        }
+    };
+
     if (loading) return <div className="p-8">Loading...</div>;
 
     return (
@@ -106,15 +126,24 @@ export default function UsersPage() {
                                     )}
                                 </td>
                                 <td className="p-4 text-right">
-                                    {!user.isApproved && (
+                                    <div className="inline-flex items-center gap-2 justify-end">
+                                        {!user.isApproved && (
+                                            <button
+                                                onClick={() => handleApprove(user._id)}
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                                            >
+                                                <Check className="w-4 h-4" />
+                                                Approve
+                                            </button>
+                                        )}
                                         <button
-                                            onClick={() => handleApprove(user._id)}
-                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                                            onClick={() => handleDelete(user._id)}
+                                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
                                         >
-                                            <Check className="w-4 h-4" />
-                                            Approve
+                                            <X className="w-4 h-4" />
+                                            Delete
                                         </button>
-                                    )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { Plus, Home, MapPin, DollarSign, Star } from "lucide-react";
 import Image from "next/image";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 interface Property {
     _id: string;
@@ -21,6 +22,8 @@ interface Property {
 export default function ListingsPage() {
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [targetProperty, setTargetProperty] = useState<{ id: string; title: string } | null>(null);
 
     useEffect(() => {
         fetchProperties();
@@ -54,6 +57,41 @@ export default function ListingsPage() {
                     Add Property
                 </Link>
             </div>
+
+            <ConfirmModal
+                open={confirmOpen}
+                title={targetProperty ? `Delete \"${targetProperty.title}\"?` : "Delete property?"}
+                message={"This will permanently remove the property and all related bookings and reviews."}
+                confirmLabel="Delete"
+                cancelLabel="Cancel"
+                onCancel={() => {
+                    setConfirmOpen(false);
+                    setTargetProperty(null);
+                }}
+                onConfirm={async () => {
+                    if (!targetProperty) return;
+                    try {
+                        const res = await fetch('/api/admin/properties/delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ propertyId: targetProperty.id }),
+                        });
+                        if (res.ok) {
+                            setProperties((prev) => prev.filter((p) => p._id !== targetProperty.id));
+                        } else {
+                            const data = await res.json();
+                            console.error('Delete failed', data);
+                            alert('Failed to delete property: ' + (data?.message || res.status));
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert('Failed to delete property');
+                    } finally {
+                        setConfirmOpen(false);
+                        setTargetProperty(null);
+                    }
+                }}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {properties.map((property) => (
@@ -137,6 +175,16 @@ export default function ListingsPage() {
                                         Approve
                                     </button>
                                 )}
+
+                                <button
+                                    onClick={() => {
+                                        setTargetProperty({ id: property._id, title: property.title });
+                                        setConfirmOpen(true);
+                                    }}
+                                    className="px-3 py-1 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700"
+                                >
+                                    Delete
+                                </button>
                             </div>
                         </div>
                     </div>
