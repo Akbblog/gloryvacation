@@ -37,6 +37,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
     const pathname = usePathname();
     const menuRef = useRef<HTMLDivElement>(null);
     const burgerRef = useRef<HTMLButtonElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
     const t = useTranslations('Navbar');
     const tHero = useTranslations('Hero');
     const locale = useLocale();
@@ -65,6 +66,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
             const target = event.target as Node;
             // if click is inside desktop menu, do nothing
             if (menuRef.current && menuRef.current.contains(target)) return;
+            // if click is inside mobile menu overlay, do nothing
+            if (mobileMenuRef.current && mobileMenuRef.current.contains(target)) return;
             // if click is on the burger button, do nothing (it will toggle)
             if (burgerRef.current && burgerRef.current.contains(target)) return;
             // otherwise close menu
@@ -300,6 +303,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
             {menuOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] md:hidden animate-in fade-in duration-300" onClick={() => setMenuOpen(false)}>
                     <div
+                        ref={mobileMenuRef}
                         className="absolute right-0 top-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
