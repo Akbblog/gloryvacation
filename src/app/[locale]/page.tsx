@@ -14,7 +14,7 @@ import { BlogsSection } from "@/components/home/BlogsSection";
 import { MobileAppSection } from "@/components/home/MobileAppSection";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 
 // Mock property data matching EasyGo's style exactly

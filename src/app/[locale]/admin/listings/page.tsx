@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Plus, Home, MapPin, DollarSign, Star } from "lucide-react";
 import Image from "next/image";
 
@@ -109,6 +109,34 @@ export default function ListingsPage() {
                                     <Star className="w-4 h-4 fill-current mr-1" />
                                     {property.rating || "New"}
                                 </div>
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                                {!property.isActive && (
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                const res = await fetch('/api/admin/properties/approve', {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ propertyId: property._id }),
+                                                });
+                                                if (res.ok) {
+                                                    setProperties((prev) => prev.map((p) => p._id === property._id ? { ...p, isActive: true } : p));
+                                                } else {
+                                                    const data = await res.json();
+                                                    console.error('Approve failed', data);
+                                                    alert('Failed to approve property: ' + (data?.message || res.status));
+                                                }
+                                            } catch (e) {
+                                                console.error(e);
+                                                alert('Failed to approve property');
+                                            }
+                                        }}
+                                        className="px-3 py-1 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700"
+                                    >
+                                        Approve
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>

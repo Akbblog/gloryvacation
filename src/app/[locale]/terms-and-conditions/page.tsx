@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import Link from "next/link";
 
 export default function TermsPage() {
     return (
@@ -65,7 +66,7 @@ export default function TermsPage() {
 
                         <h2>5. Cancellation Policy</h2>
                         <p>
-                            Please refer to our <a href="/cancellation-policy" className="text-primary">Cancellation Policy</a> for detailed information on cancellation terms and refund procedures.
+                            Please refer to our <Link href="/cancellation-policy" className="text-primary">Cancellation Policy</Link> for detailed information on cancellation terms and refund procedures.
                         </p>
 
                         <h2>6. Guest Responsibilities</h2>
@@ -106,7 +107,7 @@ export default function TermsPage() {
 
                         <h2>9. Privacy</h2>
                         <p>
-                            Your privacy is important to us. Please review our <a href="/privacy-policy" className="text-primary">Privacy Policy</a> to understand how we collect, use, and protect your personal information.
+                            Your privacy is important to us. Please review our <Link href="/privacy-policy" className="text-primary">Privacy Policy</Link> to understand how we collect, use, and protect your personal information.
                         </p>
 
                         <h2>10. Governing Law</h2>

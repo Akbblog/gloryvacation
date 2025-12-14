@@ -34,6 +34,28 @@ async function getProperty(id: string) {
         // Serialize strictly because of Mongoose hydration issues in Next.js
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
+        // If DB is unavailable or ID invalid, fall back to demo data in non-production
+        if (process.env.NODE_ENV !== 'production') {
+            return {
+                _id: id,
+                title: 'Demo Property',
+                images: [
+                    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop',
+                ],
+                pricePerNight: 299,
+                guests: 2,
+                bedrooms: 1,
+                bathrooms: 1,
+                propertyType: 'apartment',
+                amenities: ['Pool', 'WiFi'],
+                isNew: false,
+                location: { area: 'Demo Area', address: 'Demo Address', city: 'Dubai', country: 'UAE' },
+                description: 'This is demo property data used when the database is not available in development.',
+                host: { name: 'Demo Host', image: '' },
+                rating: null,
+                reviewCount: 0,
+            };
+        }
         return null; // Handle invalid ID format or not found
     }
 }

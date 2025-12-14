@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Users, Home, Calendar, DollarSign, TrendingUp, ArrowUpRight, PlusCircle, Eye, Settings } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";

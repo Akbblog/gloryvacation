@@ -301,7 +301,7 @@ function SearchPageContent() {
 
     // Loading and pagination
     const [isLoading, setIsLoading] = useState(false);
-    const [properties, setProperties] = useState(MOCK_PROPERTIES);
+    const [properties, setProperties] = useState<typeof MOCK_PROPERTIES>([] as any);
     const [visibleCount, setVisibleCount] = useState(8);
     const [totalCount, setTotalCount] = useState(MOCK_PROPERTIES.length);
 
@@ -381,6 +381,47 @@ function SearchPageContent() {
         filterProperties();
     }, [filterProperties]);
 
+    // Fetch properties from API so newly created listings appear live
+    useEffect(() => {
+        let mounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const res = await fetch(`/api/properties`);
+                if (!res.ok) throw new Error('Failed to fetch');
+                const data = await res.json();
+                if (!mounted) return;
+                // Map server properties to the client shape expected by the UI
+                const mapped = data.map((p: any) => ({
+                    id: p._id || p.id,
+                    title: p.title,
+                    pricePerNight: p.pricePerNight || p.price,
+                    images: p.images && p.images.length ? p.images : ["/placeholder.jpg"],
+                    guests: p.guests || 1,
+                    bedrooms: p.bedrooms || 1,
+                    propertyType: p.propertyType || 'apartment',
+                    amenities: p.amenities || [],
+                    isNew: p.isNew || false,
+                    area: p.location?.area || (p.area || 'Unknown'),
+                }));
+                setProperties(mapped);
+                setTotalCount(mapped.length);
+            } catch (e) {
+                // fallback to mock data in development or if API fails
+                if (process.env.NODE_ENV !== 'production') {
+                    setProperties(MOCK_PROPERTIES);
+                    setTotalCount(MOCK_PROPERTIES.length);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        load();
+
+        return () => { mounted = false; };
+    }, []);
+
     // Update URL with filters
     const updateURL = useCallback(() => {
         const params = new URLSearchParams();
@@ -442,7 +483,7 @@ function SearchPageContent() {
             <Navbar />
 
             {/* Search Header */}
-            <section className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm pt-20">
+            <section className="relative md:sticky md:top-0 z-40 bg-white border-b border-gray-100 shadow-sm pt-20">
                 {/* Main Search Bar */}
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-4">
                     <div className="flex flex-wrap items-center gap-3">

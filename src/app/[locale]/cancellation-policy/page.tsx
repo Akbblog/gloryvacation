@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import Link from "next/link";
 import { CheckCircle, AlertCircle, Clock } from "lucide-react";
 
 export default function CancellationPolicyPage() {
@@ -151,7 +152,7 @@ export default function CancellationPolicyPage() {
 
                         <h2>Questions?</h2>
                         <p>
-                            If you have any questions about our cancellation policy, please <a href="/contact" className="text-primary">contact us</a>. Our team is available 24/7 to assist you.
+                            If you have any questions about our cancellation policy, please <Link href="/contact" className="text-primary">contact us</Link>. Our team is available 24/7 to assist you.
                         </p>
                     </div>
                 </div>
