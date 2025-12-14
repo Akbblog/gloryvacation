@@ -36,6 +36,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
     const router = useRouter();
     const pathname = usePathname();
     const menuRef = useRef<HTMLDivElement>(null);
+    const burgerRef = useRef<HTMLButtonElement>(null);
     const t = useTranslations('Navbar');
     const tHero = useTranslations('Hero');
     const locale = useLocale();
@@ -61,9 +62,13 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
     // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setMenuOpen(false);
-            }
+            const target = event.target as Node;
+            // if click is inside desktop menu, do nothing
+            if (menuRef.current && menuRef.current.contains(target)) return;
+            // if click is on the burger button, do nothing (it will toggle)
+            if (burgerRef.current && burgerRef.current.contains(target)) return;
+            // otherwise close menu
+            setMenuOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -276,6 +281,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
 
                         {/* Mobile Menu Button */}
                         <button
+                            ref={burgerRef}
                             onClick={() => setMenuOpen(!menuOpen)}
                             className={cn(
                                 "md:hidden flex items-center justify-center p-2 rounded-full transition-all duration-300",
@@ -314,19 +320,18 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         {/* Scrollable Content */}
                         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                             {!session ? (
-                                <Link
-                                    href="/auth/signin"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="w-full flex items-center gap-4 px-4 py-4 mb-4 bg-[#F5A623]/10 rounded-2xl hover:bg-[#F5A623]/20 transition-colors text-left group"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-[#F5A623]">
-                                        <SignIn weight="fill" className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <span className="block text-[#1C1C1C] font-bold text-base">{t('login')}</span>
-                                        <span className="block text-xs text-gray-600 mt-0.5">{t('startJourney')}</span>
-                                    </div>
-                                </Link>
+                                    <button
+                                        onClick={() => handleMenuItemClick('/auth/signin')}
+                                        className="w-full flex items-center gap-4 px-4 py-4 mb-4 bg-[#F5A623]/10 rounded-2xl hover:bg-[#F5A623]/20 transition-colors text-left group"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-[#F5A623]">
+                                            <SignIn weight="fill" className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <span className="block text-[#1C1C1C] font-bold text-base">{t('login')}</span>
+                                            <span className="block text-xs text-gray-600 mt-0.5">{t('startJourney')}</span>
+                                        </div>
+                                    </button>
                             ) : (
                                 <div className="px-4 py-4 bg-gray-50 rounded-2xl mb-4 flex items-center gap-3">
                                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F5A623] to-[#E09000] flex items-center justify-center text-white shadow-md">
