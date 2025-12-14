@@ -33,6 +33,7 @@ export async function POST(req: Request) {
             email,
             password: hashedPassword,
             role: role || "guest",
+            isApproved: true,
         });
 
         return NextResponse.json(

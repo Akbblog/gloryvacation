@@ -43,6 +43,7 @@ export async function POST(req: Request) {
         const property = await Property.create({
             ...body,
             host: session.user.id,
+            isActive: false,
         });
 
         return NextResponse.json(property, { status: 201 });
