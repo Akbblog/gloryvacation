@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 // This would come from MongoDB in production
 const BLOGS = [
@@ -90,8 +90,8 @@ export default function BlogsPage() {
                             <button
                                 key={idx}
                                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${idx === 0
-                                        ? "bg-primary text-white"
-                                        : "bg-[#F5F5F5] text-[#7E7E7E] hover:bg-gray-200"
+                                    ? "bg-primary text-white"
+                                    : "bg-[#F5F5F5] text-[#7E7E7E] hover:bg-gray-200"
                                     }`}
                             >
                                 {cat}

@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut } from "next-auth/react";
 import { LayoutDashboard, Home, Calendar, Users, Settings, LogOut, PlusCircle, ChevronRight, MessageSquare } from "lucide-react";
 
