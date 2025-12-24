@@ -8,7 +8,7 @@ export type PublicProperty = {
     images: string[];
     guests: number;
     bedrooms: number;
-    propertyType: string;
+    propertyType: "apartment" | "villa" | "studio" | "townhouse" | "penthouse";
     amenities: string[];
     isNew: boolean;
     area: string;

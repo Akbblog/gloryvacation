@@ -24,6 +24,7 @@ export interface IProperty extends Document {
     };
     host: mongoose.Types.ObjectId;
     isActive: boolean;
+    isApprovedByAdmin: boolean;
     isFeatured: boolean;
     dtcmPermitNumber?: string;
     rating?: number;
@@ -59,7 +60,8 @@ const PropertySchema = new Schema<IProperty>(
             },
         },
         host: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        isActive: { type: Boolean, default: true },
+        isActive: { type: Boolean, default: false },
+        isApprovedByAdmin: { type: Boolean, default: false },
         isFeatured: { type: Boolean, default: false },
         dtcmPermitNumber: { type: String },
         rating: { type: Number, min: 0, max: 5 },

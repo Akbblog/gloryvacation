@@ -80,7 +80,8 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
     };
 
     return (
-        <div className="rounded-2xl shadow-xl p-4 bg-white sticky top-24 w-full max-w-sm">
+        <div className="rounded-2xl shadow-xl p-6 bg-white sticky top-24 w-full max-w-sm border border-gray-100">
+            {/* No price display here */}
             <div className="flex justify-between items-start mb-4">
                 <div>
                     <div className="text-sm text-gray-600">Request a reservation — pricing will be provided after contact</div>
@@ -91,7 +92,7 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
                 </div>
             </div>
 
-            <div className="border border-gray-100 rounded-lg mb-4 bg-white overflow-hidden">
+            <div className="border border-gray-100 rounded-lg mb-4 bg-white overflow-hidden shadow-sm">
                 <div className="grid grid-cols-2 gap-0 border-b border-gray-100">
                     <div className="p-3">
                         <label className="block text-[11px] font-semibold text-gray-600">Check In</label>
@@ -133,7 +134,11 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
             <button
                 onClick={handleReserve}
                 disabled={loading || nights <= 0}
-                className={`w-full py-3 rounded-lg font-semibold text-white mb-4 transition ${session ? 'bg-orange-500 hover:bg-orange-600' : 'bg-orange-100 text-white/80 cursor-pointer'}`}
+                className={`w-full py-3 rounded-lg font-semibold text-white mb-4 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg ${
+                    session 
+                        ? 'bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700' 
+                        : 'bg-gradient-to-r from-teal-400 to-teal-500 hover:from-teal-500 hover:to-teal-600'
+                } disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed disabled:scale-100`}
             >
                 {loading ? "Processing..." : session ? "Request Reservation" : "Sign in to Request"}
             </button>

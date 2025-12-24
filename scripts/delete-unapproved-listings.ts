@@ -19,9 +19,9 @@ const deleteUnapproved = async () => {
         await mongoose.connect(MONGODB_URI);
         console.log("Connected to MongoDB.");
 
-        // Delete properties that are not approved/active
-        // This will remove any listing where isActive is false or missing.
-        const result = await Property.deleteMany({ $or: [{ isActive: false }, { isActive: { $exists: false } }] });
+        // Delete properties that are not approved by admin
+        // This will remove any listing where isApprovedByAdmin is false or missing.
+        const result = await Property.deleteMany({ $or: [{ isApprovedByAdmin: false }, { isApprovedByAdmin: { $exists: false } }] });
 
         console.log(`Deleted ${result.deletedCount} unapproved listings.`);
     } catch (error) {

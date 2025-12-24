@@ -36,6 +36,44 @@ async function compressImage(file: File, maxWidth = 1600, quality = 0.75): Promi
     });
 }
 
+async function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const result = reader.result as string;
+            // Remove the data URL prefix
+            const base64 = result.split(',')[1];
+            resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function freeImageHostUpload(file: File, onProgress: (p: number) => void): Promise<{ url: string }> {
+    onProgress(10);
+    const base64 = await fileToBase64(file);
+    onProgress(30);
+    const formData = new FormData();
+    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
+    formData.append('action', 'upload');
+    formData.append('source', base64);
+    formData.append('format', 'json');
+    onProgress(50);
+    const res = await fetch('https://freeimage.host/api/1/upload', {
+        method: 'POST',
+        body: formData,
+    });
+    onProgress(80);
+    const data = await res.json();
+    onProgress(100);
+    if (data && data.status_code === 200 && data.image && data.image.url) {
+        return { url: data.image.url };
+    } else {
+        throw new Error(data?.success?.message || 'Image upload failed');
+    }
+}
+
 export default function ImageUploader({
     initial = [],
     onChange,
@@ -72,7 +110,7 @@ export default function ImageUploader({
         });
     };
 
-    const uploader = uploadHandler || defaultUpload;
+    const uploader = uploadHandler || freeImageHostUpload;
 
     const handleFiles = async (files: FileList | null) => {
         if (!files) return;

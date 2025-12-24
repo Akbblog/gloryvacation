@@ -4,7 +4,8 @@ import { Property } from "@/models/Property";
 
 export async function GET(req: Request, context: any) {
     try {
-        const { id } = context?.params || {};
+        const params = await context?.params;
+        const { id } = params ?? {};
         if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 });
 
         await connectDB();

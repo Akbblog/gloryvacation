@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
         await connectDB();
 
-        const updated = await Property.findByIdAndUpdate(propertyId, { isActive: true }, { new: true });
+        const updated = await Property.findByIdAndUpdate(propertyId, { isActive: true, isApprovedByAdmin: true }, { new: true });
         if (!updated) {
             return NextResponse.json({ message: 'Property not found' }, { status: 404 });
         }

@@ -1,7 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* EasyGo-inspired Palette */
+  /* =============================================
+     GLORY VACATION - UNIFIED THEME SYSTEM
+     ============================================= */
+  
+  /* Base Colors */
   --background: #ffffff;
   --foreground: #1c1c1c;
 
@@ -11,15 +16,54 @@
   --popover: #ffffff;
   --popover-foreground: #1c1c1c;
 
-  /* Primary Teal */
+  /* Primary Teal - Main brand color */
   --primary: #0d9488;
   --primary-foreground: #ffffff;
 
-  /* Secondary */
+  /* Secondary - Light teal tints */
   --secondary: #f0fdfa;
   --secondary-foreground: #0f766e;
 
-  /* Neutrals */
+  /* =============================================
+     ACCENT COLORS - Orange/Gold (Brand Highlight)
+     ============================================= */
+  --accent-orange: #F5A623;
+  --accent-orange-hover: #E09000;
+  --accent-orange-light: #FFF8EB;
+  --accent-orange-10: rgba(245, 166, 35, 0.1);
+  --accent-orange-20: rgba(245, 166, 35, 0.2);
+
+  /* =============================================
+     BUTTON & INTERACTIVE COLORS
+     ============================================= */
+  --button-dark: #2D2D2D;
+  --button-dark-hover: #3D3D3D;
+  --button-dark-80: rgba(45, 45, 45, 0.8);
+
+  /* =============================================
+     NEUTRAL PALETTE - Text & UI Elements
+     ============================================= */
+  --neutral-1: #1c1c1c;   /* Primary text, headings */
+  --neutral-2: #3d3d3d;   /* Secondary text, icons */
+  --neutral-3: #7e7e7e;   /* Muted text, descriptions */
+  --neutral-4: #9a9a9a;   /* Placeholder text */
+  --neutral-5: #b4b4b4;   /* Disabled text, inactive */
+  --neutral-6: #d9d9d9;   /* Light borders */
+  --neutral-7: #e8e8e8;   /* Card borders, dividers */
+  --neutral-8: #f4f4f4;   /* Light backgrounds */
+  --neutral-9: #fafafa;   /* Subtle backgrounds */
+
+  /* Icon-specific grays */
+  --icon-muted: #9CA3AF;
+  --icon-default: #7E7E7E;
+  --icon-dark: #3D3D3D;
+
+  /* Star/Rating color */
+  --rating-star: #F5A623;
+
+  /* =============================================
+     SEMANTIC COLORS
+     ============================================= */
   --muted: #f8f9fc;
   --muted-foreground: #6b7280;
 
@@ -29,22 +73,29 @@
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+
+  /* =============================================
+     FORM & INPUT COLORS
+     ============================================= */
   --border: #e5e7eb;
   --input: #e5e7eb;
   --ring: #0d9488;
 
-  --radius: 1rem;
+  /* Border radius (consistent 12px across cards) */
+  --radius: 0.75rem;
 
-  /* Neutral palette (matching EasyGo) */
-  --neutral-1: #1c1c1c;
-  --neutral-2: #3d3d3d;
-  --neutral-3: #7e7e7e;
-  --neutral-4: #9a9a9a;
-  --neutral-5: #b4b4b4;
-  --neutral-6: #d9d9d9;
-  --neutral-7: #e8e8e8;
-  --neutral-8: #f4f4f4;
-  --neutral-9: #fafafa;
+  /* =============================================
+     SHADOW DEFINITIONS
+     ============================================= */
+  --shadow-card: 0px 3px 8px 0px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0px 8px 24px 0px rgba(0, 0, 0, 0.12);
+  --shadow-search: 0px 6px 22px 0px rgba(139, 80, 17, 0.17);
+  --shadow-dropdown: 0 8px 30px rgb(0, 0, 0, 0.12);
 }
 
 @theme inline {
@@ -68,7 +119,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-google-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', 'Outfit', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -252,6 +303,11 @@ input:focus-visible {
 
 .animate-slide-in-up {
   animation: slideInUp 0.4s ease-out forwards;
+}
+
+/* Fade-in-up alias used across components */
+.animate-fade-in-up {
+  animation: slideInUp 0.36s ease-out forwards;
 }
 
 /* No scrollbar for specific elements */

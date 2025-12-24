@@ -35,7 +35,7 @@ async function deleteUnapproved() {
     console.log('Connected to MongoDB.');
 
     const collection = mongoose.connection.collection('properties');
-    const query = { $or: [{ isActive: false }, { isActive: { $exists: false } }] };
+    const query = { $or: [{ isApprovedByAdmin: false }, { isApprovedByAdmin: { $exists: false } }] };
     console.log('Deleting documents matching:', JSON.stringify(query));
 
     const result = await collection.deleteMany(query);
