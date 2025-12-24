@@ -20,7 +20,7 @@ import {
 interface PropertyCardProps {
     id: string;
     title: string;
-    pricePerNight: number;
+    pricePerNight?: number;
     images: string[];
     guests: number;
     bedrooms: number;
