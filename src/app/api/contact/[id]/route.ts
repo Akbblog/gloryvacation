@@ -23,29 +23,3 @@ export async function DELETE(req: Request, { params }: any) {
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }
-import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import { ContactMessage } from "@/models/ContactMessage";
-
-export async function DELETE(req: Request, context: any) {
-    try {
-        const { id } = context?.params || {};
-
-        if (!id) {
-            return NextResponse.json({ message: "Missing id" }, { status: 400 });
-        }
-
-        await connectDB();
-
-        const deleted = await ContactMessage.findByIdAndDelete(id);
-
-        if (!deleted) {
-            return NextResponse.json({ message: "Message not found" }, { status: 404 });
-        }
-
-        return NextResponse.json({ message: "Deleted" }, { status: 200 });
-    } catch (error) {
-        console.error("Error deleting contact message:", error);
-        return NextResponse.json({ message: "Failed to delete message" }, { status: 500 });
-    }
-}
