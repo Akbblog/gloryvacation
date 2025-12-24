@@ -6,6 +6,7 @@ export interface IContactMessage extends Document {
     phone?: string;
     subject: string;
     message: string;
+    property?: mongoose.Types.ObjectId; // optional link to Property
     status: "new" | "read" | "replied" | "closed";
     assignedTo?: mongoose.Types.ObjectId;
     createdAt: Date;
@@ -19,6 +20,7 @@ const ContactMessageSchema = new Schema<IContactMessage>(
         phone: { type: String },
         subject: { type: String, required: true },
         message: { type: String, required: true },
+            property: { type: Schema.Types.ObjectId, ref: "Property" },
         status: {
             type: String,
             enum: ["new", "read", "replied", "closed"],

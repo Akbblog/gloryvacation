@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { mutate } from 'swr';
 import { useRouter } from "next/navigation";
 import { Check, X, Plus, Save } from "lucide-react";
+import ImageUploader from "@/components/properties/ImageUploader";
 
 const PROPERTY_TYPES = ["studio", "apartment", "villa", "townhouse", "penthouse"];
 const AMENITIES_LIST = [
@@ -88,11 +90,13 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
         setLoading(true);
 
         try {
-            const cleanData = {
-                ...formData,
-                images: formData.images.filter(img => img.trim() !== ""),
-                pricePerNight: Number(formData.pricePerNight)
-            };
+            const images = formData.images.filter(img => img.trim() !== "");
+            const cleanData: any = { ...formData, images };
+            if (formData.pricePerNight !== "" && formData.pricePerNight != null) {
+                cleanData.pricePerNight = Number(formData.pricePerNight);
+            } else {
+                delete cleanData.pricePerNight;
+            }
 
             const res = await fetch("/api/properties", {
                 method: "POST",
@@ -101,6 +105,8 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
             });
 
             if (res.ok) {
+                // revalidate properties list
+                await mutate('/api/properties');
                 onSuccess();
             } else {
                 const error = await res.json();
@@ -178,13 +184,12 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
                 <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Property Details</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Price / Night</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Price / Night (optional)</label>
                         <input
                             type="number"
                             name="pricePerNight"
                             value={formData.pricePerNight}
                             onChange={handleChange}
-                            required
                             min="0"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-gray-900 bg-white"
                         />
@@ -268,35 +273,10 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
             </div>
 
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Images (URLs)</h2>
+                <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Images</h2>
                 <div className="space-y-3">
-                    {formData.images.map((img, index) => (
-                        <div key={index} className="flex gap-2">
-                            <input
-                                type="text"
-                                value={img}
-                                onChange={(e) => handleImageChange(index, e.target.value)}
-                                placeholder="https://example.com/image.jpg"
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-gray-900 bg-white"
-                            />
-                            {formData.images.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeImageField(index)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                    <button
-                        type="button"
-                        onClick={addImageField}
-                        className="text-sm text-primary font-medium hover:text-primary/80 flex items-center gap-1"
-                    >
-                        <Plus className="w-4 h-4" /> Add Another Image
-                    </button>
+                    {/* ImageUploader handles uploads and returns URLs via onChange */}
+                    <ImageUploader initial={formData.images} onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))} />
                 </div>
             </div>
 

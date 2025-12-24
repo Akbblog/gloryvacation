@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { format } from "date-fns";
 import { Mail, Search, Trash2, Eye, MessageSquare, Clock } from "lucide-react";
 
@@ -15,29 +16,17 @@ interface ContactMessage {
     createdAt: string;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function MessagesPage() {
-    const [messages, setMessages] = useState<ContactMessage[]>([]);
-    const [loading, setLoading] = useState(true);
     const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        fetchMessages();
-    }, []);
+    const { data, error, mutate } = useSWR<ContactMessage[]>('/api/contact', fetcher, { revalidateOnFocus: false });
 
-    const fetchMessages = async () => {
-        try {
-            const res = await fetch("/api/contact");
-            if (res.ok) {
-                const data = await res.json();
-                setMessages(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch messages", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const loading = !data && !error;
+
+    const messages = data || [];
 
     const filteredMessages = messages.filter((msg) => {
         if (!searchQuery) return true;
@@ -48,6 +37,26 @@ export default function MessagesPage() {
             msg.subject.toLowerCase().includes(query)
         );
     });
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Delete this message?')) return;
+        try {
+            const res = await fetch(`/api/contact/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                // revalidate
+                await mutate();
+                if (selectedMessage && selectedMessage._id === id) {
+                    setSelectedMessage(null);
+                }
+            } else {
+                const body = await res.json();
+                alert(body?.message || 'Failed to delete');
+            }
+        } catch (err) {
+            console.error('Delete failed', err);
+            alert('Failed to delete message');
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -119,7 +128,7 @@ export default function MessagesPage() {
                         <div>
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-semibold text-[#1C1C1C]">Message Details</h3>
-                                <button className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                                <button onClick={() => handleDelete(selectedMessage._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>

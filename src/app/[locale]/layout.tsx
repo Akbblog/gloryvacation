@@ -4,6 +4,7 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import SWRProvider from '@/components/providers/SWRProvider';
 
 export const metadata: Metadata = {
   title: "Glory Vacation | Luxury Vacation Rentals in Dubai",
@@ -39,11 +40,13 @@ export default async function RootLayout({
         style={{ fontFamily: isRtl ? "'Tahoma', 'Arial', sans-serif" : "'Google Sans', 'Roboto', sans-serif" }}
         suppressHydrationWarning
       >
-        <NextIntlClientProvider messages={messages}>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <SWRProvider>
+          <NextIntlClientProvider messages={messages}>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </NextIntlClientProvider>
+        </SWRProvider>
       </body>
     </html>
   );

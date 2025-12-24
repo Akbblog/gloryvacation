@@ -156,15 +156,9 @@ export function PropertyCard({
                         </p>
                     </div>
 
-                    {/* Price & Rating */}
-                    <div className="flex items-end justify-between mt-3 sm:mt-4 pt-3 border-t border-gray-100">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] sm:text-xs text-[#9CA3AF] font-medium">{t('from')}</span>
-                            <p className="text-base sm:text-lg font-bold text-[#1C1C1C]">
-                                AED {pricePerNight.toLocaleString()}
-                                <span className="text-sm font-normal text-[#7E7E7E]">{t('night')}</span>
-                            </p>
-                        </div>
+                    {/* Rating */}
+                    <div className="flex items-center justify-between mt-3 sm:mt-4 pt-3 border-t border-gray-100">
+                        <div className="text-sm text-[#9CA3AF]">{/* Price hidden — contact for pricing */}</div>
                         {isNew && (
                             <div className="hidden sm:flex items-center gap-1 bg-[#F5A623]/10 px-2.5 py-1 rounded-full">
                                 <Star weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />

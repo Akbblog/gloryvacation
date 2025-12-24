@@ -70,11 +70,10 @@ export function ListingCard({
                         </div>
                     </div>
 
-                    {/* Price */}
+                    {/* Price hidden - contact to request pricing */}
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                         <div>
-                            <span className="text-xl font-bold text-primary">AED {price.toLocaleString()}</span>
-                            <span className="text-[#7E7E7E] text-sm"> / night</span>
+                            <span className="text-sm text-gray-500">Contact to request pricing</span>
                         </div>
                         <span className="text-sm text-primary font-medium group-hover:underline">
                             View Details

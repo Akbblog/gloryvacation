@@ -28,8 +28,15 @@ async function connectDB() {
     }
 
     if (!cached.promise) {
+        // Tuned options for serverless environments (Vercel)
+        // Keep small pool sizes to avoid exhausting MongoDB connections
         const opts = {
             bufferCommands: false,
+            // limit pool size for ephemeral serverless functions
+            maxPoolSize: Number(process.env.MONGODB_MAX_POOL_SIZE) || 5,
+            // fail fast if server is not selectable
+            serverSelectionTimeoutMS: 5000,
+            // use new URL parser / unified topology (defaults in mongoose >=6)
         };
 
         cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {

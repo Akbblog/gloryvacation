@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
 import { Check, X, Shield, User as UserIcon } from "lucide-react";
 
 interface User {
@@ -13,26 +14,13 @@ interface User {
 }
 
 export default function UsersPage() {
-    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+    const { data: users, mutate } = useSWR<User[]>('/api/admin/users', fetcher, { shouldRetryOnError: false });
 
     useEffect(() => {
-        fetchUsers();
+        setLoading(false);
     }, []);
-
-    const fetchUsers = async () => {
-        try {
-            const res = await fetch("/api/admin/users");
-            if (res.ok) {
-                const data = await res.json();
-                setUsers(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch users", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleApprove = async (userId: string) => {
         try {
@@ -42,10 +30,8 @@ export default function UsersPage() {
                 body: JSON.stringify({ userId }),
             });
             if (res.ok) {
-                // Update UI optimistically or refetch
-                setUsers((prev) =>
-                    prev.map((u) => (u._id === userId ? { ...u, isApproved: true } : u))
-                );
+                // revalidate
+                await mutate();
             }
         } catch (error) {
             console.error("Failed to approve user", error);
@@ -61,7 +47,7 @@ export default function UsersPage() {
                 body: JSON.stringify({ userId }),
             });
             if (res.ok) {
-                setUsers((prev) => prev.filter((u) => u._id !== userId));
+                await mutate();
             } else {
                 const data = await res.json();
                 console.error('Delete failed', data);
@@ -73,6 +59,8 @@ export default function UsersPage() {
     };
 
     if (loading) return <div className="p-8">Loading...</div>;
+
+    const list = users ?? [];
 
     return (
         <div className="p-6">
@@ -89,7 +77,7 @@ export default function UsersPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {users.map((user) => (
+                        {list.map((user) => (
                             <tr key={user._id} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-4">
                                     <div className="flex items-center gap-3">
@@ -149,7 +137,7 @@ export default function UsersPage() {
                         ))}
                     </tbody>
                 </table>
-                {users.length === 0 && (
+                {list.length === 0 && (
                     <div className="p-12 text-center text-gray-400">No users found.</div>
                 )}
             </div>

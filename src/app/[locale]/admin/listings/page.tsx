@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
 import { Link } from "@/i18n/navigation";
 import { Plus, Home, MapPin, DollarSign, Star } from "lucide-react";
 import Image from "next/image";
@@ -20,30 +21,17 @@ interface Property {
 }
 
 export default function ListingsPage() {
-    const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+    const { data: properties, mutate } = useSWR<Property[]>('/api/properties', fetcher, { shouldRetryOnError: false });
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [targetProperty, setTargetProperty] = useState<{ id: string; title: string } | null>(null);
 
-    useEffect(() => {
-        fetchProperties();
-    }, []);
-
-    const fetchProperties = async () => {
-        try {
-            const res = await fetch("/api/properties");
-            if (res.ok) {
-                const data = await res.json();
-                setProperties(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch properties", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => setLoading(false), []);
 
     if (loading) return <div className="p-8">Loading...</div>;
+
+    const items = properties ?? [];
 
     return (
         <div className="p-6">
@@ -77,7 +65,7 @@ export default function ListingsPage() {
                             body: JSON.stringify({ propertyId: targetProperty.id }),
                         });
                         if (res.ok) {
-                            setProperties((prev) => prev.filter((p) => p._id !== targetProperty.id));
+                            await mutate();
                         } else {
                             const data = await res.json();
                             console.error('Delete failed', data);
@@ -94,7 +82,7 @@ export default function ListingsPage() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {properties.map((property) => (
+                {items.map((property) => (
                     <div
                         key={property._id}
                         className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
@@ -159,7 +147,7 @@ export default function ListingsPage() {
                                                     body: JSON.stringify({ propertyId: property._id }),
                                                 });
                                                 if (res.ok) {
-                                                    setProperties((prev) => prev.map((p) => p._id === property._id ? { ...p, isActive: true } : p));
+                                                    await mutate();
                                                 } else {
                                                     const data = await res.json();
                                                     console.error('Approve failed', data);
@@ -191,7 +179,7 @@ export default function ListingsPage() {
                 ))}
             </div>
 
-            {properties.length === 0 && (
+            {items.length === 0 && (
                 <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300">
                     <Home className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                     <h3 className="text-lg font-medium text-slate-900">No properties found</h3>

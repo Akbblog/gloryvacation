@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
 import { format } from "date-fns";
 import { Calendar, Search, Filter, Download, Eye, CheckCircle, XCircle, Trash } from "lucide-react";
 
@@ -32,25 +33,13 @@ export default function BookingsPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+    const apiKey = statusFilter === 'all' ? '/api/admin/bookings' : `/api/admin/bookings?status=${statusFilter}`;
+    const { data: bookingsData, mutate } = useSWR<Booking[]>(apiKey, fetcher, { shouldRetryOnError: false });
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        fetchBookings();
-    }, [statusFilter]);
-
-    const fetchBookings = async () => {
-        try {
-            const res = await fetch(`/api/admin/bookings?status=${statusFilter}`);
-            if (res.ok) {
-                const data = await res.json();
-                setBookings(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch bookings", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => setLoading(false), [statusFilter]);
 
     const updateBookingStatus = async (bookingId: string, status: string) => {
         try {
@@ -60,7 +49,7 @@ export default function BookingsPage() {
                 body: JSON.stringify({ bookingId, status }),
             });
             if (res.ok) {
-                fetchBookings();
+                await mutate();
             }
         } catch (error) {
             console.error("Failed to update booking", error);
@@ -76,7 +65,7 @@ export default function BookingsPage() {
                 body: JSON.stringify({ bookingId }),
             });
             if (res.ok) {
-                setBookings((prev) => prev.filter((b) => b._id !== bookingId));
+                await mutate();
             } else {
                 const data = await res.json();
                 console.error('Delete booking failed', data);
@@ -87,7 +76,7 @@ export default function BookingsPage() {
         }
     };
 
-    const filteredBookings = bookings.filter((booking) => {
+    const filteredBookings = (bookingsData || []).filter((booking) => {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
         return (

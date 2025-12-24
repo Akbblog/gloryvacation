@@ -222,8 +222,14 @@ export default function Home() {
           {filteredProperties.map((property) => (
             <PropertyCard
               key={property.id}
-              {...property}
+              id={property.id}
               title={t(`${property.id}.title`)}
+              images={property.images}
+              guests={property.guests}
+              bedrooms={property.bedrooms}
+              propertyType={property.propertyType}
+              amenities={property.amenities}
+              isNew={property.isNew}
             />
           ))}
         </div>

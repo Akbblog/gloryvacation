@@ -9,7 +9,7 @@ export interface IProperty extends Document {
     bedrooms: number;
     bathrooms: number;
     guests: number;
-    pricePerNight: number;
+    pricePerNight?: number;
     images: string[];
     amenities: string[];
     location: {
@@ -45,7 +45,7 @@ const PropertySchema = new Schema<IProperty>(
         bedrooms: { type: Number, required: true, default: 0 },
         bathrooms: { type: Number, required: true, default: 1 },
         guests: { type: Number, required: true, default: 2 },
-        pricePerNight: { type: Number, required: true },
+        pricePerNight: { type: Number },
         images: [{ type: String }],
         amenities: [{ type: String }],
         location: {

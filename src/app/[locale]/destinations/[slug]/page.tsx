@@ -158,7 +158,17 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                         {MOCK_PROPERTIES.map((property) => (
-                            <PropertyCard key={property.id} {...property} />
+                            <PropertyCard
+                                key={property.id}
+                                id={property.id}
+                                title={property.title}
+                                images={property.images}
+                                guests={property.guests}
+                                bedrooms={property.bedrooms}
+                                propertyType={property.propertyType}
+                                amenities={property.amenities}
+                                isNew={property.isNew}
+                            />
                         ))}
                     </div>
                 </div>

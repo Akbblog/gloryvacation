@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import useSWR from 'swr';
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User, LogOut, Settings, Heart, Calendar, Home, Plus, LayoutDashboard, MapPin, Loader2 } from "lucide-react";
@@ -39,42 +40,21 @@ export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState("dashboard");
     const [loading, setLoading] = useState(true);
 
-    // Data States
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const [properties, setProperties] = useState<Property[]>([]);
+    const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+    const { data: bookingsData, mutate: mutateBookings } = useSWR<Booking[]>('/api/bookings', fetcher, { shouldRetryOnError: false });
+    const { data: propertiesData, mutate: mutateProperties } = useSWR<Property[]>(
+        session?.user?.role === 'host' ? '/api/properties?myProperties=true' : null,
+        fetcher,
+        { shouldRetryOnError: false }
+    );
 
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/auth/signin");
-        } else if (status === "authenticated") {
-            fetchData();
         }
+        setLoading(false);
     }, [status, router]);
-
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            // Fetch bookings
-            const bookingsRes = await fetch("/api/bookings");
-            if (bookingsRes.ok) {
-                const data = await bookingsRes.json();
-                setBookings(data.bookings || []);
-            }
-
-            // Fetch properties if host
-            if (session?.user?.role === "host") {
-                const propsRes = await fetch("/api/properties?myProperties=true"); // Assuming API supports this or we filter
-                if (propsRes.ok) {
-                    // logic to fetch my properties, might need specific endpoint or filter
-                    // For now using placeholder or existing endpoint logic if adapted
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (status === "loading") {
         return (
@@ -96,7 +76,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-transform hover:scale-[1.02]">
-                    <div className="text-4xl font-bold text-primary mb-1">{bookings.length}</div>
+                    <div className="text-4xl font-bold text-primary mb-1">{(bookingsData || []).length}</div>
                     <div className="text-[#7E7E7E] text-sm">Active Bookings</div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-transform hover:scale-[1.02]">
@@ -110,11 +90,11 @@ export default function ProfilePage() {
             </div>
 
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 min-h-[300px] flex flex-col items-center justify-center text-center">
-                {bookings.length > 0 ? (
+                {(bookingsData || []).length > 0 ? (
                     <div className="w-full text-left space-y-4">
                         <h3 className="text-xl font-bold text-[#1C1C1C]">Recent Bookings</h3>
                         <div className="space-y-4">
-                            {bookings.slice(0, 3).map((booking) => (
+                            {(bookingsData || []).slice(0, 3).map((booking) => (
                                 <div key={booking._id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="w-24 h-24 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
                                         {/* Image placeholder */}
@@ -153,9 +133,9 @@ export default function ProfilePage() {
     const BookingsView = () => (
         <div className="space-y-6 animate-in fade-in duration-500">
             <h2 className="text-2xl font-bold text-[#1C1C1C]">My Bookings</h2>
-            {bookings.length > 0 ? (
+            {(bookingsData || []).length > 0 ? (
                 <div className="grid gap-4">
-                    {bookings.map((booking) => (
+                    {(bookingsData || []).map((booking) => (
                         <div key={booking._id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
                             <div className="w-full md:w-48 h-32 bg-gray-200 rounded-xl relative overflow-hidden flex-shrink-0">
                                 <Image src={booking.property?.images?.[0] || "/placeholder.jpg"} alt={booking.property?.title} fill className="object-cover" />
@@ -361,7 +341,7 @@ export default function ProfilePage() {
                                     onCancel={() => setActiveTab("properties")}
                                     onSuccess={() => {
                                         setActiveTab("properties");
-                                        fetchData();
+                                        mutateProperties?.();
                                     }}
                                 />
                             </div>

@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, useRef } from "react";
+import { useProperties } from "@/lib/hooks/useProperties";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PropertyCard } from "@/components/listings/PropertyCard";
+import { format, addDays } from "date-fns";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { useTranslations, useLocale } from "next-intl";
+import { ar, enUS } from "date-fns/locale";
 import {
     MagnifyingGlass,
     FunnelSimple,
@@ -18,7 +24,20 @@ import {
     MapTrifold,
     SquaresFour,
     SpinnerGap,
+    Buildings,
+    Tree,
+    Umbrella,
+    Briefcase,
+    Mountains,
+    Laptop,
+    Anchor,
+    Storefront,
+    Horse,
+    SoccerBall,
+    Minus,
+    Plus,
 } from "@phosphor-icons/react";
+import { cn } from "@/lib/utils";
 
 // Filter options
 const PROPERTY_TYPES = [
@@ -77,25 +96,23 @@ const AMENITIES = [
     "Hot Tub",
 ];
 
+// Dubai Areas Configuration with Icons
 const DUBAI_AREAS = [
-    "Any Area",
-    "Dubai Marina",
-    "Downtown Dubai",
-    "Palm Jumeirah",
-    "JBR",
-    "Business Bay",
-    "Dubai Hills",
-    "JVC",
-    "DIFC",
-    "Creek Harbour",
-    "Al Barsha",
-    "Meydan",
-    "Discovery Gardens",
-    "Sports City",
-    "Silicon Oasis",
+    { value: "downtown-dubai", label: "Downtown Dubai", Icon: Buildings },
+    { value: "palm-jumeirah", label: "Palm Jumeirah", Icon: Tree },
+    { value: "jbr", label: "JBR - Jumeirah Beach Residence", Icon: Umbrella },
+    { value: "business-bay", label: "Business Bay", Icon: Briefcase },
+    { value: "dubai-hills", label: "Dubai Hills", Icon: Mountains },
+    { value: "jvc", label: "Jumeirah Village Circle", Icon: House },
+    { value: "difc", label: "DIFC", Icon: Briefcase },
+    { value: "creek-harbour", label: "Creek Harbour", Icon: Anchor },
+    { value: "al-barsha", label: "Al Barsha", Icon: Storefront },
+    { value: "meydan", label: "Meydan", Icon: Horse },
+    { value: "sports-city", label: "Sports City", Icon: SoccerBall },
+    { value: "silicon-oasis", label: "Silicon Oasis", Icon: Laptop },
 ];
 
-// Mock properties for demo
+// Mock properties for demo (Keeping the existing mock data)
 const MOCK_PROPERTIES = [
     {
         id: "1",
@@ -282,28 +299,91 @@ const MOCK_PROPERTIES = [
 function SearchPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    // Using Hero's translation namespace where appropriate or falling back to defaults
+    // Since we don't know if 'Hero' namespace is available globally, we'll implement safe defaults using hardcoded strings for now to match the existing listing page style, 
+    // but adopting the visual structure of Hero.
+    const locale = useLocale();
+    const dateLocale = locale === 'ar' ? ar : enUS;
 
     // State for filters
     const [area, setArea] = useState(searchParams.get("area") || "");
-    const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
-    const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
-    const [guests, setGuests] = useState(searchParams.get("guests") || "1");
+    const [checkInDate, setCheckInDate] = useState<Date | undefined>(
+        searchParams.get("checkIn") ? new Date(searchParams.get("checkIn")!) : undefined
+    );
+    const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(
+        searchParams.get("checkOut") ? new Date(searchParams.get("checkOut")!) : undefined
+    );
+    const [guests, setGuests] = useState(parseInt(searchParams.get("guests") || "1"));
+    const [adults, setAdults] = useState(guests); // Simplified mapping
+    const [children, setChildren] = useState(0); // Listing page doesn't usually track children separately in URL param 'guests' usually implies total
+
     const [propertyType, setPropertyType] = useState(searchParams.get("type") || "");
     const [bedrooms, setBedrooms] = useState(searchParams.get("bedrooms") || "");
     const [priceRange, setPriceRange] = useState(searchParams.get("price") || "");
     const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+
+    // UI States for dropdowns
+    const [showDestinations, setShowDestinations] = useState(false);
+    const [showCheckIn, setShowCheckIn] = useState(false);
+    const [showCheckOut, setShowCheckOut] = useState(false);
+    const [showGuests, setShowGuests] = useState(false);
+    const [showType, setShowType] = useState(false);
+
+    // Refs for click outside
+    const destRef = useRef<HTMLDivElement>(null);
+    const checkInRef = useRef<HTMLDivElement>(null);
+    const checkOutRef = useRef<HTMLDivElement>(null);
+    const guestsRef = useRef<HTMLDivElement>(null);
+    const typeRef = useRef<HTMLDivElement>(null);
+
     const [showMap, setShowMap] = useState(false);
     const [showFiltersModal, setShowFiltersModal] = useState(false);
     const [showSortDropdown, setShowSortDropdown] = useState(false);
-    const [showAreaDropdown, setShowAreaDropdown] = useState(false);
-    const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
+
+    // Filter Area Search
+    const [searchInput, setSearchInput] = useState("");
+    const [filteredAreas, setFilteredAreas] = useState(DUBAI_AREAS);
 
     // Loading and pagination
     const [isLoading, setIsLoading] = useState(false);
-    const [properties, setProperties] = useState<typeof MOCK_PROPERTIES>([] as any);
     const [visibleCount, setVisibleCount] = useState(8);
+    const { properties: fetchedProperties, isLoading: propsLoading, isError } = useProperties();
+    const [properties, setProperties] = useState<any[]>([]);
     const [totalCount, setTotalCount] = useState(MOCK_PROPERTIES.length);
+
+    // Handle Click Outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (destRef.current && !destRef.current.contains(event.target as Node)) setShowDestinations(false);
+            if (checkInRef.current && !checkInRef.current.contains(event.target as Node)) setShowCheckIn(false);
+            if (checkOutRef.current && !checkOutRef.current.contains(event.target as Node)) setShowCheckOut(false);
+            if (guestsRef.current && !guestsRef.current.contains(event.target as Node)) setShowGuests(false);
+            if (typeRef.current && !typeRef.current.contains(event.target as Node)) setShowType(false);
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Filter destinations based on input
+    useEffect(() => {
+        if (searchInput) {
+            const filtered = DUBAI_AREAS.filter(area =>
+                area.label.toLowerCase().includes(searchInput.toLowerCase())
+            );
+            setFilteredAreas(filtered);
+        } else {
+            setFilteredAreas(DUBAI_AREAS);
+        }
+    }, [searchInput]);
+
+    // Format date for display
+    const formatDateDisplay = (date: Date | undefined) => {
+        if (!date) return null;
+        return format(date, "MMM dd", { locale: dateLocale });
+    };
+
+    const today = new Date();
 
     // Filter properties based on current filters
     const filterProperties = useCallback(() => {
@@ -311,8 +391,10 @@ function SearchPageContent() {
 
         // Filter by area
         if (area && area !== "Any Area") {
+            // Check if area matches value or label
             filtered = filtered.filter((p) =>
-                p.area.toLowerCase().includes(area.toLowerCase())
+                p.area.toLowerCase().includes(area.toLowerCase()) ||
+                DUBAI_AREAS.find(a => a.value === area)?.label.toLowerCase().includes(p.area.toLowerCase())
             );
         }
 
@@ -350,8 +432,7 @@ function SearchPageContent() {
 
         // Filter by guests
         if (guests) {
-            const guestNum = parseInt(guests);
-            filtered = filtered.filter((p) => p.guests >= guestNum);
+            filtered = filtered.filter((p) => p.guests >= guests);
         }
 
         // Sort
@@ -381,54 +462,33 @@ function SearchPageContent() {
         filterProperties();
     }, [filterProperties]);
 
-    // Fetch properties from API so newly created listings appear live
+    // Update properties from SWR hook
     useEffect(() => {
-        let mounted = true;
-        const load = async () => {
-            setIsLoading(true);
-            try {
-                const res = await fetch(`/api/properties`);
-                if (!res.ok) throw new Error('Failed to fetch');
-                const data = await res.json();
-                if (!mounted) return;
-                // Map server properties to the client shape expected by the UI
-                const mapped = data.map((p: any) => ({
-                    id: p._id || p.id,
-                    title: p.title,
-                    pricePerNight: p.pricePerNight || p.price,
-                    images: p.images && p.images.length ? p.images : ["/placeholder.jpg"],
-                    guests: p.guests || 1,
-                    bedrooms: p.bedrooms || 1,
-                    propertyType: p.propertyType || 'apartment',
-                    amenities: p.amenities || [],
-                    isNew: p.isNew || false,
-                    area: p.location?.area || (p.area || 'Unknown'),
-                }));
-                setProperties(mapped);
-                setTotalCount(mapped.length);
-            } catch (e) {
-                // fallback to mock data in development or if API fails
-                if (process.env.NODE_ENV !== 'production') {
-                    setProperties(MOCK_PROPERTIES);
-                    setTotalCount(MOCK_PROPERTIES.length);
-                }
-            } finally {
-                setIsLoading(false);
+        if (propsLoading) return;
+        if (isError) {
+            if (process.env.NODE_ENV !== 'production') {
+                setProperties(MOCK_PROPERTIES);
+                setTotalCount(MOCK_PROPERTIES.length);
             }
-        };
+            return;
+        }
 
-        load();
+        const normalized = (fetchedProperties || []).map((p: any) => ({
+            ...p,
+            id: p.id || p._id || (p._id && p._id.toString && p._id.toString()) || p.slug || (p.slug && p.slug.toString && p.slug.toString()),
+        }));
 
-        return () => { mounted = false; };
-    }, []);
+        setProperties(normalized);
+        setTotalCount(normalized.length || 0);
+    }, [fetchedProperties, propsLoading, isError]);
 
     // Update URL with filters
     const updateURL = useCallback(() => {
         const params = new URLSearchParams();
         if (area && area !== "Any Area") params.set("area", area);
-        if (checkIn) params.set("checkIn", checkIn);
-        if (checkOut) params.set("checkOut", checkOut);
-        if (guests && guests !== "1") params.set("guests", guests);
+        if (checkInDate) params.set("checkIn", format(checkInDate, 'yyyy-MM-dd'));
+        if (checkOutDate) params.set("checkOut", format(checkOutDate, 'yyyy-MM-dd'));
+        if (guests > 1) params.set("guests", guests.toString());
         if (propertyType) params.set("type", propertyType);
         if (bedrooms) params.set("bedrooms", bedrooms);
         if (priceRange) params.set("price", priceRange);
@@ -436,7 +496,7 @@ function SearchPageContent() {
 
         const queryString = params.toString();
         router.push(`/listings${queryString ? `?${queryString}` : ""}`, { scroll: false });
-    }, [area, checkIn, checkOut, guests, propertyType, bedrooms, priceRange, sortBy, router]);
+    }, [area, checkInDate, checkOutDate, guests, propertyType, bedrooms, priceRange, sortBy, router]);
 
     const handleSearch = () => {
         setIsLoading(true);
@@ -453,9 +513,11 @@ function SearchPageContent() {
 
     const clearFilters = () => {
         setArea("");
-        setCheckIn("");
-        setCheckOut("");
-        setGuests("1");
+        setCheckInDate(undefined);
+        setCheckOutDate(undefined);
+        setGuests(1);
+        setAdults(1);
+        setChildren(0);
         setPropertyType("");
         setBedrooms("");
         setPriceRange("");
@@ -473,115 +535,377 @@ function SearchPageContent() {
     };
 
     const activeFiltersCount =
-        (propertyType ? 1 : 0) +
         (bedrooms ? 1 : 0) +
         (priceRange ? 1 : 0) +
         selectedAmenities.length;
 
+    // Custom Calendar Styles
+    const css = `
+    .rdp {
+    --rdp-cell-size: 40px;
+    --rdp-accent-color: #F5A623;
+    --rdp-background-color: #FFF8EB;
+    margin: 0;
+    }
+        .rdp-day {
+    color: #1C1C1C;
+    }
+        .rdp-caption_label {
+    color: #1C1C1C;
+    font-weight: bold;
+    }
+        .rdp-head_cell {
+    color: #7E7E7E;
+    font-weight: 500;
+    }
+        .rdp-nav_button {
+    color: #1C1C1C;
+    }
+        .rdp-day_selected:not([disabled]), .rdp-day_selected:focus:not([disabled]), .rdp-day_selected:active:not([disabled]), .rdp-day_selected:hover:not([disabled]) {
+    background-color: var(--rdp-accent-color);
+    color: white;
+    font-weight: bold;
+    }
+        .rdp-day_today {
+    font-weight: bold;
+    color: #F5A623;
+    }
+        .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+    background-color: #FFF8EB;
+    color: #F5A623;
+    }
+        .rdp-day_disabled {
+    opacity: 0.25;
+    }
+    `;
+
     return (
         <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
             <Navbar />
+            <style>{css}</style>
 
             {/* Search Header */}
             <section className="relative md:sticky md:top-0 z-40 bg-white border-b border-gray-100 shadow-sm pt-20">
-                {/* Main Search Bar */}
-                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Location/Area */}
-                        <div className="relative flex-1 min-w-[200px]">
+                {/* Main Search Bar (Pill Design) */}
+                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-6">
+                    <div className="bg-white rounded-[60px] py-2 px-2 shadow-[0px_6px_22px_0px_rgba(139,80,17,0.17)] flex items-center max-w-6xl mx-auto border border-gray-100">
+
+                        {/* 1. Destination */}
+                        <div ref={destRef} className="relative flex-1 min-w-[180px]">
                             <div
-                                className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl bg-white cursor-pointer hover:border-primary transition-colors"
-                                onClick={() => setShowAreaDropdown(!showAreaDropdown)}
+                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showDestinations ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                onClick={() => {
+                                    setShowDestinations(!showDestinations);
+                                    setShowCheckIn(false);
+                                    setShowCheckOut(false);
+                                    setShowGuests(false);
+                                    setShowType(false);
+                                }}
                             >
-                                <MapPin weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                <span className="text-[#1C1C1C] flex-1 truncate">
-                                    {area || "Dubai, United Arab Emirates"}
-                                </span>
-                                <CaretDown weight="bold" className="w-4 h-4 text-gray-400" />
-                            </div>
-                            {showAreaDropdown && (
-                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto">
-                                    {DUBAI_AREAS.map((areaOption) => (
+                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                    <MapPin weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                    Where
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        type="text"
+                                        placeholder="Search destinations"
+                                        value={searchInput || (area ? DUBAI_AREAS.find(a => a.value === area)?.label : "")}
+                                        onChange={(e) => {
+                                            setSearchInput(e.target.value);
+                                            setShowDestinations(true);
+                                        }}
+                                        onFocus={() => setShowDestinations(true)}
+                                        className="w-full bg-transparent border-none text-sm text-neutral-600 font-medium outline-none placeholder:text-neutral-400 p-0"
+                                    />
+                                    {(searchInput || area) && (
                                         <button
-                                            key={areaOption}
-                                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#1C1C1C] first:rounded-t-xl last:rounded-b-xl"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setArea("");
+                                                setSearchInput("");
+                                            }}
+                                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                        >
+                                            <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Destination Dropdown */}
+                            {showDestinations && (
+                                <div className="absolute top-full left-0 mt-2 w-[340px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="max-h-[320px] overflow-y-auto">
+                                        {filteredAreas.length > 0 ? (
+                                            filteredAreas.map((item) => {
+                                                const IconComponent = item.Icon;
+                                                return (
+                                                    <button
+                                                        key={item.value}
+                                                        className="w-full px-4 py-3.5 text-left hover:bg-[#F5A623]/5 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-b-0"
+                                                        onClick={() => {
+                                                            setArea(item.value);
+                                                            setSearchInput("");
+                                                            setShowDestinations(false);
+                                                        }}
+                                                    >
+                                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/20 to-[#F5A623]/5 flex items-center justify-center">
+                                                            <IconComponent weight="duotone" className="w-5 h-5 text-[#F5A623]" />
+                                                        </div>
+                                                        <span className="text-sm text-[#1C1C1C] font-medium">{item.label}</span>
+                                                    </button>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="px-4 py-8 text-center">
+                                                <MapPin weight="duotone" className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                                                <p className="text-gray-400 text-sm">No destinations found</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-px h-8 bg-neutral-200" />
+
+                        {/* 2. Check In */}
+                        <div ref={checkInRef} className="relative flex-1">
+                            <div
+                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showCheckIn ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                onClick={() => {
+                                    setShowCheckIn(!showCheckIn);
+                                    setShowDestinations(false);
+                                    setShowCheckOut(false);
+                                    setShowGuests(false);
+                                    setShowType(false);
+                                }}
+                            >
+                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                    <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                    Check In
+                                </div>
+                                <div className={`text-sm font-medium ${checkInDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
+                                    {formatDateDisplay(checkInDate) || "Add Dates"}
+                                </div>
+                            </div>
+
+                            {showCheckIn && (
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <DayPicker
+                                        mode="single"
+                                        selected={checkInDate}
+                                        onSelect={(date) => {
+                                            setCheckInDate(date);
+                                            if (date && (!checkOutDate || date >= checkOutDate)) {
+                                                const nextDay = addDays(date, 1);
+                                                setCheckOutDate(nextDay);
+                                                setShowCheckIn(false);
+                                                setShowCheckOut(true);
+                                            } else if (date) {
+                                                setShowCheckIn(false);
+                                                setShowCheckOut(true);
+                                            }
+                                        }}
+                                        disabled={[{ before: today }]}
+                                        showOutsideDays
+                                        locale={dateLocale}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-px h-8 bg-neutral-200" />
+
+                        {/* 3. Check Out */}
+                        <div ref={checkOutRef} className="relative flex-1">
+                            <div
+                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showCheckOut ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                onClick={() => {
+                                    setShowCheckOut(!showCheckOut);
+                                    setShowDestinations(false);
+                                    setShowCheckIn(false);
+                                    setShowGuests(false);
+                                    setShowType(false);
+                                }}
+                            >
+                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                    <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                    Check Out
+                                </div>
+                                <div className={`text-sm font-medium ${checkOutDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
+                                    {formatDateDisplay(checkOutDate) || "Add Dates"}
+                                </div>
+                            </div>
+
+                            {showCheckOut && (
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <DayPicker
+                                        mode="single"
+                                        selected={checkOutDate}
+                                        onSelect={(date) => {
+                                            setCheckOutDate(date);
+                                            if (date) setShowCheckOut(false);
+                                        }}
+                                        disabled={[
+                                            { before: checkInDate ? addDays(checkInDate, 1) : addDays(today, 1) }
+                                        ]}
+                                        showOutsideDays
+                                        locale={dateLocale}
+                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-px h-8 bg-neutral-200" />
+
+                        {/* 4. Guests */}
+                        <div ref={guestsRef} className="relative flex-[0.8]">
+                            <div
+                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showGuests ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                onClick={() => {
+                                    setShowGuests(!showGuests);
+                                    setShowDestinations(false);
+                                    setShowCheckIn(false);
+                                    setShowCheckOut(false);
+                                    setShowType(false);
+                                }}
+                            >
+                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                    <UsersThree weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                    Who
+                                </div>
+                                <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-neutral-800' : 'text-neutral-400'}`}>
+                                    {guests > 1 ? `${guests} Guests` : "Add Guests"}
+                                </div>
+                            </div>
+
+                            {showGuests && (
+                                <div className="absolute top-full right-0 mt-2 w-[300px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {/* Adults */}
+                                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                                        <div>
+                                            <div className="text-sm font-semibold text-[#1C1C1C]">Adults</div>
+                                            <div className="text-xs text-gray-400 mt-0.5">Ages 13 or above</div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <button
+                                                onClick={() => {
+                                                    const newVal = Math.max(1, adults - 1);
+                                                    setAdults(newVal);
+                                                    setGuests(newVal + children);
+                                                }}
+                                                disabled={adults <= 1}
+                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                            >
+                                                <Minus weight="bold" className="w-4 h-4" />
+                                            </button>
+                                            <span className="w-6 text-center font-semibold text-[#1C1C1C] text-lg">{adults}</span>
+                                            <button
+                                                onClick={() => {
+                                                    const newVal = Math.min(10, adults + 1);
+                                                    setAdults(newVal);
+                                                    setGuests(newVal + children);
+                                                }}
+                                                disabled={adults >= 10}
+                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                            >
+                                                <Plus weight="bold" className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Children */}
+                                    <div className="flex items-center justify-between py-4">
+                                        <div>
+                                            <div className="text-sm font-semibold text-[#1C1C1C]">Children</div>
+                                            <div className="text-xs text-gray-400 mt-0.5">Ages 2–12</div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <button
+                                                onClick={() => {
+                                                    const newVal = Math.max(0, children - 1);
+                                                    setChildren(newVal);
+                                                    setGuests(adults + newVal);
+                                                }}
+                                                disabled={children <= 0}
+                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                            >
+                                                <Minus weight="bold" className="w-4 h-4" />
+                                            </button>
+                                            <span className="w-6 text-center font-semibold text-[#1C1C1C] text-lg">{children}</span>
+                                            <button
+                                                onClick={() => {
+                                                    const newVal = Math.min(10, children + 1);
+                                                    setChildren(newVal);
+                                                    setGuests(adults + newVal);
+                                                }}
+                                                disabled={children >= 10}
+                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                            >
+                                                <Plus weight="bold" className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowGuests(false)}
+                                        className="w-full mt-3 px-4 py-2.5 bg-[#F5A623] text-white rounded-xl text-sm font-semibold hover:bg-[#E09000] transition-colors"
+                                    >
+                                        Done
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="w-px h-8 bg-neutral-200" />
+
+                        {/* 5. Property Type (Added to Pill) */}
+                        <div ref={typeRef} className="relative flex-[0.8]">
+                            <div
+                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showType ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                onClick={() => {
+                                    setShowType(!showType);
+                                    setShowDestinations(false);
+                                    setShowCheckIn(false);
+                                    setShowCheckOut(false);
+                                    setShowGuests(false);
+                                }}
+                            >
+                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                    <House weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                    Kind
+                                </div>
+                                <div className={`text-sm font-medium truncate ${propertyType ? 'text-neutral-800' : 'text-neutral-400'}`}>
+                                    {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any Type"}
+                                </div>
+                            </div>
+
+                            {showType && (
+                                <div className="absolute top-full right-0 mt-2 w-[240px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {PROPERTY_TYPES.map((type) => (
+                                        <button
+                                            key={type.value}
+                                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#1C1C1C] text-sm font-medium border-b border-gray-50 last:border-b-0"
                                             onClick={() => {
-                                                setArea(areaOption === "Any Area" ? "" : areaOption);
-                                                setShowAreaDropdown(false);
+                                                setPropertyType(type.value);
+                                                setShowType(false);
                                             }}
                                         >
-                                            {areaOption}
+                                            {type.label}
                                         </button>
                                     ))}
                                 </div>
                             )}
                         </div>
-
-                        {/* Check-in / Check-out */}
-                        <div className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl bg-white min-w-[240px]">
-                            <CalendarBlank weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                            <input
-                                type="date"
-                                value={checkIn}
-                                onChange={(e) => setCheckIn(e.target.value)}
-                                className="bg-transparent outline-none text-[#1C1C1C] w-[110px]"
-                                placeholder="Check-in"
-                            />
-                            <span className="text-gray-300">—</span>
-                            <input
-                                type="date"
-                                value={checkOut}
-                                onChange={(e) => setCheckOut(e.target.value)}
-                                className="bg-transparent outline-none text-[#1C1C1C] w-[110px]"
-                                placeholder="Check-out"
-                            />
-                        </div>
-
-                        {/* Guests */}
-                        <div className="relative">
-                            <div
-                                className="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl bg-white cursor-pointer hover:border-primary transition-colors min-w-[130px]"
-                                onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                            >
-                                <UsersThree weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                <span className="text-[#1C1C1C]">{guests} Guest{parseInt(guests) !== 1 ? "s" : ""}</span>
-                                <CaretDown weight="bold" className="w-4 h-4 text-gray-400" />
-                            </div>
-                            {showGuestsDropdown && (
-                                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[150px]">
-                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                                        <button
-                                            key={num}
-                                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#1C1C1C] first:rounded-t-xl last:rounded-b-xl"
-                                            onClick={() => {
-                                                setGuests(num.toString());
-                                                setShowGuestsDropdown(false);
-                                            }}
-                                        >
-                                            {num} Guest{num !== 1 ? "s" : ""}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Property Type */}
-                        <select
-                            value={propertyType}
-                            onChange={(e) => setPropertyType(e.target.value)}
-                            className="px-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1C1C1C] outline-none hover:border-primary transition-colors cursor-pointer min-w-[140px]"
-                        >
-                            {PROPERTY_TYPES.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                    {type.label}
-                                </option>
-                            ))}
-                        </select>
 
                         {/* Search Button */}
                         <button
                             onClick={handleSearch}
-                            className="p-3 bg-[#F5A623] text-white rounded-xl hover:bg-[#E09000] transition-colors flex items-center justify-center"
+                            className="bg-[#F5A623] hover:bg-[#E09000] text-white rounded-full h-12 w-12 flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:scale-[1.05] active:scale-[0.98] mr-1"
                         >
                             <MagnifyingGlass weight="bold" className="w-5 h-5" />
                         </button>
@@ -709,7 +1033,7 @@ function SearchPageContent() {
                         <p className="text-[#7E7E7E]">
                             {isLoading ? (
                                 <span className="flex items-center gap-2">
-                                    <SpinnerGap weight="bold" className="w-4 h-4 animate-spin" />
+                                    <SpinnerGap weight="bold" className="w-4 h-8 animate-spin" />
                                     Searching...
                                 </span>
                             ) : (
@@ -738,7 +1062,6 @@ function SearchPageContent() {
                                             key={property.id}
                                             id={property.id}
                                             title={property.title}
-                                            pricePerNight={property.pricePerNight}
                                             images={property.images}
                                             guests={property.guests}
                                             bedrooms={property.bedrooms}
