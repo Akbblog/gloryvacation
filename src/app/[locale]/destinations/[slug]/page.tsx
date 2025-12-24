@@ -141,7 +141,7 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
                         <p className="text-[#7E7E7E] leading-relaxed mb-6">{destination.longDescription}</p>
                         <div className="flex flex-wrap gap-3">
                             {destination.highlights.map((h, idx) => (
-                                <span key={idx} className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
+                                <span key={idx} className="bg-teal-50 text-teal-600 px-4 py-2 rounded-full text-sm font-medium">
                                     {h}
                                 </span>
                             ))}

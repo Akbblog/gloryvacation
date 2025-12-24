@@ -8,7 +8,7 @@ export function MobileAppSection() {
     const t = useTranslations('MobileApp');
 
     return (
-        <section className="py-12 md:py-20 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+        <section className="py-12 md:py-20 bg-gradient-to-br from-teal-50 to-amber-50">
             <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px]">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     {/* Left - Phone Mockup */}
@@ -18,9 +18,9 @@ export function MobileAppSection() {
                             <div className="absolute inset-0 bg-[#1C1C1C] rounded-[40px] p-3 shadow-2xl">
                                 <div className="w-full h-full bg-white rounded-[32px] overflow-hidden relative">
                                     {/* App Screen Content */}
-                                    <div className="absolute inset-0 bg-gradient-to-b from-primary to-primary/80 flex flex-col items-center justify-center text-white p-8">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-teal-500 to-teal-600 flex flex-col items-center justify-center text-white p-8">
                                         <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6">
-                                            <span className="text-primary text-2xl font-bold">{t('logoText')}</span>
+                                            <span className="text-teal-600 text-2xl font-bold">{t('logoText')}</span>
                                         </div>
                                         <h3 className="text-xl font-bold mb-2 text-center">{t('appName')}</h3>
                                         <p className="text-white/80 text-sm text-center">{t('slogan')}</p>
@@ -34,14 +34,14 @@ export function MobileAppSection() {
 
                     {/* Right Content */}
                     <div className="text-center lg:text-left">
-                        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+                        <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
                             <Smartphone className="w-4 h-4" />
                             {t('badge')}
                         </div>
                         <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1C1C1C] mb-4 leading-tight">
                             {t('title1')}
                             <br />
-                            <span className="text-primary">{t('title2')}</span>
+                            <span className="text-teal-600">{t('title2')}</span>
                         </h2>
                         <p className="text-lg text-[#7E7E7E] mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
                             {t('description')}

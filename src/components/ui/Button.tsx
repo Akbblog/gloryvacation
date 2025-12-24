@@ -1,50 +1,50 @@
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-// Note: I'm not installing class-variance-authority yet, I should check if I need to.
-// Actually, I should install it. It's standard for this stack. 
-// I'll add a command to install it if it's not there.
-// For now, I'll write a simpler version without cva or just wait for installation.
-// Wait, I can't run another install command easily while one is running.
-// I'll write a simpler button without cva for now, or just assume I'll install it next.
-
-// Let's stick to standard props for now to avoid dependency hell before the main install finishes.
-// actually I'll use simple template literals for now.
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "default" | "outline" | "ghost" | "link";
+    variant?: "primary" | "secondary" | "outline" | "ghost" | "link";
     size?: "default" | "sm" | "lg" | "icon";
+    isLoading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = "default", size = "default", ...props }, ref) => {
+    ({ className, variant = "primary", size = "default", isLoading, children, disabled, ...props }, ref) => {
         const variants = {
-            default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
-            outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-            ghost: "hover:bg-accent hover:text-accent-foreground",
-            link: "text-primary underline-offset-4 hover:underline",
+            primary: "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-sm hover:shadow-lg",
+            secondary: "bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white shadow-sm hover:shadow-lg",
+            outline: "border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white bg-transparent",
+            ghost: "text-gray-700 hover:bg-gray-100 bg-transparent",
+            link: "text-teal-600 underline-offset-4 hover:underline bg-transparent",
         };
 
         const sizes = {
-            default: "h-10 px-4 py-2",
-            sm: "h-9 rounded-md px-3",
-            lg: "h-11 rounded-md px-8",
-            icon: "h-10 w-10",
+            default: "h-11 px-6 py-3",
+            sm: "h-9 px-4 py-2 text-sm",
+            lg: "h-12 px-8 py-3.5 text-lg",
+            icon: "h-10 w-10 p-0",
         };
 
         return (
             <button
                 className={cn(
-                    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+                    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
                     variants[variant],
                     sizes[size],
                     className
                 )}
                 ref={ref}
+                disabled={disabled || isLoading}
                 {...props}
-            />
+            >
+                {isLoading ? (
+                    <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Loading...
+                    </>
+                ) : (
+                    children
+                )}
+            </button>
         )
     }
 )

@@ -53,7 +53,7 @@ export function NewsletterSection() {
                             <button
                                 type="submit"
                                 disabled={isSubmitted}
-                                className="bg-primary hover:bg-primary/90 disabled:bg-green-500 text-white rounded-full px-8 py-4 font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+                                className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:from-green-500 disabled:to-green-600 text-white rounded-full px-8 py-4 font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02]"
                             >
                                 {isSubmitted ? (
                                     <>

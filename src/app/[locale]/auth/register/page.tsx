@@ -179,7 +179,7 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white py-3.5 rounded-full font-semibold transition-all shadow-lg shadow-primary/20"
+                            className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:from-teal-400 disabled:to-teal-500 disabled:cursor-not-allowed text-white py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                         >
                             {isLoading ? "Creating Account..." : "Create Account"}
                         </button>
@@ -187,7 +187,7 @@ export default function RegisterPage() {
 
                     <div className="mt-8 text-center text-sm text-[#7E7E7E]">
                         Already have an account?{" "}
-                        <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
+                        <Link href="/auth/signin" className="text-teal-600 font-semibold hover:underline">
                             Sign in
                         </Link>
                     </div>

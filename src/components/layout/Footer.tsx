@@ -52,7 +52,7 @@ export function Footer() {
                     {/* Brand Column */}
                     <div className="col-span-2 md:col-span-4 lg:col-span-2">
                         <Link href="/" className="inline-block mb-6">
-                            <span className="text-2xl font-bold text-primary">Glory Vacation</span>
+                            <span className="text-2xl font-bold text-teal-600">Glory Vacation</span>
                         </Link>
                         <p className="text-[#7E7E7E] text-sm leading-relaxed mb-6 max-w-[320px]">
                             {t('description')}
@@ -60,11 +60,11 @@ export function Footer() {
 
                         {/* Contact Info */}
                         <div className="space-y-3 text-sm text-[#7E7E7E]">
-                            <a href="mailto:info@gloryvacation.com" className="flex items-center gap-2 hover:text-primary transition-colors">
+                            <a href="mailto:info@gloryvacation.com" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
                                 <Mail className="w-4 h-4" />
                                 <span className={/* Use dir="ltr" for email/phone if mostly latin */ "dir-ltr"}>info@gloryvacation.com</span>
                             </a>
-                            <a href="tel:+971503505752" className="flex items-center gap-2 hover:text-primary transition-colors">
+                            <a href="tel:+971503505752" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
                                 <Phone className="w-4 h-4" />
                                 <span className="dir-ltr">+971 50 350 5752</span>
                             </a>
@@ -105,14 +105,14 @@ export function Footer() {
                                                 href={link.href}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-[#7E7E7E] hover:text-primary transition-colors text-sm"
+                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-sm"
                                             >
                                                 {link.name}
                                             </a>
                                         ) : (
                                             <Link
                                                 href={link.href}
-                                                className="text-[#7E7E7E] hover:text-primary transition-colors text-sm"
+                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-sm"
                                             >
                                                 {link.name}
                                             </Link>

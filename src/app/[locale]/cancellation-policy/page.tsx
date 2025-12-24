@@ -9,11 +9,11 @@ export default function CancellationPolicyPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-20 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-20 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Cancellation <span className="text-primary">Policy</span>
+                            Cancellation <span className="text-teal-600">Policy</span>
                         </h1>
                         <p className="text-[#7E7E7E]">Understanding our booking cancellation and refund terms</p>
                     </div>
@@ -152,7 +152,7 @@ export default function CancellationPolicyPage() {
 
                         <h2>Questions?</h2>
                         <p>
-                            If you have any questions about our cancellation policy, please <Link href="/contact" className="text-primary">contact us</Link>. Our team is available 24/7 to assist you.
+                            If you have any questions about our cancellation policy, please <Link href="/contact" className="text-teal-600 hover:underline">contact us</Link>. Our team is available 24/7 to assist you.
                         </p>
                     </div>
                 </div>

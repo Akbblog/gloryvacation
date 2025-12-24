@@ -58,7 +58,7 @@ export function Destinations() {
                     </div>
                     <Link
                         href="/destinations"
-                        className="hidden md:block text-primary font-semibold hover:underline transition-colors"
+                        className="hidden md:block text-teal-600 font-semibold hover:underline transition-colors"
                     >
                         View all destinations →
                     </Link>
@@ -81,10 +81,10 @@ export function Destinations() {
                                     sizes="(max-width: 768px) 150px, 180px"
                                 />
                                 {/* Hover overlay */}
-                                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-colors duration-300" />
+                                <div className="absolute inset-0 bg-teal-600/0 group-hover:bg-teal-600/20 transition-colors duration-300" />
                             </div>
                             <div className="text-center">
-                                <h3 className="font-bold text-base md:text-lg text-gray-900 group-hover:text-primary transition-colors">
+                                <h3 className="font-bold text-base md:text-lg text-gray-900 group-hover:text-teal-600 transition-colors">
                                     {loc.name}
                                 </h3>
                                 <p className="text-sm text-gray-500 font-medium">{loc.count}</p>
@@ -97,7 +97,7 @@ export function Destinations() {
                 <div className="mt-8 text-center md:hidden">
                     <Link
                         href="/destinations"
-                        className="inline-block text-primary font-semibold hover:underline"
+                        className="inline-block text-teal-600 font-semibold hover:underline"
                     >
                         View all destinations →
                     </Link>

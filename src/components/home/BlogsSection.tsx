@@ -38,7 +38,7 @@ export function BlogsSection() {
                     </h2>
                     <Link
                         href="/blogs"
-                        className="text-primary font-semibold hover:underline transition-colors"
+                        className="text-teal-600 font-semibold hover:underline transition-colors"
                     >
                         {t('seeMore')}
                     </Link>
@@ -62,7 +62,7 @@ export function BlogsSection() {
                                 />
                                 {/* Badge */}
                                 <div className="absolute top-4 left-4 rtl:left-auto rtl:right-4">
-                                    <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
+                                    <span className="bg-gradient-to-r from-teal-500 to-teal-600 text-white text-xs font-medium px-3 py-1 rounded-full">
                                         {t('badge')}
                                     </span>
                                 </div>
@@ -71,7 +71,7 @@ export function BlogsSection() {
                             {/* Content */}
                             <div className="p-5">
                                 <p className="text-xs text-[#7E7E7E] mb-2">{blog.date}</p>
-                                <h3 className="text-base font-semibold text-[#1C1C1C] line-clamp-2 mb-2 group-hover:text-primary transition-colors">
+                                <h3 className="text-base font-semibold text-[#1C1C1C] line-clamp-2 mb-2 group-hover:text-teal-600 transition-colors">
                                     {t(`${blog.key}.title`)}
                                 </h3>
                                 <p className="text-sm text-[#7E7E7E] line-clamp-2">

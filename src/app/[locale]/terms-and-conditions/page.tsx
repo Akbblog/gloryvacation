@@ -8,11 +8,11 @@ export default function TermsPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-20 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-20 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Terms & <span className="text-primary">Conditions</span>
+                            Terms & <span className="text-teal-600">Conditions</span>
                         </h1>
                         <p className="text-[#7E7E7E]">Last updated: December 2024</p>
                     </div>
@@ -66,7 +66,7 @@ export default function TermsPage() {
 
                         <h2>5. Cancellation Policy</h2>
                         <p>
-                            Please refer to our <Link href="/cancellation-policy" className="text-primary">Cancellation Policy</Link> for detailed information on cancellation terms and refund procedures.
+                            Please refer to our <Link href="/cancellation-policy" className="text-teal-600 hover:underline">Cancellation Policy</Link> for detailed information on cancellation terms and refund procedures.
                         </p>
 
                         <h2>6. Guest Responsibilities</h2>
@@ -107,7 +107,7 @@ export default function TermsPage() {
 
                         <h2>9. Privacy</h2>
                         <p>
-                            Your privacy is important to us. Please review our <Link href="/privacy-policy" className="text-primary">Privacy Policy</Link> to understand how we collect, use, and protect your personal information.
+                            Your privacy is important to us. Please review our <Link href="/privacy-policy" className="text-teal-600 hover:underline">Privacy Policy</Link> to understand how we collect, use, and protect your personal information.
                         </p>
 
                         <h2>10. Governing Law</h2>

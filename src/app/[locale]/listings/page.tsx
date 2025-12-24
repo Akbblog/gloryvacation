@@ -952,14 +952,14 @@ function SearchPageContent() {
                             <button
                                 onClick={() => setShowFiltersModal(true)}
                                 className={`flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm transition-colors ${activeFiltersCount > 0
-                                    ? "border-primary bg-primary/5 text-primary"
-                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-primary"
+                                    ? "border-teal-500 bg-teal-50 text-teal-600"
+                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-teal-500"
                                     }`}
                             >
                                 <FunnelSimple weight="bold" className="w-4 h-4" />
                                 <span>More Filters</span>
                                 {activeFiltersCount > 0 && (
-                                    <span className="w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+                                    <span className="w-5 h-5 bg-teal-600 text-white text-xs rounded-full flex items-center justify-center">
                                         {activeFiltersCount}
                                     </span>
                                 )}
@@ -969,7 +969,7 @@ function SearchPageContent() {
                             {(area || propertyType || bedrooms || priceRange || selectedAmenities.length > 0) && (
                                 <button
                                     onClick={clearFilters}
-                                    className="flex items-center gap-1 px-3 py-2.5 text-sm text-[#7E7E7E] hover:text-primary transition-colors"
+                                    className="flex items-center gap-1 px-3 py-2.5 text-sm text-[#7E7E7E] hover:text-teal-600 transition-colors"
                                 >
                                     <X weight="bold" className="w-4 h-4" />
                                     Clear
@@ -982,8 +982,8 @@ function SearchPageContent() {
                             <button
                                 onClick={() => setShowMap(!showMap)}
                                 className={`flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm transition-colors ${showMap
-                                    ? "border-primary bg-primary text-white"
-                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-primary"
+                                    ? "border-teal-600 bg-teal-600 text-white"
+                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-teal-500"
                                     }`}
                             >
                                 {showMap ? <SquaresFour weight="bold" className="w-4 h-4" /> : <MapTrifold weight="fill" className="w-4 h-4" />}
@@ -1005,7 +1005,7 @@ function SearchPageContent() {
                                             <button
                                                 key={option.value}
                                                 className={`w-full px-4 py-3 text-left text-sm transition-colors first:rounded-t-xl last:rounded-b-xl ${sortBy === option.value
-                                                    ? "bg-primary/5 text-primary"
+                                                    ? "bg-teal-50 text-teal-600"
                                                     : "hover:bg-gray-50 text-[#1C1C1C]"
                                                     }`}
                                                 onClick={() => {
@@ -1082,7 +1082,7 @@ function SearchPageContent() {
                                     </p>
                                     <button
                                         onClick={clearFilters}
-                                        className="inline-block px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                                        className="inline-block px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
                                     >
                                         Clear Filters
                                     </button>
@@ -1135,8 +1135,8 @@ function SearchPageContent() {
                                             key={range.value}
                                             onClick={() => setPriceRange(range.value)}
                                             className={`px-4 py-3 border rounded-xl text-sm transition-colors ${priceRange === range.value
-                                                ? "border-primary bg-primary/5 text-primary"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-primary"
+                                                ? "border-teal-500 bg-teal-50 text-teal-600"
+                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
                                                 }`}
                                         >
                                             {range.label}
@@ -1154,8 +1154,8 @@ function SearchPageContent() {
                                             key={type.value}
                                             onClick={() => setPropertyType(type.value)}
                                             className={`px-4 py-3 border rounded-xl text-sm transition-colors ${propertyType === type.value
-                                                ? "border-primary bg-primary/5 text-primary"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-primary"
+                                                ? "border-teal-500 bg-teal-50 text-teal-600"
+                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
                                                 }`}
                                         >
                                             {type.label}
@@ -1173,8 +1173,8 @@ function SearchPageContent() {
                                             key={option.value}
                                             onClick={() => setBedrooms(option.value)}
                                             className={`px-4 py-2 border rounded-full text-sm transition-colors ${bedrooms === option.value
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-primary"
+                                                ? "border-teal-600 bg-teal-600 text-white"
+                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
                                                 }`}
                                         >
                                             {option.label}
@@ -1192,8 +1192,8 @@ function SearchPageContent() {
                                             key={amenity}
                                             onClick={() => toggleAmenity(amenity)}
                                             className={`px-4 py-2 border rounded-full text-sm transition-colors ${selectedAmenities.includes(amenity)
-                                                ? "border-primary bg-primary text-white"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-primary"
+                                                ? "border-teal-600 bg-teal-600 text-white"
+                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
                                                 }`}
                                         >
                                             {amenity}
@@ -1221,7 +1221,7 @@ function SearchPageContent() {
                                     setShowFiltersModal(false);
                                     handleSearch();
                                 }}
-                                className="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors"
+                                className="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
                             >
                                 Show {totalCount} Properties
                             </button>
@@ -1239,7 +1239,7 @@ export default function ListingsPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-                <SpinnerGap weight="bold" className="w-8 h-8 animate-spin text-primary" />
+                <SpinnerGap weight="bold" className="w-8 h-8 animate-spin text-teal-600" />
             </div>
         }>
             <SearchPageContent />

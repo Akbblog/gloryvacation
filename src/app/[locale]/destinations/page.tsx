@@ -76,11 +76,11 @@ export default function DestinationsPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Explore <span className="text-primary">Destinations</span> in Dubai
+                            Explore <span className="text-teal-600">Destinations</span> in Dubai
                         </h1>
                         <p className="text-lg text-[#7E7E7E]">
                             Discover the best neighborhoods for your holiday home stay in Dubai.

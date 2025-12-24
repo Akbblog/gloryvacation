@@ -126,11 +126,11 @@ export default function FAQPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Frequently Asked <span className="text-primary">Questions</span>
+                            Frequently Asked <span className="text-teal-600">Questions</span>
                         </h1>
                         <p className="text-lg text-[#7E7E7E] mb-8">
                             Find answers to common questions about booking, payments, and more.
@@ -163,7 +163,7 @@ export default function FAQPage() {
                                 className={cn(
                                     "px-5 py-2 rounded-full text-sm font-medium transition-all",
                                     activeCategory === cat.id
-                                        ? "bg-primary text-white"
+                                        ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white"
                                         : "bg-[#F5F5F5] text-[#7E7E7E] hover:bg-gray-200"
                                 )}
                             >
@@ -188,7 +188,7 @@ export default function FAQPage() {
                         <p className="text-[#7E7E7E] mb-4">Still have questions?</p>
                         <a
                             href="/contact"
-                            className="inline-block bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
+                            className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
                             Contact Us
                         </a>

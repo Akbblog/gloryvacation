@@ -48,11 +48,11 @@ export default function ContactPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Contact <span className="text-primary">Us</span>
+                            Contact <span className="text-teal-600">Us</span>
                         </h1>
                         <p className="text-lg text-[#7E7E7E]">
                             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
@@ -76,8 +76,8 @@ export default function ContactPage() {
 
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <Phone className="w-5 h-5 text-primary" />
+                                    <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center shrink-0">
+                                        <Phone className="w-5 h-5 text-teal-600" />
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-[#1C1C1C] mb-1">Phone</h3>
@@ -86,8 +86,8 @@ export default function ContactPage() {
                                 </div>
 
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <Mail className="w-5 h-5 text-primary" />
+                                    <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center shrink-0">
+                                        <Mail className="w-5 h-5 text-teal-600" />
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-[#1C1C1C] mb-1">Email</h3>
@@ -97,8 +97,8 @@ export default function ContactPage() {
                                 </div>
 
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <MapPin className="w-5 h-5 text-primary" />
+                                    <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center shrink-0">
+                                        <MapPin className="w-5 h-5 text-teal-600" />
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-[#1C1C1C] mb-1">Office</h3>
@@ -107,8 +107,8 @@ export default function ContactPage() {
                                 </div>
 
                                 <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                                        <Clock className="w-5 h-5 text-primary" />
+                                    <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center shrink-0">
+                                        <Clock className="w-5 h-5 text-teal-600" />
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-[#1C1C1C] mb-1">Hours</h3>
@@ -205,7 +205,7 @@ export default function ContactPage() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white py-4 rounded-full font-semibold text-lg transition-all flex items-center justify-center gap-2"
+                                        className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:hover:scale-100 flex items-center justify-center gap-2"
                                     >
                                         {isSubmitting ? (
                                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

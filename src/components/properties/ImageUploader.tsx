@@ -203,7 +203,7 @@ export default function ImageUploader({
                 <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
                 <div className="flex flex-col items-center gap-3">
                     <div className="text-sm text-gray-600">Drag & drop images here or</div>
-                    <button type="button" onClick={onPick} className="px-4 py-2 bg-primary text-white rounded-md">Select Images</button>
+                    <button type="button" onClick={onPick} className="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-md transition-all">Select Images</button>
                     <div className="text-xs text-gray-400">Max {maxFiles} images. JPEG/PNG recommended.</div>
                 </div>
             </div>
@@ -217,7 +217,7 @@ export default function ImageUploader({
 
                         <div className="p-2 flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
-                                <button type="button" onClick={() => setCover(item.id)} className={`px-2 py-1 text-xs rounded ${item.isCover ? 'bg-primary text-white' : 'bg-white text-gray-700 border'}`}>Cover</button>
+                                <button type="button" onClick={() => setCover(item.id)} className={`px-2 py-1 text-xs rounded ${item.isCover ? 'bg-teal-600 text-white' : 'bg-white text-gray-700 border'}`}>Cover</button>
                             </div>
                             <div className="flex items-center gap-1">
                                 <button type="button" onClick={() => move(item.id, -1)} className="text-gray-500 px-1">◀</button>
@@ -233,7 +233,7 @@ export default function ImageUploader({
                         {item.uploading && (
                             <div className="absolute inset-x-0 bottom-0 left-0 right-0">
                                 <div className="h-1 bg-gray-200">
-                                    <div style={{ width: `${item.progress || 0}%` }} className="h-1 bg-primary transition-all" />
+                                    <div style={{ width: `${item.progress || 0}%` }} className="h-1 bg-teal-500 transition-all" />
                                 </div>
                             </div>
                         )}

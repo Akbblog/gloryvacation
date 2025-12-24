@@ -74,7 +74,7 @@ export default function ListYourPropertyPage() {
                         </p>
                         <a
                             href="/"
-                            className="inline-block bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
+                            className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
                             Back to Home
                         </a>
@@ -90,12 +90,12 @@ export default function ListYourPropertyPage() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative py-20 md:py-28 bg-gradient-to-br from-primary/10 to-[#F5A623]/10">
+            <section className="relative py-20 md:py-28 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="text-center max-w-3xl mx-auto">
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1C1C1C] mb-6">
                             List Your Property with{" "}
-                            <span className="text-primary">Glory Vacation</span>
+                            <span className="text-teal-600">Glory Vacation</span>
                         </h1>
                         <p className="text-lg md:text-xl text-[#7E7E7E] mb-8">
                             Turn your empty property into a steady income stream. We handle everything from listing to guest management.
@@ -113,7 +113,7 @@ export default function ListYourPropertyPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {BENEFITS.map((benefit, idx) => (
                             <div key={idx} className="text-center p-6 rounded-2xl bg-[#FAFAFA] hover:shadow-lg transition-shadow">
-                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                     {benefit.icon}
                                 </div>
                                 <h3 className="text-lg font-semibold text-[#1C1C1C] mb-2">{benefit.title}</h3>
@@ -263,7 +263,7 @@ export default function ListYourPropertyPage() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2"
+                                className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:from-teal-400 disabled:to-teal-500 disabled:cursor-not-allowed text-white py-4 rounded-full font-semibold text-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 {isSubmitting ? (
                                     <>

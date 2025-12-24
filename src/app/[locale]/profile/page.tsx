@@ -59,7 +59,7 @@ export default function ProfilePage() {
     if (status === "loading") {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white">
-                <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                <Loader2 className="w-10 h-10 text-teal-600 animate-spin" />
             </div>
         );
     }
@@ -76,15 +76,15 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-transform hover:scale-[1.02]">
-                    <div className="text-4xl font-bold text-primary mb-1">{(bookingsData || []).length}</div>
+                    <div className="text-4xl font-bold text-teal-600 mb-1">{(bookingsData || []).length}</div>
                     <div className="text-[#7E7E7E] text-sm">Active Bookings</div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-transform hover:scale-[1.02]">
-                    <div className="text-4xl font-bold text-primary mb-1">0</div>
+                    <div className="text-4xl font-bold text-teal-600 mb-1">0</div>
                     <div className="text-[#7E7E7E] text-sm">Completed Stays</div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-transform hover:scale-[1.02]">
-                    <div className="text-4xl font-bold text-primary mb-1">0</div>
+                    <div className="text-4xl font-bold text-teal-600 mb-1">0</div>
                     <div className="text-[#7E7E7E] text-sm">Favorites</div>
                 </div>
             </div>
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                         </p>
                         <button
                             onClick={() => router.push('/')}
-                            className="px-6 py-2.5 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors"
+                            className="px-6 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full font-medium transition-all hover:scale-[1.02]"
                         >
                             Browse Properties
                         </button>
@@ -169,7 +169,7 @@ export default function ProfilePage() {
                                     </div>
                                     <div className="ml-auto flex items-center gap-2">
                                         <span className="text-xs text-gray-400 block uppercase tracking-wider text-right">Total</span>
-                                        <span className="font-bold text-primary text-lg">${booking.totalPrice}</span>
+                                        <span className="font-bold text-teal-600 text-lg">${booking.totalPrice}</span>
                                     </div>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                     <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900">No bookings yet</h3>
                     <p className="text-gray-500 mb-6">You haven't made any bookings yet.</p>
-                    <button onClick={() => router.push('/')} className="px-6 py-2 bg-primary text-white rounded-full">
+                    <button onClick={() => router.push('/')} className="px-6 py-2 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full transition-all hover:scale-[1.02]">
                         Find a Place
                     </button>
                 </div>
@@ -208,7 +208,7 @@ export default function ProfilePage() {
                                         className="object-cover rounded-full"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-primary/10 text-primary rounded-full flex items-center justify-center text-3xl font-bold">
+                                    <div className="w-full h-full bg-teal-50 text-teal-600 rounded-full flex items-center justify-center text-3xl font-bold">
                                         {session?.user?.name?.[0] || "U"}
                                     </div>
                                 )}
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                                         onClick={() => setActiveTab("dashboard")}
                                         className={cn(
                                             "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                            activeTab === "dashboard" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                            activeTab === "dashboard" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                         )}
                                     >
                                         <LayoutDashboard className="w-5 h-5" />
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                                         onClick={() => setActiveTab("bookings")}
                                         className={cn(
                                             "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                            activeTab === "bookings" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                            activeTab === "bookings" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                         )}
                                     >
                                         <Calendar className="w-5 h-5" />
@@ -253,7 +253,7 @@ export default function ProfilePage() {
                                         onClick={() => setActiveTab("favorites")}
                                         className={cn(
                                             "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                            activeTab === "favorites" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                            activeTab === "favorites" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                         )}
                                     >
                                         <Heart className="w-5 h-5" />
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                                                 onClick={() => setActiveTab("properties")}
                                                 className={cn(
                                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                                    activeTab === "properties" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                                    activeTab === "properties" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                                 )}
                                             >
                                                 <Home className="w-5 h-5" />
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                                                 onClick={() => setActiveTab("add-property")}
                                                 className={cn(
                                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                                    activeTab === "add-property" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                                    activeTab === "add-property" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                                 )}
                                             >
                                                 <Plus className="w-5 h-5" />
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                                         onClick={() => setActiveTab("settings")}
                                         className={cn(
                                             "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
-                                            activeTab === "settings" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-gray-500 hover:bg-gray-50"
+                                            activeTab === "settings" ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md shadow-teal-500/20" : "text-gray-500 hover:bg-gray-50"
                                         )}
                                     >
                                         <Settings className="w-5 h-5" />
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                                 <Home className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                                 <h2 className="text-xl font-bold text-gray-900 mb-2">My Properties</h2>
                                 <p className="text-gray-500 mb-6">Manage your listed properties here.</p>
-                                <button onClick={() => setActiveTab('add-property')} className="px-6 py-2 bg-primary text-white rounded-full">Add Property</button>
+                                <button onClick={() => setActiveTab('add-property')} className="px-6 py-2 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full transition-all hover:scale-[1.02]">Add Property</button>
                             </div>
                         )}
                         {activeTab === "add-property" && (

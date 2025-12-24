@@ -7,11 +7,11 @@ export default function PrivacyPolicyPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-20 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-20 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Privacy <span className="text-primary">Policy</span>
+                            Privacy <span className="text-teal-600">Policy</span>
                         </h1>
                         <p className="text-[#7E7E7E]">Last updated: December 2024</p>
                     </div>

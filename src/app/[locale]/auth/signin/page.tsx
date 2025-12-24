@@ -97,10 +97,10 @@ function SignInContent() {
 
                 <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300" />
+                        <input type="checkbox" className="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-gray-300" />
                         <span className="text-[#7E7E7E]">Remember me</span>
                     </label>
-                    <Link href="/auth/forgot-password" className="text-primary hover:underline font-medium">
+                    <Link href="/auth/forgot-password" className="text-teal-600 hover:underline font-medium">
                         Forgot password?
                     </Link>
                 </div>
@@ -108,15 +108,20 @@ function SignInContent() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white py-3.5 rounded-full font-semibold transition-all shadow-lg shadow-primary/20"
+                    className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3.5 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:hover:scale-100 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? "Signing in..." : "Sign In"}
+                    {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Signing in...
+                        </span>
+                    ) : "Sign In"}
                 </button>
             </form>
 
             <div className="mt-8 text-center text-sm text-[#7E7E7E]">
                 Don't have an account?{" "}
-                <Link href="/auth/register" className="text-primary font-semibold hover:underline">
+                <Link href="/auth/register" className="text-teal-600 font-semibold hover:underline">
                     Sign up
                 </Link>
             </div>

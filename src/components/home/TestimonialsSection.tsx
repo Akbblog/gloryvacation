@@ -86,8 +86,8 @@ export function TestimonialsSection() {
                             className="flex-shrink-0 w-[300px] md:w-[340px] bg-white rounded-2xl p-6 shadow-[0px_4px_16px_rgba(0,0,0,0.06)] hover:shadow-[0px_8px_24px_rgba(0,0,0,0.1)] transition-shadow duration-300"
                         >
                             {/* Quote Icon */}
-                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                                <Quote className="w-5 h-5 text-primary" />
+                            <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                                <Quote className="w-5 h-5 text-teal-600" />
                             </div>
 
                             {/* Title */}

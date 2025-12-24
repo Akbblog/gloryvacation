@@ -50,7 +50,7 @@ export default function AboutPage() {
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1C1C1C] mb-6">
-                            About <span className="text-primary">EasyGo</span>
+                            About <span className="text-teal-600">Glory Vacation</span>
                         </h1>
                         <p className="text-lg md:text-xl text-[#7E7E7E]">
                             We're on a mission to make holiday home rentals in Dubai simple, safe, and exceptional for everyone.
@@ -73,15 +73,15 @@ export default function AboutPage() {
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center gap-2 text-[#1C1C1C]">
-                                    <CheckCircle className="w-5 h-5 text-primary" />
+                                    <CheckCircle className="w-5 h-5 text-teal-600" />
                                     <span>DTCM Licensed</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-[#1C1C1C]">
-                                    <CheckCircle className="w-5 h-5 text-primary" />
+                                    <CheckCircle className="w-5 h-5 text-teal-600" />
                                     <span>4.6★ Average Rating</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-[#1C1C1C]">
-                                    <CheckCircle className="w-5 h-5 text-primary" />
+                                    <CheckCircle className="w-5 h-5 text-teal-600" />
                                     <span>100+ Reviews</span>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {STATS.map((stat, idx) => (
                             <div key={idx} className="text-center">
-                                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.value}</div>
+                                <div className="text-4xl md:text-5xl font-bold text-teal-400 mb-2">{stat.value}</div>
                                 <div className="text-white/80">{stat.label}</div>
                             </div>
                         ))}
@@ -119,7 +119,7 @@ export default function AboutPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {VALUES.map((value, idx) => (
                             <div key={idx} className="p-6 rounded-2xl bg-[#FAFAFA] hover:shadow-lg transition-shadow">
-                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4">
+                                <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-4">
                                     {value.icon}
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1C1C1C] mb-3">{value.title}</h3>

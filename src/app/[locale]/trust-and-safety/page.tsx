@@ -50,14 +50,14 @@ export default function TrustAndSafetyPage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Shield className="w-8 h-8 text-primary" />
+                        <div className="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Shield className="w-8 h-8 text-teal-600" />
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Trust & <span className="text-primary">Safety</span>
+                            Trust & <span className="text-teal-600">Safety</span>
                         </h1>
                         <p className="text-lg text-[#7E7E7E]">
                             Your safety and security are our top priorities. Learn about the measures we take to protect our guests and property owners.
@@ -75,7 +75,7 @@ export default function TrustAndSafetyPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {TRUST_FEATURES.map((feature, idx) => (
                             <div key={idx} className="p-6 rounded-2xl bg-[#FAFAFA] hover:shadow-lg transition-shadow">
-                                <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-4">
+                                <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-4">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-xl font-semibold text-[#1C1C1C] mb-3">{feature.title}</h3>
@@ -95,7 +95,7 @@ export default function TrustAndSafetyPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {SAFETY_TIPS.map((tip, idx) => (
                             <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-white/5">
-                                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shrink-0 text-white font-semibold text-sm">
+                                <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-teal-600 rounded-full flex items-center justify-center shrink-0 text-white font-semibold text-sm">
                                     {idx + 1}
                                 </div>
                                 <p className="text-white/80">{tip}</p>
@@ -135,7 +135,7 @@ export default function TrustAndSafetyPage() {
                     </p>
                     <a
                         href="/contact"
-                        className="inline-block bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
+                        className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
                     >
                         Contact Support
                     </a>

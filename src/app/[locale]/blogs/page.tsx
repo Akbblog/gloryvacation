@@ -69,11 +69,11 @@ export default function BlogsPage() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="py-16 md:py-24 bg-gradient-to-br from-primary/5 to-[#F5A623]/5">
+            <section className="py-16 md:py-24 bg-gradient-to-br from-teal-50 to-amber-50">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold text-[#1C1C1C] mb-4">
-                            Travel <span className="text-primary">Blogs</span>
+                            Travel <span className="text-teal-600">Blogs</span>
                         </h1>
                         <p className="text-lg text-[#7E7E7E]">
                             Discover travel tips, property guides, and insider knowledge about Dubai's best holiday destinations.
@@ -90,7 +90,7 @@ export default function BlogsPage() {
                             <button
                                 key={idx}
                                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${idx === 0
-                                    ? "bg-primary text-white"
+                                    ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white"
                                     : "bg-[#F5F5F5] text-[#7E7E7E] hover:bg-gray-200"
                                     }`}
                             >
@@ -119,7 +119,7 @@ export default function BlogsPage() {
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute top-4 left-4">
-                                        <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
+                                        <span className="bg-gradient-to-r from-teal-500 to-teal-600 text-white text-xs font-medium px-3 py-1 rounded-full">
                                             {blog.category}
                                         </span>
                                     </div>
@@ -130,7 +130,7 @@ export default function BlogsPage() {
                                         <span>•</span>
                                         <span>{blog.readTime}</span>
                                     </div>
-                                    <h2 className="text-xl font-semibold text-[#1C1C1C] mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                                    <h2 className="text-xl font-semibold text-[#1C1C1C] mb-3 line-clamp-2 group-hover:text-teal-600 transition-colors">
                                         {blog.title}
                                     </h2>
                                     <p className="text-[#7E7E7E] line-clamp-2">{blog.excerpt}</p>

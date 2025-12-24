@@ -285,7 +285,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {AMENITIES_LIST.map((amenity) => (
                         <label key={amenity} className="flex items-center gap-2 cursor-pointer group">
-                            <div className={`w-5 h-5 border rounded flex items-center justify-center transition-colors ${formData.amenities.includes(amenity) ? "bg-primary border-primary" : "border-gray-300 group-hover:border-primary"}`}>
+                            <div className={`w-5 h-5 border rounded flex items-center justify-center transition-colors ${formData.amenities.includes(amenity) ? "bg-teal-600 border-teal-600" : "border-gray-300 group-hover:border-teal-500"}`}>
                                 {formData.amenities.includes(amenity) && <Check className="w-3 h-3 text-white" />}
                             </div>
                             <input
@@ -294,7 +294,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
                                 onChange={() => toggleAmenity(amenity)}
                                 className="hidden"
                             />
-                            <span className="text-gray-700 group-hover:text-primary transition-colors">{amenity}</span>
+                            <span className="text-gray-700 group-hover:text-teal-600 transition-colors">{amenity}</span>
                         </label>
                     ))}
                 </div>
@@ -311,7 +311,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold shadow-lg shadow-primary/30 transition-all flex items-center gap-2"
+                    className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg shadow-teal-500/30 transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
                 >
                     {loading ? "Saving..." : (
                         <>

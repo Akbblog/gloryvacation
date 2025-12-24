@@ -29,7 +29,7 @@ export function PromoSection() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <Link href="/list-your-property">
-                                <button className="bg-primary hover:bg-primary/90 text-white border-none rounded-full px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold shadow-lg transition-all duration-300 hover:scale-105">
+                                <button className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white border-none rounded-full px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
                                     List Your Property
                                 </button>
                             </Link>

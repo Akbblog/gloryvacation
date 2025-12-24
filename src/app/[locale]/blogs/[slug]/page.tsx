@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
                     <div className="container mx-auto max-w-[900px]">
-                        <span className="inline-block bg-primary text-white text-sm font-medium px-4 py-1 rounded-full mb-4">
+                        <span className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium px-4 py-1 rounded-full mb-4">
                             {blog.category}
                         </span>
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -97,11 +97,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <div className="container mx-auto px-4 md:px-6 max-w-[900px]">
                     {/* Back & Share */}
                     <div className="flex justify-between items-center mb-8">
-                        <Link href="/blogs" className="flex items-center gap-2 text-[#7E7E7E] hover:text-primary transition-colors">
+                        <Link href="/blogs" className="flex items-center gap-2 text-[#7E7E7E] hover:text-teal-600 transition-colors">
                             <ArrowLeft className="w-4 h-4" />
                             Back to Blogs
                         </Link>
-                        <button className="flex items-center gap-2 text-[#7E7E7E] hover:text-primary transition-colors">
+                        <button className="flex items-center gap-2 text-[#7E7E7E] hover:text-teal-600 transition-colors">
                             <Share2 className="w-4 h-4" />
                             Share
                         </button>
@@ -120,7 +120,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                     {/* Article Content */}
                     <div
-                        className="prose prose-lg max-w-none prose-headings:text-[#1C1C1C] prose-p:text-[#7E7E7E] prose-a:text-primary"
+                        className="prose prose-lg max-w-none prose-headings:text-[#1C1C1C] prose-p:text-[#7E7E7E] prose-a:text-teal-600"
                         dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
 
@@ -132,7 +132,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         </p>
                         <Link
                             href="/"
-                            className="inline-block bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
+                            className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
                             Browse Properties
                         </Link>

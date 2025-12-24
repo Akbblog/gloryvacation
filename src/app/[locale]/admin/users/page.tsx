@@ -81,7 +81,7 @@ export default function UsersPage() {
                             <tr key={user._id} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                        <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600">
                                             <UserIcon className="w-4 h-4" />
                                         </div>
                                         <span className="font-medium text-gray-900">{user.name}</span>
@@ -118,7 +118,7 @@ export default function UsersPage() {
                                         {!user.isApproved && (
                                             <button
                                                 onClick={() => handleApprove(user._id)}
-                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white text-sm font-medium rounded-lg transition-all"
                                             >
                                                 <Check className="w-4 h-4" />
                                                 Approve

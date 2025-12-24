@@ -98,7 +98,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         <span
                             className={cn(
                                 "text-xl md:text-2xl font-bold transition-colors whitespace-nowrap",
-                                showSolid ? "text-primary" : "text-white"
+                                showSolid ? "text-teal-600" : "text-white"
                             )}
                         >
                             Glory Vacation

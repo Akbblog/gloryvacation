@@ -46,7 +46,7 @@ export function ListingCard({
 
                 {/* Content */}
                 <div className="p-4">
-                    <h3 className="font-semibold text-[#1C1C1C] text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-[#1C1C1C] text-lg mb-1 line-clamp-1 group-hover:text-teal-600 transition-colors">
                         {title}
                     </h3>
                     <div className="flex items-center gap-1 text-[#7E7E7E] text-sm mb-3">
@@ -75,7 +75,7 @@ export function ListingCard({
                         <div>
                             <span className="text-sm text-gray-500">Contact to request pricing</span>
                         </div>
-                        <span className="text-sm text-primary font-medium group-hover:underline">
+                        <span className="text-sm text-teal-600 font-medium group-hover:text-teal-700 group-hover:underline transition-colors">
                             View Details
                         </span>
                     </div>

@@ -323,3 +323,145 @@ input:focus-visible {
 .dir-ltr {
   direction: ltr;
 }
+
+/* =============================================
+   UNIFIED THEME COMPONENTS
+   ============================================= */
+
+/* Primary Button - Teal gradient */
+.btn-primary {
+  @apply bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 
+         text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 
+         transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+}
+
+/* Secondary Button - Orange accent */
+.btn-secondary {
+  @apply bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 
+         text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 
+         transform hover:scale-[1.02] hover:shadow-lg;
+}
+
+/* Outline Button */
+.btn-outline {
+  @apply border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white 
+         font-semibold py-3 px-6 rounded-xl transition-all duration-300;
+}
+
+/* Ghost Button */
+.btn-ghost {
+  @apply text-gray-700 hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition-colors;
+}
+
+/* Unified Card Styles */
+.card {
+  @apply bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300;
+}
+
+.card-elevated {
+  @apply bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+}
+
+.card-interactive {
+  @apply bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer;
+}
+
+/* Form Input Styles */
+.input-field {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent 
+         outline-none transition-all text-gray-900 bg-white placeholder-gray-400;
+}
+
+.input-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+/* Section Headers */
+.section-title {
+  @apply text-2xl md:text-3xl font-bold text-gray-900;
+}
+
+.section-subtitle {
+  @apply text-gray-600 mt-2;
+}
+
+/* Badge Styles */
+.badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-teal-100 text-teal-700;
+}
+
+.badge-accent {
+  @apply bg-orange-100 text-orange-700;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-700;
+}
+
+.badge-warning {
+  @apply bg-amber-100 text-amber-700;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply w-6 h-6 border-2 border-gray-200 border-t-teal-500 rounded-full animate-spin;
+}
+
+/* Toast/Alert Styles */
+.alert-success {
+  @apply bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl;
+}
+
+.alert-error {
+  @apply bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl;
+}
+
+.alert-info {
+  @apply bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-xl;
+}
+
+/* Link Styles */
+.link-primary {
+  @apply text-teal-600 hover:text-teal-700 font-medium hover:underline transition-colors;
+}
+
+/* Avatar Placeholder */
+.avatar {
+  @apply w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white;
+}
+
+.avatar-lg {
+  @apply w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white;
+}
+
+/* Page Container */
+.page-container {
+  @apply min-h-screen flex flex-col bg-gray-50;
+}
+
+.content-container {
+  @apply container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px];
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .card, .card-elevated, .card-interactive {
+    @apply bg-gray-800 border-gray-700;
+  }
+  
+  .input-field {
+    @apply bg-gray-800 border-gray-600 text-white placeholder-gray-400;
+  }
+  
+  .section-title {
+    @apply text-white;
+  }
+  
+  .section-subtitle {
+    @apply text-gray-400;
+  }
+}
