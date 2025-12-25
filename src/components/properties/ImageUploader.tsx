@@ -120,20 +120,20 @@ export default function ImageUploader({
             const id = uid();
             const previewUrl = URL.createObjectURL(file);
             const newItem: Item = { id, file, url: previewUrl, uploading: true, progress: 0 };
-            setItems(prev => [...prev, newItem]);
+            setItems((prev: Item[]) => [...prev, newItem]);
 
             try {
                 const blob = await compressImage(file);
                 const compressedFile = new File([blob], file.name.replace(/\s+/g, "_"), { type: blob.type });
 
                 const result = await uploader(compressedFile, (p) => {
-                    setItems(prev => prev.map(it => it.id === id ? { ...it, progress: p } : it));
+                    setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, progress: p } : it));
                 });
 
-                setItems(prev => prev.map(it => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
+                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
             } catch (e) {
                 console.error("Upload error", e);
-                setItems(prev => prev.map(it => it.id === id ? { ...it, uploading: false } : it));
+                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false } : it));
             }
         }
     };
@@ -149,8 +149,8 @@ export default function ImageUploader({
     };
 
     const removeItem = (id: string) => {
-        setItems(prev => {
-            const next = prev.filter(it => it.id !== id);
+        setItems((prev: Item[]) => {
+            const next = prev.filter((it: Item) => it.id !== id);
             // ensure cover exists
             if (!next.some(n => n.isCover) && next.length > 0) next[0].isCover = true;
             return next;
@@ -160,16 +160,16 @@ export default function ImageUploader({
     const replaceItem = (id: string, file: File) => {
         const doReplace = async () => {
             const previewUrl = URL.createObjectURL(file);
-            setItems(prev => prev.map(it => it.id === id ? { ...it, file, url: previewUrl, uploading: true, progress: 0 } : it));
+            setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, file, url: previewUrl, uploading: true, progress: 0 } : it));
 
             try {
                 const blob = await compressImage(file);
                 const compressedFile = new File([blob], file.name.replace(/\s+/g, "_"), { type: blob.type });
-                const result = await uploader(compressedFile, (p) => setItems(prev => prev.map(it => it.id === id ? { ...it, progress: p } : it)));
-                setItems(prev => prev.map(it => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
+                const result = await uploader(compressedFile, (p) => setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, progress: p } : it)));
+                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
             } catch (e) {
                 console.error(e);
-                setItems(prev => prev.map(it => it.id === id ? { ...it, uploading: false } : it));
+                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false } : it));
             }
         };
 
@@ -177,12 +177,12 @@ export default function ImageUploader({
     };
 
     const setCover = (id: string) => {
-        setItems(prev => prev.map(it => ({ ...it, isCover: it.id === id })));
+        setItems((prev: Item[]) => prev.map((it: Item) => ({ ...it, isCover: it.id === id })));
     };
 
     const move = (id: string, dir: number) => {
-        setItems(prev => {
-            const idx = prev.findIndex(p => p.id === id);
+        setItems((prev: Item[]) => {
+            const idx = prev.findIndex((p: Item) => p.id === id);
             if (idx === -1) return prev;
             const newIdx = idx + dir;
             if (newIdx < 0 || newIdx >= prev.length) return prev;
