@@ -14,6 +14,17 @@ if (!MONGODB_URI) {
     process.exit(1);
 }
 
+// Safety: require explicit confirmation before running deletion scripts.
+if (process.env.DELETE_CONFIRM !== 'true') {
+    console.error("Refusing to run cleanup-temp-listings: set DELETE_CONFIRM=true to confirm.");
+    process.exit(1);
+}
+
+if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_DELETES !== 'true') {
+    console.error("Refusing to run in production: set ALLOW_PRODUCTION_DELETES=true to override.");
+    process.exit(1);
+}
+
 const cleanUpListings = async () => {
     try {
         console.log("Connecting to MongoDB...");
@@ -31,11 +42,14 @@ const cleanUpListings = async () => {
         }
 
         console.log(`Admin user found with ID: ${adminUser._id}`);
-        console.log("Deleting properties owned by admin...");
+        console.log("Found properties owned by admin (no automatic deletion will be performed by this script).");
 
-        const result = await Property.deleteMany({ host: adminUser._id });
+        const props = await Property.find({ host: adminUser._id }).select('_id title slug createdAt isActive isApprovedByAdmin').lean();
 
-        console.log(`Cleanup complete. Deleted ${result.deletedCount} temporary listings.`);
+        console.log(`Admin owns ${props.length} properties:`);
+        props.forEach(p => console.log(`- ${p._id} | ${p.title || '(no title)'} | slug=${p.slug} | active=${p.isActive} approved=${p.isApprovedByAdmin}`));
+
+        console.log("To delete these properties manually, run an explicit delete command or re-enable deletion in this script with a deliberate change.");
 
     } catch (error) {
         console.error("Error during cleanup:", error);
