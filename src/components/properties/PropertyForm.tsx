@@ -312,7 +312,11 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
                 <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Images</h2>
                 <div className="space-y-3">
                     {/* ImageUploader handles uploads and returns URLs via onChange */}
-                    <ImageUploader initial={formData.images} onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))} />
+                    <ImageUploader 
+                        key={JSON.stringify(formData.images)} 
+                        initial={formData.images} 
+                        onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))} 
+                    />
                 </div>
             </div>
 

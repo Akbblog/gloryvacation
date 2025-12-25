@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { Upload, X, Star, GripVertical, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
