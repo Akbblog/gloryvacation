@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, Link } from "@/i18n/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Lock, Mail, AlertCircle } from "lucide-react";
+import { useLocale } from "next-intl";
 
 function SignInContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const locale = useLocale();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
 
     const [formData, setFormData] = useState({
@@ -19,6 +21,21 @@ function SignInContent() {
     });
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const normalizedCallback = useMemo(() => {
+        const decoded = (() => {
+            try {
+                return decodeURIComponent(callbackUrl);
+            } catch {
+                return callbackUrl;
+            }
+        })();
+
+        if (!decoded.startsWith("/")) return decoded;
+        if (decoded === `/${locale}`) return "/";
+        if (decoded.startsWith(`/${locale}/`)) return decoded.slice(locale.length + 1);
+        return decoded;
+    }, [callbackUrl, locale]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,7 +52,7 @@ function SignInContent() {
             if (res?.error) {
                 setError("Invalid email or password");
             } else {
-                router.push(callbackUrl);
+                router.push(normalizedCallback || "/");
             }
         } catch (err) {
             setError("An error occurred during sign in");

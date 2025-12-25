@@ -53,101 +53,124 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
     return (
         <div className="w-full bg-white min-h-screen">
             {/* Enhanced Image Gallery */}
-            <div className="px-4 md:px-6 py-6 max-w-7xl mx-auto">
+            <div className="pt-8 md:pt-12 lg:pt-16 px-4 md:px-6 lg:px-8 pb-6 max-w-7xl mx-auto">
                 <EnhancedImageGallery images={images} title={p.title} />
             </div>
 
             {/* Content Section - Title and Info */}
-            <div className="px-4 md:px-6 py-8 md:py-12 max-w-7xl mx-auto border-b border-gray-200">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-8">
-                    {/* Left: Title and Location */}
-                    <div className="flex-1">
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
-                            {p.title}
-                        </h1>
-                        <div className="flex flex-wrap gap-6 items-center text-gray-700 mb-6">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-teal-600" />
-                                <span className="font-medium text-gray-700">{p.location?.area || p.location?.city || 'Location not specified'}</span>
+            <div className="px-4 md:px-6 lg:px-8 py-8 md:py-10 max-w-7xl mx-auto">
+                {/* Breadcrumb */}
+                <nav className="mb-6 text-sm text-gray-500">
+                    <span className="hover:text-teal-600 cursor-pointer">Home</span>
+                    <span className="mx-2">/</span>
+                    <span className="hover:text-teal-600 cursor-pointer">Listings</span>
+                    <span className="mx-2">/</span>
+                    <span className="text-teal-600 font-medium">{p.title?.slice(0, 30)}{p.title?.length > 30 ? '...' : ''}</span>
+                </nav>
+                
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-8">
+                        {/* Left: Title and Location */}
+                        <div className="flex-1">
+                            <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+                                {p.title}
+                            </h1>
+                            <div className="flex flex-wrap gap-4 items-center text-gray-700 mb-6">
+                                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
+                                    <MapPin className="w-5 h-5 text-teal-600" />
+                                    <span className="font-medium text-gray-700">{p.location?.area || p.location?.city || 'Location not specified'}</span>
+                                </div>
+                                {p.rating && p.rating > 0 ? (
+                                    <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2 rounded-full border border-amber-200">
+                                        <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                                        <span className="font-semibold text-gray-900">{p.rating.toFixed(1)}</span>
+                                        <span className="text-sm text-gray-600">({p.reviewCount || 0} reviews)</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 bg-gradient-to-r from-teal-50 to-cyan-50 px-4 py-2 rounded-full border border-teal-200">
+                                        <Star className="w-5 h-5 text-teal-500" />
+                                        <span className="text-sm text-gray-600">New listing - Be the first to review!</span>
+                                    </div>
+                                )}
                             </div>
-                            {p.rating && p.rating > 0 ? (
-                                <div className="flex items-center gap-2 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-2 rounded-full border border-amber-200">
-                                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                                    <span className="font-semibold text-gray-900">{p.rating.toFixed(1)}</span>
-                                    <span className="text-sm text-gray-600">({p.reviewCount || 0} reviews)</span>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-2 rounded-full border border-blue-200">
-                                    <Star className="w-5 h-5 text-blue-500" />
-                                    <span className="text-sm text-gray-600">New listing - Be the first to review!</span>
-                                </div>
-                            )}
                         </div>
-                    </div>
 
-                    {/* Right: Price and Actions */}
-                    <div className="mt-6 md:mt-0 flex flex-col items-start md:items-end gap-4">
-                        {/* Price display removed as per reservation model */}
-                        <button 
-                            onClick={() => setIsWishlisted(!isWishlisted)}
-                            className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-300 hover:shadow-md"
-                        >
-                            <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
-                            <span>{isWishlisted ? 'Saved' : 'Save'}</span>
-                        </button>
+                        {/* Right: Actions */}
+                        <div className="mt-4 md:mt-0 flex items-center gap-3">
+                            <button 
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
+                            >
+                                <Share2 className="w-5 h-5" />
+                                <span className="hidden md:inline">Share</span>
+                            </button>
+                            <button 
+                                onClick={() => setIsWishlisted(!isWishlisted)}
+                                className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 ${
+                                    isWishlisted 
+                                        ? 'bg-red-50 border-red-200 text-red-600' 
+                                        : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                                }`}
+                            >
+                                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+                                <span className="hidden md:inline">{isWishlisted ? 'Saved' : 'Save'}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Enhanced Feature Cards */}
-                <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-                    <div className="flex flex-col items-center p-4 bg-gradient-to-br from-white to-slate-50 rounded-xl border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                            <Home className="w-6 h-6 text-white" />
+                <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+                    <div className="flex flex-col items-center p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-teal-200">
+                            <Home className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">Type</div>
-                        <div className="font-bold text-sm text-gray-900 capitalize">{p.propertyType || 'apartment'}</div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Type</div>
+                        <div className="font-bold text-base text-gray-900 capitalize mt-1">{p.propertyType || 'apartment'}</div>
                     </div>
-                    <div className="flex flex-col items-center p-4 bg-gradient-to-br from-white to-slate-50 rounded-xl border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                            <Sofa className="w-6 h-6 text-white" />
+                    <div className="flex flex-col items-center p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-blue-200">
+                            <Sofa className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">Bedrooms</div>
-                        <div className="font-bold text-sm text-gray-900">{p.bedrooms || 0}</div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Bedrooms</div>
+                        <div className="font-bold text-base text-gray-900 mt-1">{p.bedrooms || 0}</div>
                     </div>
-                    <div className="flex flex-col items-center p-4 bg-gradient-to-br from-white to-slate-50 rounded-xl border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                            <Users className="w-6 h-6 text-white" />
+                    <div className="flex flex-col items-center p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-purple-200">
+                            <Users className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">Bathrooms</div>
-                        <div className="font-bold text-sm text-gray-900">{p.bathrooms || 0}</div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Bathrooms</div>
+                        <div className="font-bold text-base text-gray-900 mt-1">{p.bathrooms || 0}</div>
                     </div>
-                    <div className="flex flex-col items-center p-4 bg-gradient-to-br from-white to-slate-50 rounded-xl border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                            <Users className="w-6 h-6 text-white" />
+                    <div className="flex flex-col items-center p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-pink-200">
+                            <Users className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">Guests</div>
-                        <div className="font-bold text-sm text-gray-900">{p.guests || 2}</div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Guests</div>
+                        <div className="font-bold text-base text-gray-900 mt-1">{p.guests || 2}</div>
                     </div>
-                    <div className="flex flex-col items-center p-4 bg-gradient-to-br from-white to-slate-50 rounded-xl border border-slate-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                            <Award className="w-6 h-6 text-white" />
+                    <div className="flex flex-col items-center p-5 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg shadow-amber-200">
+                            <Award className="w-7 h-7 text-white" />
                         </div>
-                        <div className="text-xs text-gray-600 font-medium">Reviews</div>
-                        <div className="font-bold text-sm text-gray-900">{p.reviewCount || 0}</div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider">Reviews</div>
+                        <div className="font-bold text-base text-gray-900 mt-1">{p.reviewCount || 0}</div>
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="px-4 md:px-6 py-8 md:py-12 max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="px-4 md:px-6 lg:px-8 py-8 md:py-12 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                     {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-10">
+                    <div className="lg:col-span-2 space-y-8">
                         {/* Description */}
                         {p.description && (
-                            <section className="animate-fade-in-up">
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">About this place</h2>
-                                <p className="text-gray-700 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
+                            <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                                    <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
+                                    About this place
+                                </h2>
+                                <p className="text-gray-600 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
                                     {p.description}
                                 </p>
                             </section>
@@ -155,8 +178,11 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
 
                         {/* Enhanced Amenities Section */}
                         {amenities.length > 0 && (
-                            <section className="animate-fade-in-up">
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">What this place offers</h2>
+                            <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
+                                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                                    <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
+                                    What this place offers
+                                </h2>
                                 
                                 {/* Category Tabs */}
                                 {Object.keys(groupedAmenities).length > 1 && (
@@ -164,7 +190,7 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                         {Object.keys(groupedAmenities).map(category => (
                                             <button
                                                 key={category}
-                                                className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-colors"
+                                                className="px-4 py-2 rounded-full bg-gray-100 hover:bg-teal-50 hover:text-teal-600 text-gray-700 text-sm font-medium transition-all duration-200"
                                             >
                                                 {category}
                                             </button>
@@ -172,13 +198,13 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                     </div>
                                 )}
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {visibleAmenities.map((amenity: string, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
-                                            <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 text-white flex-shrink-0 group-hover:scale-110 transition-transform animate-pulse">
+                                        <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-teal-50 transition-all duration-300 group">
+                                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-teal-600 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
                                                 {getAmenityIcon(amenity)}
                                             </div>
-                                            <span className="text-gray-800 font-medium group-hover:text-teal-600 transition text-sm">{amenity}</span>
+                                            <span className="text-gray-700 font-medium group-hover:text-teal-700 transition text-sm">{amenity}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -186,7 +212,7 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                 {amenities.length > 8 && (
                                     <button
                                         onClick={() => setShowAllAmenities(!showAllAmenities)}
-                                        className="mt-6 px-6 py-3 border border-teal-500 text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-colors"
+                                        className="mt-6 px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                                     >
                                         {showAllAmenities ? 'Show less' : `Show all ${amenities.length} amenities`}
                                     </button>
@@ -195,9 +221,12 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                         )}
 
                         {/* Enhanced Map Section */}
-                        <section className="animate-fade-in-up">
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Where you'll be</h2>
-                            <div className="w-full h-96 rounded-2xl overflow-hidden border-2 border-slate-200 bg-gray-100 shadow-lg relative">
+                        <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                                <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
+                                Where you'll be
+                            </h2>
+                            <div className="w-full h-80 md:h-96 rounded-2xl overflow-hidden bg-gray-100 relative">
                                 {p.location?.lat && p.location?.lng ? (
                                     <>
                                         <iframe
@@ -214,8 +243,9 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                                 href={`https://www.google.com/maps/dir/?api=1&destination=${p.location.lat},${p.location.lng}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg"
+                                                className="bg-white hover:bg-gray-50 text-teal-600 px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
                                             >
+                                                <MapPin className="w-4 h-4" />
                                                 Get Directions
                                             </a>
                                         </div>
@@ -234,57 +264,70 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
 
                     {/* Right Sidebar */}
                     <aside>
-                        <div className="sticky top-24 space-y-5">
+                        <div className="sticky top-24 space-y-6">
                             {/* Enhanced Booking Form */}
-                            <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 border border-slate-200 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg">
                                 <BookingForm propertyId={p._id || p.id} maxGuests={p.guests || 1} />
                             </div>
 
                             {/* Enhanced Trust Badges */}
-                            <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-5 border border-emerald-200 space-y-3 hover:shadow-lg transition-shadow duration-300">
+                            <div className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-5 border border-teal-100 space-y-4">
+                                <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Why book with us</h4>
                                 <div className="flex items-center gap-3">
-                                    <Shield className="w-5 h-5 text-emerald-600" />
-                                    <span className="font-semibold text-gray-800">Verified Host</span>
+                                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                                        <Shield className="w-5 h-5 text-teal-600" />
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-gray-800 text-sm">Verified Host</span>
+                                        <p className="text-xs text-gray-500">Identity confirmed</p>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Award className="w-5 h-5 text-amber-500" />
-                                    <span className="font-semibold text-gray-800">Superhost</span>
+                                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                                        <Award className="w-5 h-5 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-gray-800 text-sm">Superhost</span>
+                                        <p className="text-xs text-gray-500">Top-rated experience</p>
+                                    </div>
                                 </div>
-                                <p className="text-sm text-gray-600">Trusted by 1000+ guests</p>
+                                <div className="pt-2 border-t border-teal-100">
+                                    <p className="text-sm text-teal-700 font-medium">✓ Trusted by 1000+ guests</p>
+                                </div>
                             </div>
 
                             {/* Enhanced Host Section */}
-                            <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition-shadow duration-300 group">
+                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm group">
                                 <h3 className="text-lg font-bold text-gray-900 mb-4">Hosted by</h3>
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 border-3 border-white shadow-md group-hover:scale-105 transition-transform">
-                                        <User className="w-6 h-6 text-white" />
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200 group-hover:scale-105 transition-transform">
+                                        <User className="w-7 h-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-gray-900">
+                                        <p className="font-bold text-gray-900 text-lg">
                                             {p.host?.role === 'admin' ? 'Glory Vacations' : (p.host?.name || 'Host')}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-sm text-gray-500">
                                             {p.host?.role === 'admin' ? 'Official Partner' : `Joined ${p.host?.joinedAt ? new Date(p.host.joinedAt).toLocaleDateString() : 'recently'}`}
                                         </p>
                                     </div>
                                 </div>
                                 
                                 {/* Host Metrics */}
-                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div className="grid grid-cols-2 gap-4 mb-5 p-4 bg-gray-50 rounded-xl">
                                     <div className="text-center">
-                                        <div className="text-lg font-bold text-teal-600">95%</div>
-                                        <div className="text-xs text-gray-600">Response Rate</div>
+                                        <div className="text-xl font-bold text-teal-600">95%</div>
+                                        <div className="text-xs text-gray-500">Response Rate</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-lg font-bold text-teal-600">{"< 2h"}</div>
-                                        <div className="text-xs text-gray-600">Response Time</div>
+                                        <div className="text-xl font-bold text-teal-600">{"< 2h"}</div>
+                                        <div className="text-xs text-gray-500">Response Time</div>
                                     </div>
                                 </div>
                                 
-                                <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg">
-                                    <Clock className="w-4 h-4 text-blue-600" />
-                                    <span className="text-sm text-blue-700">Usually responds within 2 hours</span>
+                                <div className="flex items-center gap-2 bg-teal-50 px-4 py-3 rounded-xl">
+                                    <Clock className="w-4 h-4 text-teal-600" />
+                                    <span className="text-sm text-teal-700 font-medium">Usually responds within 2 hours</span>
                                 </div>
                                 
                                 {p.host?.bio && (
@@ -301,16 +344,17 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
 
             {/* Mobile Sticky Footer */}
             {isMobile && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg p-4 z-40">
-                    <div className="flex items-center justify-between">
-                        {/* Price display removed from mobile footer */}
-                        <div />
-                        <button className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl p-4 z-40">
+                    <div className="flex items-center justify-center">
+                        <button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-teal-200">
                             Request Booking
                         </button>
                     </div>
                 </div>
             )}
+
+            {/* Bottom Spacing for Mobile Footer */}
+            {isMobile && <div className="h-24"></div>}
         </div>
     );
 }
