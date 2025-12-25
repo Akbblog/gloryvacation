@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import { Reservation } from "@/models/Reservation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
     try {
@@ -35,6 +36,80 @@ export async function POST(req: Request) {
                 phone: guestDetails.phone || "",
             },
         });
+
+        // attempt to notify team via webhook, fallback to SMTP email if configured
+        const notifyTeam = async () => {
+            const webhookUrl = process.env.RESERVATION_WEBHOOK_URL;
+            const sendEmailIfConfigured = async (reason?: string) => {
+                const smtpHost = process.env.SMTP_HOST;
+                const smtpPort = process.env.SMTP_PORT;
+                const smtpUser = process.env.SMTP_USER;
+                const smtpPass = process.env.SMTP_PASS;
+                const notifyTo = process.env.RESERVATION_NOTIFY_TO || process.env.ADMIN_EMAIL;
+                const fromEmail = process.env.FROM_EMAIL || smtpUser;
+                if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !notifyTo) return;
+
+                try {
+                    const transporter = nodemailer.createTransport({
+                        host: smtpHost,
+                        port: Number(smtpPort),
+                        secure: Number(smtpPort) === 465, // true for 465, false for other ports
+                        auth: { user: smtpUser, pass: smtpPass },
+                    });
+
+                    const subject = `New reservation request: ${reservation._id}` + (reason ? ` (${reason})` : "");
+                    const text = `A new reservation was created.\n\nProperty: ${propertyId}\nUser: ${session.user.id}\nGuest: ${reservation.guestDetails?.name} <${reservation.guestDetails?.email}>\nCheck-in: ${reservation.checkIn?.toISOString?.()}\nCheck-out: ${reservation.checkOut?.toISOString?.()}\nGuests: ${reservation.guests}\nStatus: ${reservation.status}\n\nView in admin panel: /admin/reservations`;
+
+                    await transporter.sendMail({
+                        from: fromEmail,
+                        to: notifyTo,
+                        subject,
+                        text,
+                    });
+                } catch (err) {
+                    console.error("Failed to send reservation email:", err);
+                }
+            };
+
+            if (webhookUrl) {
+                try {
+                    const payload = {
+                        text: `New reservation request (${reservation._id})`,
+                        reservation: {
+                            id: reservation._id,
+                            property: propertyId,
+                            user: session.user.id,
+                            checkIn: reservation.checkIn?.toISOString?.() || String(checkIn),
+                            checkOut: reservation.checkOut?.toISOString?.() || String(checkOut),
+                            guests: reservation.guests,
+                            status: reservation.status,
+                            guestEmail: reservation.guestDetails?.email,
+                            guestName: reservation.guestDetails?.name,
+                        },
+                    };
+
+                    const res = await fetch(webhookUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!res.ok) {
+                        // webhook failed; try email fallback
+                        await sendEmailIfConfigured("webhook_failed");
+                    }
+                } catch (err) {
+                    console.error("Failed to send reservation webhook:", err);
+                    await sendEmailIfConfigured("webhook_error");
+                }
+            } else {
+                // no webhook configured — try email
+                await sendEmailIfConfigured("no_webhook");
+            }
+        };
+
+        // fire-and-forget notification
+        void notifyTeam();
 
         return NextResponse.json({ message: "Reservation created", reservation }, { status: 201 });
     } catch (error) {

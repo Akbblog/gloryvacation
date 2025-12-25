@@ -2,13 +2,14 @@
 
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, Home, Calendar, Users, Settings, LogOut, PlusCircle, ChevronRight, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Home, Calendar, ClipboardList, Users, Settings, LogOut, PlusCircle, ChevronRight, MessageSquare } from "lucide-react";
 
 const MENU_ITEMS = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Listings", href: "/admin/listings", icon: Home },
     { name: "Add Property", href: "/admin/listings/add", icon: PlusCircle },
     { name: "Bookings", href: "/admin/bookings", icon: Calendar },
+    { name: "Reservations", href: "/admin/reservations", icon: ClipboardList },
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Messages", href: "/admin/messages", icon: MessageSquare },
     { name: "Settings", href: "/admin/settings", icon: Settings },

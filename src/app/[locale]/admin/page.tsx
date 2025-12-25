@@ -1,29 +1,41 @@
 import { Link } from "@/i18n/navigation";
-import { Users, Home, Calendar, DollarSign, TrendingUp, ArrowUpRight, PlusCircle, Eye, Settings } from "lucide-react";
+import { Users, Home, Calendar, DollarSign, TrendingUp, ArrowUpRight, PlusCircle, Eye, Settings, ClipboardList } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
 import { User } from "@/models/User";
 import { Booking } from "@/models/Booking";
+import { Reservation } from "@/models/Reservation";
 
 async function getStats() {
     await connectDB();
 
-    const [totalListings, totalUsers, bookings] = await Promise.all([
+    const [
+        totalListings,
+        totalUsers,
+        bookings,
+        confirmedBookings,
+        activeBookings,
+        pendingReservations,
+        totalReservations,
+    ] = await Promise.all([
         Property.countDocuments(),
         User.countDocuments(),
         Booking.find().sort({ createdAt: -1 }).limit(5).populate("property").populate("guest").lean(),
+        Booking.find({ status: "confirmed" }),
+        Booking.countDocuments({ status: { $in: ["pending", "confirmed"] } }),
+        Reservation.countDocuments({ status: "pending" }),
+        Reservation.countDocuments(),
     ]);
 
-    // Calculate revenue from confirmed bookings
-    const confirmedBookings = await Booking.find({ status: "confirmed" });
     const totalRevenue = confirmedBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
-    const activeBookings = await Booking.countDocuments({ status: { $in: ["pending", "confirmed"] } });
 
     return {
         totalListings,
         totalUsers,
         totalRevenue,
         activeBookings,
+        pendingReservations,
+        totalReservations,
         recentBookings: JSON.parse(JSON.stringify(bookings)),
     };
 }
@@ -58,7 +70,7 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                 <StatsCard
                     title="Total Revenue"
                     value={`AED ${stats.totalRevenue.toLocaleString()}`}
@@ -82,6 +94,12 @@ export default async function AdminDashboard() {
                     value={stats.totalUsers.toString()}
                     icon={Users}
                     color="blue"
+                />
+                <StatsCard
+                    title="Pending Reservations"
+                    value={stats.pendingReservations.toString()}
+                    icon={ClipboardList}
+                    color="purple"
                 />
             </div>
 
@@ -110,6 +128,16 @@ export default async function AdminDashboard() {
                                 <p className="text-xs text-[#7E7E7E]">Manage reservations</p>
                             </div>
                             <ArrowUpRight className="w-4 h-4 text-amber-600 ml-auto" />
+                        </Link>
+                        <Link href="/admin/reservations" className="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 transition-colors group">
+                            <div className="p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                                <ClipboardList className="w-5 h-5 text-indigo-600" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-[#1C1C1C]">Review Reservations</p>
+                                <p className="text-xs text-[#7E7E7E]">Respond to new requests</p>
+                            </div>
+                            <ArrowUpRight className="w-4 h-4 text-indigo-600 ml-auto" />
                         </Link>
                         <Link href="/admin/users" className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors group">
                             <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
@@ -251,13 +279,14 @@ function StatsCard({
     title: string;
     value: string;
     icon: any;
-    color: "primary" | "amber" | "emerald" | "blue";
+    color: "primary" | "amber" | "emerald" | "blue" | "purple";
 }) {
     const colorClasses = {
         primary: "bg-primary/10 text-primary",
         amber: "bg-amber-100 text-amber-600",
         emerald: "bg-emerald-100 text-emerald-600",
         blue: "bg-blue-100 text-blue-600",
+        purple: "bg-indigo-100 text-indigo-700",
     };
 
     return (
