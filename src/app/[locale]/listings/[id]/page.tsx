@@ -62,8 +62,8 @@ async function getProperty(id: string) {
     }
 }
 
-export default async function ListingPage({ params }: { params: { id: string; locale: string } }) {
-    const { id } = params;
+export default async function ListingPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
+    const { id } = await params;
     const listing = await getProperty(id);
 
     if (!listing) {
