@@ -4,6 +4,9 @@ import { Property } from "@/models/Property";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+// Force dynamic to prevent Next.js from caching API responses
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
     try {
         await connectDB();

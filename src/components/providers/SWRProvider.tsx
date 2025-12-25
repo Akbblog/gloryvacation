@@ -5,7 +5,13 @@ import fetcher from '@/lib/fetcher';
 
 export function SWRProvider({ children }: { children: React.ReactNode }) {
     return (
-        <SWRConfig value={{ fetcher, revalidateOnFocus: false, shouldRetryOnError: false }}>
+        <SWRConfig value={{ 
+            fetcher, 
+            revalidateOnFocus: true,  // Revalidate when window regains focus
+            revalidateOnReconnect: true,  // Revalidate when network reconnects
+            shouldRetryOnError: false,
+            dedupingInterval: 2000,  // Dedupe requests within 2 seconds
+        }}>
             {children}
         </SWRConfig>
     );
