@@ -7,8 +7,6 @@ import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
 import { notFound } from "next/navigation";
 
-console.log('[page.tsx] Property model loaded:', !!Property);
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -42,34 +40,27 @@ async function getProperty(id: string) {
     }
     
     try {
-        console.log(`[getProperty] Connecting to database...`);
         await connectDB();
-        console.log(`[getProperty] Connected successfully`);
         
         // Prefer lookup by ObjectId when id looks like one, otherwise try slug.
         const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
-        console.log(`[getProperty] isObjectId: ${isObjectId}`);
 
         let property: any = null;
 
         if (isObjectId) {
-            console.log(`[getProperty] Looking up by ObjectId: ${id}`);
             // Fetch property by _id (allow inactive so admin-created stays viewable)
             property = await Property.findById(id).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
-            console.log(`[getProperty] ObjectId lookup result:`, property ? 'found' : 'not found');
         }
 
         // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
         if (!property) {
-            console.log(`[getProperty] Not found by ID or not ID, trying slug: '${id}'`);
             property = await Property.findOne({ slug: id }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
-            console.log(`[getProperty] Slug lookup result:`, property ? 'found' : 'not found');
         }
 
         if (!property) {
@@ -77,11 +68,11 @@ async function getProperty(id: string) {
             return null;
         }
 
-        console.log(`[getProperty] Found property: ${property._id}`);
         // Serialize strictly because of Mongoose hydration issues in Next.js
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
         console.error(`[getProperty] Error fetching property:`, e);
+        // If DB is unavailable or ID invalid, fall back to demo data in non-production
         // If DB is unavailable or ID invalid, fall back to demo data in non-production
         // If DB is unavailable or ID invalid, fall back to demo data in non-production
         // If DB is unavailable or ID invalid, fall back to demo data in non-production
@@ -113,16 +104,13 @@ async function getProperty(id: string) {
 export default async function ListingPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
     const resolvedParams = await params;
     const { id } = resolvedParams;
-    console.log(`[ListingPage] Page requested with id: '${id}', locale: '${resolvedParams.locale}'`);
     
     const listing = await getProperty(id);
 
     if (!listing) {
-        console.log(`[ListingPage] Listing not found for id: '${id}', calling notFound()`);
         notFound();
     }
 
-    console.log(`[ListingPage] Property found, rendering page for: ${listing._id}`);
     return (
         <div className="min-h-screen flex flex-col">
             <Navbar />

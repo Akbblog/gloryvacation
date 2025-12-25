@@ -77,5 +77,3 @@ PropertySchema.index({ pricePerNight: 1 });
 
 export const Property: Model<IProperty> =
     mongoose.models.Property || mongoose.model<IProperty>("Property", PropertySchema);
-
-console.log('[Property.ts] Property model registered:', !!Property);
