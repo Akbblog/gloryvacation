@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "img.crs.itsolutions.es",
       },
+      // allow iili.io image host (used by external uploads)
+      {
+        protocol: "https",
+        hostname: "iili.io",
+      },
     ],
   },
 };
