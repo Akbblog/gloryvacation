@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { PropertyForm } from "@/components/properties/PropertyForm";
 
 export default function AdminEditListingPage() {
@@ -42,8 +43,8 @@ export default function AdminEditListingPage() {
             <div className="max-w-3xl mx-auto">
                 <h1 className="text-2xl font-bold mb-4">Edit Property</h1>
                 <PropertyForm
-                    onCancel={() => router.push('/en/admin/listings')}
-                    onSuccess={() => router.push('/en/admin/listings')}
+                    onCancel={() => router.push('/admin/listings')}
+                    onSuccess={() => router.push('/admin/listings')}
                     isAdmin
                     initial={initial}
                     submitUrl="/api/admin/properties/update"
