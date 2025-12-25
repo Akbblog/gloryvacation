@@ -106,8 +106,8 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
 
         try {
             // Prevent submitting transient blob/data URLs which are only valid in the uploader session
-            const imagesRaw = formData.images.filter(img => img.trim() !== "");
-            const hasTransient = imagesRaw.some(img => img.startsWith('blob:') || img.startsWith('data:'));
+            const imagesRaw = formData.images.filter((img: string) => img.trim() !== "");
+            const hasTransient = imagesRaw.some((img: string) => img.startsWith('blob:') || img.startsWith('data:'));
             if (hasTransient) {
                 alert('Please wait for image uploads to finish before saving the property.');
                 setLoading(false);
