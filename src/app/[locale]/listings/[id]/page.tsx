@@ -7,11 +7,16 @@ import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getProperty(id: string) {
+    console.log(`[getProperty] Starting lookup for id: '${id}'`);
     try {
         await connectDB();
         // Prefer lookup by ObjectId when id looks like one, otherwise try slug.
         const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
+        console.log(`[getProperty] isObjectId: ${isObjectId}`);
 
         let property: any = null;
 
@@ -25,17 +30,23 @@ async function getProperty(id: string) {
 
         // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
         if (!property) {
+            console.log(`[getProperty] Not found by ID or not ID, trying slug: '${id}'`);
             property = await Property.findOne({ slug: id }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
         }
 
-        if (!property) return null;
+        if (!property) {
+            console.log(`[getProperty] Property not found for id/slug: '${id}'`);
+            return null;
+        }
 
+        console.log(`[getProperty] Found property: ${property._id}`);
         // Serialize strictly because of Mongoose hydration issues in Next.js
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
+        console.error(`[getProperty] Error fetching property:`, e);
         // If DB is unavailable or ID invalid, fall back to demo data in non-production
         if (process.env.NODE_ENV !== 'production') {
             return {
@@ -63,10 +74,14 @@ async function getProperty(id: string) {
 }
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
-    const { id } = await params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+    console.log(`[ListingPage] Page requested with id: '${id}', locale: '${resolvedParams.locale}'`);
+    
     const listing = await getProperty(id);
 
     if (!listing) {
+        console.log(`[ListingPage] Listing not found for id: '${id}', calling notFound()`);
         notFound();
     }
 
