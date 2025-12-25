@@ -31,12 +31,15 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
     if (!p && isLoading) return <LoadingSkeleton />;
     if (!p && !isLoading) return <div className="p-8 text-center text-gray-500">Property not found</div>;
 
-    const images = p.images && p.images.length > 0 ? p.images : [];
-    // Debug: log images array
-    if (typeof window !== 'undefined') {
-      // Only log on client
-      console.log('Listing images:', images);
-    }
+        const allImages: string[] = p.images || [];
+        // Filter out transient blob/data URLs that may have been stored by mistake
+        const imagesFiltered = allImages.filter((u: string) => !!u && !u.startsWith('blob:') && !u.startsWith('data:'));
+        // Fallback placeholder (small SVG data URI) so EnhancedImageGallery never receives an empty src
+        const placeholder = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22 font-family=%22sans-serif%22 font-size=%2218%22%3EImage%3C/text%3E%3C/svg%3E';
+        const images = imagesFiltered.length > 0 ? imagesFiltered : [placeholder];
+        if (typeof window !== 'undefined' && imagesFiltered.length !== allImages.length) {
+            console.warn('Some listing images were transient (blob/data URLs) and were ignored. Please upload images to a permanent host.');
+        }
     const amenities = p.amenities || [];
     const groupedAmenities = groupAmenities(amenities);
     const visibleAmenities = showAllAmenities ? amenities : amenities.slice(0, 8);
