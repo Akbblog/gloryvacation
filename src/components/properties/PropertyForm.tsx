@@ -27,7 +27,7 @@ import { useEffect } from "react";
 
 export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl, submitMethod }: PropertyFormProps) {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState(() => ({
+    const [formData, setFormData] = useState<Record<string, any>>(() => ({
         title: "",
         slug: "",
         description: "",
@@ -44,7 +44,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
         },
         images: [""],
         amenities: [] as string[],
-    } as any));
+    }));
 
     // Initialize from `initial` when provided
     useEffect(() => {
