@@ -42,7 +42,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
             city: "Dubai",
             country: "UAE",
         },
-        images: [""],
+        images: [],
         amenities: [] as string[],
     }));
 

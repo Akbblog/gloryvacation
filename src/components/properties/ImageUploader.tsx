@@ -1,38 +1,41 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
+import { Upload, X, Star, GripVertical, AlertCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-type Item = {
+type ImageItem = {
     id: string;
-    file?: File | null;
+    file?: File;
     url: string;
     uploading?: boolean;
     progress?: number;
+    error?: string;
     isCover?: boolean;
 };
 
-type UploadHandler = (file: File, onProgress: (p: number) => void) => Promise<{ url: string }>;
-
-function uid() {
-    return Math.random().toString(36).slice(2, 9);
+function generateId() {
+    return Math.random().toString(36).substr(2, 9);
 }
 
-async function compressImage(file: File, maxWidth = 1600, quality = 0.75): Promise<Blob> {
-    // Basic client-side resize using canvas
-    const imgBitmap = await createImageBitmap(file);
-    const ratio = Math.min(1, maxWidth / Math.max(imgBitmap.width, imgBitmap.height));
-    const width = Math.round(imgBitmap.width * ratio);
-    const height = Math.round(imgBitmap.height * ratio);
+async function compressImage(file: File, maxWidth = 1600, quality = 0.8): Promise<Blob> {
+    return new Promise((resolve) => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+        const img = new Image();
 
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas not supported");
-    ctx.drawImage(imgBitmap, 0, 0, width, height);
+        img.onload = () => {
+            const ratio = Math.min(1, maxWidth / Math.max(img.width, img.height));
+            canvas.width = img.width * ratio;
+            canvas.height = img.height * ratio;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    return await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => resolve(blob as Blob), "image/jpeg", quality);
+            canvas.toBlob((blob) => {
+                resolve(blob!);
+            }, "image/jpeg", quality);
+        };
+
+        img.src = URL.createObjectURL(file);
     });
 }
 
@@ -41,7 +44,6 @@ async function fileToBase64(file: File): Promise<string> {
         const reader = new FileReader();
         reader.onload = () => {
             const result = reader.result as string;
-            // Remove the data URL prefix
             const base64 = result.split(',')[1];
             resolve(base64);
         };
@@ -51,194 +53,310 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 async function freeImageHostUpload(file: File, onProgress: (p: number) => void): Promise<{ url: string }> {
-    onProgress(5);
-    const base64 = await fileToBase64(file);
-    onProgress(20);
+    onProgress(10);
 
-    // POST to local server proxy to avoid CORS restrictions in browser
-    const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ base64 }),
-    });
+    try {
+        const compressed = await compressImage(file);
+        const base64 = await fileToBase64(new File([compressed], file.name, { type: "image/jpeg" }));
 
-    if (!res.ok) {
+        onProgress(30);
+
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64 }),
+        });
+
+        if (!res.ok) {
+            throw new Error('Upload failed');
+        }
+
+        const data = await res.json();
+        onProgress(100);
+
+        if (data.url) {
+            return { url: data.url };
+        }
+        throw new Error('Upload failed - no URL returned');
+    } catch (error) {
         onProgress(0);
-        throw new Error('Upload proxy failed');
+        throw error;
     }
+}
 
-    const data = await res.json();
-    onProgress(100);
-
-    if (data && data.url) return { url: data.url };
-    throw new Error('Upload failed');
+interface ImageUploaderProps {
+    initial?: string[];
+    onChange?: (images: string[]) => void;
+    maxFiles?: number;
+    className?: string;
 }
 
 export default function ImageUploader({
     initial = [],
     onChange,
-    uploadHandler,
     maxFiles = 12,
-}: {
-    initial?: string[];
-    onChange?: (images: string[]) => void;
-    uploadHandler?: UploadHandler;
-    maxFiles?: number;
-}) {
-    const [items, setItems] = useState<Item[]>(() => initial.map((u, i) => ({ id: uid() + i, url: u, uploading: false, progress: 100, isCover: i === 0 })));
-    const inputRef = useRef<HTMLInputElement | null>(null);
+    className
+}: ImageUploaderProps) {
+    const [images, setImages] = useState<ImageItem[]>(() =>
+        initial.map((url, index) => ({
+            id: generateId(),
+            url,
+            isCover: index === 0
+        }))
+    );
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        onChange?.(items.map(it => it.url));
-    }, [items]);
+    const handleFileSelect = useCallback(async (files: FileList | null) => {
+        if (!files || files.length === 0) return;
 
-    const defaultUpload: UploadHandler = async (file, onProgress) => {
-        // Simulate upload with a timeout and return object URL
-        return new Promise((res) => {
-            let p = 0;
-            const id = setInterval(() => {
-                p += Math.random() * 20;
-                if (p >= 100) {
-                    clearInterval(id);
-                    const url = URL.createObjectURL(file);
-                    onProgress(100);
-                    setTimeout(() => res({ url }), 200);
-                } else {
-                    onProgress(Math.round(p));
+        const validFiles = Array.from(files).filter(file =>
+            file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024 // 10MB limit
+        );
+
+        if (validFiles.length === 0) return;
+
+        const remainingSlots = maxFiles - images.length;
+        const filesToUpload = validFiles.slice(0, remainingSlots);
+
+        setIsUploading(true);
+
+        try {
+            const newImages: ImageItem[] = [];
+
+            for (const file of filesToUpload) {
+                const id = generateId();
+                const previewUrl = URL.createObjectURL(file);
+
+                const imageItem: ImageItem = {
+                    id,
+                    file,
+                    url: previewUrl,
+                    uploading: true,
+                    progress: 0,
+                    isCover: images.length === 0 && newImages.length === 0
+                };
+
+                newImages.push(imageItem);
+            }
+
+            // Add new images to the list
+            const updatedImages = [...images, ...newImages];
+            setImages(updatedImages);
+
+            // Upload files
+            for (const imageItem of newImages) {
+                try {
+                    const result = await freeImageHostUpload(imageItem.file!, (progress) => {
+                        setImages(prev => prev.map(img =>
+                            img.id === imageItem.id
+                                ? { ...img, progress }
+                                : img
+                        ));
+                    });
+
+                    // Replace preview URL with uploaded URL
+                    setImages(prev => prev.map(img =>
+                        img.id === imageItem.id
+                            ? { ...img, url: result.url, uploading: false, progress: 100 }
+                            : img
+                    ));
+
+                    // Clean up object URL
+                    URL.revokeObjectURL(imageItem.url);
+                } catch (error) {
+                    setImages(prev => prev.map(img =>
+                        img.id === imageItem.id
+                            ? { ...img, uploading: false, error: 'Upload failed' }
+                            : img
+                    ));
                 }
-            }, 150);
-        });
-    };
-
-    const uploader = uploadHandler || freeImageHostUpload;
-
-    const handleFiles = async (files: FileList | null) => {
-        if (!files) return;
-        const arr = Array.from(files).slice(0, Math.max(0, maxFiles - items.length));
-
-        for (const file of arr) {
-            const id = uid();
-            const previewUrl = URL.createObjectURL(file);
-            const newItem: Item = { id, file, url: previewUrl, uploading: true, progress: 0 };
-            setItems((prev: Item[]) => [...prev, newItem]);
-
-            try {
-                const blob = await compressImage(file);
-                const compressedFile = new File([blob], file.name.replace(/\s+/g, "_"), { type: blob.type });
-
-                const result = await uploader(compressedFile, (p) => {
-                    setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, progress: p } : it));
-                });
-
-                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
-            } catch (e) {
-                console.error("Upload error", e);
-                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false } : it));
             }
+
+            // Update parent component
+            setImages(current => {
+                onChange?.(current.filter(img => !img.error).map(img => img.url));
+                return current;
+            });
+
+        } finally {
+            setIsUploading(false);
         }
-    };
+    }, [images, maxFiles, onChange]);
 
-    const onDrop = (e: React.DragEvent) => {
+    const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
-        const dt = e.dataTransfer;
-        handleFiles(dt.files);
-    };
+        setIsDragOver(true);
+    }, []);
 
-    const onPick = () => {
-        inputRef.current?.click();
-    };
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+    }, []);
 
-    const removeItem = (id: string) => {
-        setItems((prev: Item[]) => {
-            const next = prev.filter((it: Item) => it.id !== id);
-            // ensure cover exists
-            if (!next.some(n => n.isCover) && next.length > 0) next[0].isCover = true;
-            return next;
-        });
-    };
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        handleFileSelect(e.dataTransfer.files);
+    }, [handleFileSelect]);
 
-    const replaceItem = (id: string, file: File) => {
-        const doReplace = async () => {
-            const previewUrl = URL.createObjectURL(file);
-            setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, file, url: previewUrl, uploading: true, progress: 0 } : it));
-
-            try {
-                const blob = await compressImage(file);
-                const compressedFile = new File([blob], file.name.replace(/\s+/g, "_"), { type: blob.type });
-                const result = await uploader(compressedFile, (p) => setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, progress: p } : it)));
-                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false, progress: 100, url: result.url, file: null } : it));
-            } catch (e) {
-                console.error(e);
-                setItems((prev: Item[]) => prev.map((it: Item) => it.id === id ? { ...it, uploading: false } : it));
+    const removeImage = useCallback((id: string) => {
+        setImages(prev => {
+            const newImages = prev.filter(img => img.id !== id);
+            // If we removed the cover image, make the first remaining image the cover
+            if (newImages.length > 0 && !newImages.some(img => img.isCover)) {
+                newImages[0].isCover = true;
             }
-        };
-
-        doReplace();
-    };
-
-    const setCover = (id: string) => {
-        setItems((prev: Item[]) => prev.map((it: Item) => ({ ...it, isCover: it.id === id })));
-    };
-
-    const move = (id: string, dir: number) => {
-        setItems((prev: Item[]) => {
-            const idx = prev.findIndex((p: Item) => p.id === id);
-            if (idx === -1) return prev;
-            const newIdx = idx + dir;
-            if (newIdx < 0 || newIdx >= prev.length) return prev;
-            const copy = [...prev];
-            const [item] = copy.splice(idx, 1);
-            copy.splice(newIdx, 0, item);
-            return copy;
+            onChange?.(newImages.map(img => img.url));
+            return newImages;
         });
-    };
+    }, [onChange]);
+
+    const setCoverImage = useCallback((id: string) => {
+        setImages(prev => prev.map(img => ({
+            ...img,
+            isCover: img.id === id
+        })));
+    }, []);
 
     return (
-        <div>
+        <div className={cn("space-y-4", className)}>
+            {/* Upload Area */}
             <div
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={onDrop}
-                className="border-dashed border-2 border-gray-200 rounded-lg p-4 text-center bg-white"
+                className={cn(
+                    "relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200",
+                    isDragOver
+                        ? "border-teal-400 bg-teal-50"
+                        : "border-gray-300 hover:border-teal-300 hover:bg-gray-50",
+                    isUploading && "opacity-50 pointer-events-none"
+                )}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
             >
-                <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
-                <div className="flex flex-col items-center gap-3">
-                    <div className="text-sm text-gray-600">Drag & drop images here or</div>
-                    <button type="button" onClick={onPick} className="px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-md transition-all">Select Images</button>
-                    <div className="text-xs text-gray-400">Max {maxFiles} images. JPEG/PNG recommended.</div>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                />
+
+                <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 bg-teal-100 rounded-full">
+                        <Upload className="w-8 h-8 text-teal-600" />
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            Upload Property Images
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                            Drag and drop images here, or{" "}
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="text-teal-600 hover:text-teal-700 font-medium underline"
+                            >
+                                browse files
+                            </button>
+                        </p>
+                        <div className="text-sm text-gray-500">
+                            <p>Supported formats: JPG, PNG, WebP</p>
+                            <p>Maximum file size: 10MB per image</p>
+                            <p>Maximum {maxFiles} images</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {items.map(item => (
-                    <div key={item.id} className="relative rounded-lg overflow-hidden border bg-gray-50">
-                        <div className="w-full h-36 relative bg-gray-100">
-                            <img src={item.url} alt="preview" className="object-cover w-full h-full" />
-                        </div>
+            {/* Image Grid */}
+            {images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {images.map((image, index) => (
+                        <div
+                            key={image.id}
+                            className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50"
+                        >
+                            {/* Image */}
+                            <img
+                                src={image.url}
+                                alt={`Property image ${index + 1}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23f3f4f6' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-family='sans-serif' font-size='18'%3EImage Error%3C/text%3E%3C/svg%3E";
+                                }}
+                            />
 
-                        <div className="p-2 flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                                <button type="button" onClick={() => setCover(item.id)} className={`px-2 py-1 text-xs rounded ${item.isCover ? 'bg-teal-600 text-white' : 'bg-white text-gray-700 border'}`}>Cover</button>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <button type="button" onClick={() => move(item.id, -1)} className="text-gray-500 px-1">◀</button>
-                                <button type="button" onClick={() => move(item.id, 1)} className="text-gray-500 px-1">▶</button>
-                                <label className="text-gray-500 px-1 cursor-pointer">
-                                    <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files) replaceItem(item.id, e.target.files[0]); }} />
-                                    Replace
-                                </label>
-                                <button type="button" onClick={() => removeItem(item.id)} className="text-red-500 px-1">Remove</button>
-                            </div>
-                        </div>
+                            {/* Cover Badge */}
+                            {image.isCover && (
+                                <div className="absolute top-2 left-2 bg-teal-600 text-white px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1">
+                                    <Star className="w-3 h-3 fill-current" />
+                                    Cover
+                                </div>
+                            )}
 
-                        {item.uploading && (
-                            <div className="absolute inset-x-0 bottom-0 left-0 right-0">
-                                <div className="h-1 bg-gray-200">
-                                    <div style={{ width: `${item.progress || 0}%` }} className="h-1 bg-teal-500 transition-all" />
+                            {/* Upload Progress */}
+                            {image.uploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                    <div className="bg-white rounded-lg p-4 w-20 h-20 flex flex-col items-center justify-center">
+                                        <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                                        <span className="text-xs text-gray-600">{image.progress}%</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Error State */}
+                            {image.error && (
+                                <div className="absolute inset-0 bg-red-50 flex items-center justify-center">
+                                    <div className="text-center p-4">
+                                        <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+                                        <p className="text-xs text-red-600">{image.error}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Actions Overlay */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <div className="flex gap-2">
+                                    {!image.isCover && !image.uploading && !image.error && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setCoverImage(image.id)}
+                                            className="p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all"
+                                            title="Set as cover"
+                                        >
+                                            <Star className="w-4 h-4 text-gray-700" />
+                                        </button>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(image.id)}
+                                        className="p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all"
+                                        title="Remove image"
+                                    >
+                                        <X className="w-4 h-4 text-red-600" />
+                                    </button>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                ))}
+
+                            {/* Drag Handle */}
+                            <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <GripVertical className="w-4 h-4 text-white drop-shadow-lg" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>{images.filter(img => !img.error).length} of {maxFiles} images uploaded</span>
+                {isUploading && <span className="text-teal-600">Uploading...</span>}
             </div>
         </div>
     );
