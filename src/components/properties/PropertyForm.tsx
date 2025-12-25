@@ -87,7 +87,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
     };
 
     const removeImageField = (index: number) => {
-        const newImages = formData.images.filter((_, i) => i !== index);
+        const newImages = formData.images.filter((_img: string, i: number) => i !== index);
         setFormData(prev => ({ ...prev, images: newImages }));
     };
 
