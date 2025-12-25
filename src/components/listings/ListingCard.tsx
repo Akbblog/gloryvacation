@@ -4,6 +4,7 @@ import { Star, MapPin, Bed, Bath, Users } from "lucide-react";
 
 interface ListingCardProps {
     id: string;
+    slug: string;
     title: string;
     location: string;
     price: number;
@@ -16,6 +17,7 @@ interface ListingCardProps {
 
 export function ListingCard({
     id,
+    slug,
     title,
     location,
     price,
@@ -26,7 +28,7 @@ export function ListingCard({
     guests,
 }: ListingCardProps) {
     return (
-        <Link href={`/listings/${id}`} className="group block">
+        <Link href={`/listings/${slug || id}`} className="group block">
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
                 {/* Image */}
                 <div className="relative h-56 overflow-hidden">

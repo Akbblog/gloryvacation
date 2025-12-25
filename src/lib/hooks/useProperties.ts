@@ -3,6 +3,7 @@ import fetcher from '@/lib/fetcher';
 
 export type PublicProperty = {
     id: string;
+    slug: string;
     title: string;
     pricePerNight: number;
     images: string[];
@@ -36,6 +37,7 @@ export function useProperties() {
 
     const properties: PublicProperty[] = (data || []).map((p: any) => ({
         id: normalizeId(p._id) || normalizeId(p.id) || '',
+        slug: p.slug || '',
         title: p.title,
         pricePerNight: p.pricePerNight || p.price,
         images: p.images && p.images.length ? p.images : ['/placeholder.jpg'],

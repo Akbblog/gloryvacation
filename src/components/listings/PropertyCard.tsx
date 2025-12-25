@@ -19,6 +19,7 @@ import {
 
 interface PropertyCardProps {
     id: string;
+    slug: string;
     title: string;
     pricePerNight?: number;
     images: string[];
@@ -31,6 +32,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({
     id,
+    slug,
     title,
     pricePerNight,
     images,
@@ -70,7 +72,7 @@ export function PropertyCard({
         return t('bedrooms', { count: bedrooms });
     };
 
-    const listingHref = `/listings/${id}`;
+    const listingHref = `/listings/${slug || id}`;
 
     return (
         <Link href={listingHref}>

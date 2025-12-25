@@ -61,6 +61,7 @@ const DESTINATIONS_DATA: Record<string, {
 const MOCK_PROPERTIES = [
     {
         id: "1",
+        slug: "modern-studio-amazing-views",
         title: "Modern Studio with Amazing Views",
         pricePerNight: 295,
         images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop"],
@@ -72,6 +73,7 @@ const MOCK_PROPERTIES = [
     },
     {
         id: "2",
+        slug: "elegant-1-bedroom-apartment",
         title: "Elegant 1-Bedroom Apartment",
         pricePerNight: 380,
         images: ["https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?q=80&w=2070&auto=format&fit=crop"],
@@ -83,6 +85,7 @@ const MOCK_PROPERTIES = [
     },
     {
         id: "3",
+        slug: "spacious-2br-balcony",
         title: "Spacious 2BR with Balcony",
         pricePerNight: 520,
         images: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop"],
@@ -94,6 +97,7 @@ const MOCK_PROPERTIES = [
     },
     {
         id: "4",
+        slug: "luxury-3br-family-apartment",
         title: "Luxury 3BR Family Apartment",
         pricePerNight: 850,
         images: ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop"],
@@ -161,6 +165,7 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
                             <PropertyCard
                                 key={property.id}
                                 id={property.id}
+                                slug={property.slug}
                                 title={property.title}
                                 images={property.images}
                                 guests={property.guests}

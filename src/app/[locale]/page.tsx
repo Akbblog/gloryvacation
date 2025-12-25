@@ -84,6 +84,7 @@ export default function Home() {
                 <PropertyCard
                   key={property.id}
                   id={property.id}
+                  slug={property.slug}
                   title={property.title}
                   images={property.images}
                   guests={property.guests}

@@ -10,6 +10,7 @@ import { useLocale } from "next-intl";
 
 interface Property {
     _id: string;
+    slug: string;
     title: string;
     location: {
         address: string;
@@ -170,7 +171,7 @@ export default function ListingsPage() {
                                 )}
 
                                 <Link
-                                    href={`/listings/${property._id}`}
+                                    href={`/listings/${property.slug || property._id}`}
                                     className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 flex items-center gap-1"
                                 >
                                     <Eye className="w-4 h-4" /> View
