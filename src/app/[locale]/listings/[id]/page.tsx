@@ -16,14 +16,11 @@ async function getProperty(id: string) {
         let property: any = null;
 
         if (isObjectId) {
-            // Fetch active properties for public viewing
+            // Fetch property by _id (allow inactive so admin-created stays viewable)
             property = await Property.findById(id).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
-            if (property && !property.isActive) {
-                return null; // Property not active
-            }
         }
 
         // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
@@ -32,9 +29,6 @@ async function getProperty(id: string) {
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
-            if (property && !property.isActive) {
-                return null; // Property not active
-            }
         }
 
         if (!property) return null;

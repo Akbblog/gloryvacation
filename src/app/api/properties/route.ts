@@ -9,6 +9,7 @@ export async function GET(req: Request) {
         await connectDB();
         const { searchParams } = new URL(req.url);
         const hostId = searchParams.get("hostId");
+        const all = searchParams.get("all");
 
         // If client requests a host's properties, require the requester to be the host or an admin.
         const session = await getServerSession(authOptions);
@@ -24,6 +25,12 @@ export async function GET(req: Request) {
                 return NextResponse.json({ message: "Forbidden" }, { status: 403 });
             }
             query = { host: hostId };
+        } else if (all === "1") {
+            // Admin-only path to fetch all listings (active + inactive)
+            if (!session || session.user?.role !== "admin") {
+                return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+            }
+            query = {}; // no isActive filter
         } else {
             // Public listing endpoint - return active properties
             query = { isActive: true };

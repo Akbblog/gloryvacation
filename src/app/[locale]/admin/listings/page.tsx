@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import useSWR from 'swr';
 import { Link } from "@/i18n/navigation";
-import { Plus, Home, MapPin, DollarSign, Star } from "lucide-react";
+import { Plus, Home, MapPin, DollarSign, Star, Eye, Pencil } from "lucide-react";
 import Image from "next/image";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import { useLocale } from "next-intl";
 
 interface Property {
     _id: string;
@@ -21,9 +22,14 @@ interface Property {
 }
 
 export default function ListingsPage() {
+    const locale = useLocale();
     const [loading, setLoading] = useState(true);
     const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const { data: properties, mutate } = useSWR<Property[]>('/api/properties', fetcher, { shouldRetryOnError: false });
+    const { data: properties, mutate } = useSWR<Property[]>(
+        '/api/properties?all=1',
+        fetcher,
+        { shouldRetryOnError: false }
+    );
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [targetProperty, setTargetProperty] = useState<{ id: string; title: string } | null>(null);
 
@@ -38,7 +44,7 @@ export default function ListingsPage() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Property Listings</h1>
                 <Link
-                    href="/admin/listings/add"
+                    href={`/${locale}/admin/listings/add`}
                     className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium shadow-sm"
                 >
                     <Plus className="w-4 h-4" />
@@ -164,6 +170,18 @@ export default function ListingsPage() {
                                     </button>
                                 )}
 
+                                <Link
+                                    href={`/${locale}/listings/${property._id}`}
+                                    className="px-3 py-1 rounded-md bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 flex items-center gap-1"
+                                >
+                                    <Eye className="w-4 h-4" /> View
+                                </Link>
+                                <Link
+                                    href={`/${locale}/admin/listings/${property._id}`}
+                                    className="px-3 py-1 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 flex items-center gap-1"
+                                >
+                                    <Pencil className="w-4 h-4" /> Edit
+                                </Link>
                                 <button
                                     onClick={() => {
                                         setTargetProperty({ id: property._id, title: property.title });
