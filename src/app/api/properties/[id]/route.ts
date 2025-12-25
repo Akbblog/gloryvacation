@@ -15,11 +15,19 @@ export async function GET(req: Request, context: any) {
         const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
 
         if (isObjectId) {
-            property = await Property.findById(id).populate({ path: 'host', select: 'name image' }).lean();
+            property = await Property.findOne({ 
+                _id: id, 
+                isActive: true, 
+                isApprovedByAdmin: true 
+            }).populate({ path: 'host', select: 'name image' }).lean();
         }
 
         if (!property) {
-            property = await Property.findOne({ slug: id }).populate({ path: 'host', select: 'name image' }).lean();
+            property = await Property.findOne({ 
+                slug: id, 
+                isActive: true, 
+                isApprovedByAdmin: true 
+            }).populate({ path: 'host', select: 'name image' }).lean();
         }
 
         if (!property) return NextResponse.json({ message: 'Not found' }, { status: 404 });

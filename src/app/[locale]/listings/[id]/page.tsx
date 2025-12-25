@@ -13,32 +13,6 @@ export const revalidate = 0;
 async function getProperty(id: string) {
     console.log(`[getProperty] Starting lookup for id: '${id}'`);
     
-    // TEMPORARY: Return mock data to test if the issue is with database lookup
-    if (id === '694daf1580239e0639cee23f') {
-        console.log(`[getProperty] Returning mock data for test property`);
-        return {
-            _id: '694daf1580239e0639cee23f',
-            title: 'Test Property',
-            slug: 'test-property',
-            description: 'Test description',
-            propertyType: 'apartment',
-            bedrooms: 2,
-            bathrooms: 2,
-            guests: 2,
-            images: ['/placeholder.jpg'],
-            amenities: ['Wifi'],
-            location: {
-                address: 'Test Address',
-                area: 'Test Area',
-                city: 'Dubai',
-                country: 'UAE'
-            },
-            host: { name: 'Test Host' },
-            isActive: true,
-            isApprovedByAdmin: true
-        };
-    }
-    
     try {
         await connectDB();
         
@@ -48,8 +22,12 @@ async function getProperty(id: string) {
         let property: any = null;
 
         if (isObjectId) {
-            // Fetch property by _id (allow inactive so admin-created stays viewable)
-            property = await Property.findById(id).populate({
+            // For public access, only show active and approved properties
+            property = await Property.findOne({ 
+                _id: id, 
+                isActive: true, 
+                isApprovedByAdmin: true 
+            }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
@@ -57,14 +35,18 @@ async function getProperty(id: string) {
 
         // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
         if (!property) {
-            property = await Property.findOne({ slug: id }).populate({
+            property = await Property.findOne({ 
+                slug: id, 
+                isActive: true, 
+                isApprovedByAdmin: true 
+            }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
         }
 
         if (!property) {
-            console.log(`[getProperty] Property not found for id/slug: '${id}'`);
+            console.log(`[getProperty] Property not found or not approved/active for id/slug: '${id}'`);
             return null;
         }
 
@@ -72,32 +54,7 @@ async function getProperty(id: string) {
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
         console.error(`[getProperty] Error fetching property:`, e);
-        // If DB is unavailable or ID invalid, fall back to demo data in non-production
-        // If DB is unavailable or ID invalid, fall back to demo data in non-production
-        // If DB is unavailable or ID invalid, fall back to demo data in non-production
-        // If DB is unavailable or ID invalid, fall back to demo data in non-production
-        if (process.env.NODE_ENV !== 'production') {
-            return {
-                _id: id,
-                title: 'Demo Property',
-                images: [
-                    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop',
-                ],
-                pricePerNight: 299,
-                guests: 2,
-                bedrooms: 1,
-                bathrooms: 1,
-                propertyType: 'apartment',
-                amenities: ['Pool', 'WiFi'],
-                isNew: false,
-                location: { area: 'Demo Area', address: 'Demo Address', city: 'Dubai', country: 'UAE' },
-                description: 'This is demo property data used when the database is not available in development.',
-                host: { name: 'Demo Host', image: '' },
-                rating: null,
-                reviewCount: 0,
-            };
-        }
-        return null; // Handle invalid ID format or not found
+        return null;
     }
 }
 
