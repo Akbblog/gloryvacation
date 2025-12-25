@@ -100,6 +100,16 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
         });
     };
 
+    const toggleAllAmenities = () => {
+        setFormData(prev => {
+            const allSelected = AMENITIES_LIST.every(amenity => prev.amenities.includes(amenity));
+            return {
+                ...prev,
+                amenities: allSelected ? [] : [...AMENITIES_LIST]
+            };
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -307,7 +317,16 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
             </div>
 
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">Amenities</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-gray-900">Amenities</h2>
+                    <button
+                        type="button"
+                        onClick={toggleAllAmenities}
+                        className="text-sm px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-md hover:bg-teal-100 transition-colors"
+                    >
+                        {AMENITIES_LIST.every(amenity => formData.amenities.includes(amenity)) ? "Deselect All" : "Select All"}
+                    </button>
+                </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {AMENITIES_LIST.map((amenity) => (
                         <label key={amenity} className="flex items-center gap-2 cursor-pointer group">
