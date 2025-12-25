@@ -298,15 +298,12 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
 
                             {/* Enhanced Host Section */}
                             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm group">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Hosted by</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Hosted by {p.host?.role === 'admin' ? 'Glory Vacations' : (p.host?.name || 'Host')}</h3>
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200 group-hover:scale-105 transition-transform">
                                         <User className="w-7 h-7 text-white" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-gray-900 text-lg">
-                                            {p.host?.role === 'admin' ? 'Glory Vacations' : (p.host?.name || 'Host')}
-                                        </p>
                                         <p className="text-sm text-gray-500">
                                             {p.host?.role === 'admin' ? 'Official Partner' : `Joined ${p.host?.joinedAt ? new Date(p.host.joinedAt).toLocaleDateString() : 'recently'}`}
                                         </p>
