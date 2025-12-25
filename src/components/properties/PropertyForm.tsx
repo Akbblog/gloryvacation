@@ -90,7 +90,15 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
         setLoading(true);
 
         try {
-            const images = formData.images.filter(img => img.trim() !== "");
+            // Prevent submitting transient blob/data URLs which are only valid in the uploader session
+            const imagesRaw = formData.images.filter(img => img.trim() !== "");
+            const hasTransient = imagesRaw.some(img => img.startsWith('blob:') || img.startsWith('data:'));
+            if (hasTransient) {
+                alert('Please wait for image uploads to finish before saving the property.');
+                setLoading(false);
+                return;
+            }
+            const images = imagesRaw;
             const cleanData: any = { ...formData, images };
             if (formData.pricePerNight !== "" && formData.pricePerNight != null) {
                 cleanData.pricePerNight = Number(formData.pricePerNight);
