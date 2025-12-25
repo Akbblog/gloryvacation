@@ -70,7 +70,7 @@ export function PropertyCard({
         return t('bedrooms', { count: bedrooms });
     };
 
-    const listingHref = `/listings/${encodeURIComponent(id)}`;
+    const listingHref = `/listings/${id}`;
 
     return (
         <Link href={listingHref}>

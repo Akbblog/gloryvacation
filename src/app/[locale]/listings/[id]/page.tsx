@@ -7,13 +7,45 @@ import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
 import { notFound } from "next/navigation";
 
+console.log('[page.tsx] Property model loaded:', !!Property);
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 async function getProperty(id: string) {
     console.log(`[getProperty] Starting lookup for id: '${id}'`);
+    
+    // TEMPORARY: Return mock data to test if the issue is with database lookup
+    if (id === '694daf1580239e0639cee23f') {
+        console.log(`[getProperty] Returning mock data for test property`);
+        return {
+            _id: '694daf1580239e0639cee23f',
+            title: 'Test Property',
+            slug: 'test-property',
+            description: 'Test description',
+            propertyType: 'apartment',
+            bedrooms: 2,
+            bathrooms: 2,
+            guests: 2,
+            images: ['/placeholder.jpg'],
+            amenities: ['Wifi'],
+            location: {
+                address: 'Test Address',
+                area: 'Test Area',
+                city: 'Dubai',
+                country: 'UAE'
+            },
+            host: { name: 'Test Host' },
+            isActive: true,
+            isApprovedByAdmin: true
+        };
+    }
+    
     try {
+        console.log(`[getProperty] Connecting to database...`);
         await connectDB();
+        console.log(`[getProperty] Connected successfully`);
+        
         // Prefer lookup by ObjectId when id looks like one, otherwise try slug.
         const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
         console.log(`[getProperty] isObjectId: ${isObjectId}`);
@@ -21,11 +53,13 @@ async function getProperty(id: string) {
         let property: any = null;
 
         if (isObjectId) {
+            console.log(`[getProperty] Looking up by ObjectId: ${id}`);
             // Fetch property by _id (allow inactive so admin-created stays viewable)
             property = await Property.findById(id).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
+            console.log(`[getProperty] ObjectId lookup result:`, property ? 'found' : 'not found');
         }
 
         // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
@@ -35,6 +69,7 @@ async function getProperty(id: string) {
                 path: "host",
                 select: "name role bio image joinedAt"
             }).lean();
+            console.log(`[getProperty] Slug lookup result:`, property ? 'found' : 'not found');
         }
 
         if (!property) {
@@ -47,6 +82,8 @@ async function getProperty(id: string) {
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
         console.error(`[getProperty] Error fetching property:`, e);
+        // If DB is unavailable or ID invalid, fall back to demo data in non-production
+        // If DB is unavailable or ID invalid, fall back to demo data in non-production
         // If DB is unavailable or ID invalid, fall back to demo data in non-production
         if (process.env.NODE_ENV !== 'production') {
             return {
@@ -85,6 +122,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         notFound();
     }
 
+    console.log(`[ListingPage] Property found, rendering page for: ${listing._id}`);
     return (
         <div className="min-h-screen flex flex-col">
             <Navbar />
