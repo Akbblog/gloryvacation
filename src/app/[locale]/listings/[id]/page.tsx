@@ -17,6 +17,7 @@ async function getProperty(id: string) {
         await connectDB();
         
         // Prefer lookup by ObjectId when id looks like one, otherwise try slug.
+        // Updated query to include backward compatibility for properties without isApprovedByAdmin field
         const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
 
         let property: any = null;
