@@ -20,10 +20,17 @@ export async function POST(req: Request) {
     });
 
     const data = await res.json();
+    console.log('Freeimage.host response:', data); // Add logging for debugging
+    
     if (data && data.status_code === 200 && data.image && data.image.url) {
-      return NextResponse.json({ url: data.image.url });
+      return NextResponse.json({ 
+        url: data.image.url,
+        thumb: data.image.thumb?.url,
+        medium: data.image.medium?.url 
+      });
     }
 
+    console.error('Upload failed with response:', data);
     return NextResponse.json({ message: 'Upload failed', detail: data }, { status: 500 });
   } catch (err) {
     console.error('Upload proxy error', err);

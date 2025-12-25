@@ -33,10 +33,13 @@ async function connectDB() {
         const opts = {
             bufferCommands: false,
             // limit pool size for ephemeral serverless functions
-            maxPoolSize: Number(process.env.MONGODB_MAX_POOL_SIZE) || 5,
+            maxPoolSize: process.env.NODE_ENV === 'production' ? 20 : 10,
+            minPoolSize: 2,
             // fail fast if server is not selectable
             serverSelectionTimeoutMS: 5000,
             // use new URL parser / unified topology (defaults in mongoose >=6)
+            maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+            socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
         };
 
         cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
