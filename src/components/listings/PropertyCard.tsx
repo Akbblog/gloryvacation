@@ -85,7 +85,6 @@ export function PropertyCard({
                                         fill
                                         className="object-cover"
                                         sizes="(max-width: 640px) 173px, 310px"
-                                        priority={idx === 0}
                                     />
                                 </div>
                             ))}
