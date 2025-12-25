@@ -70,8 +70,10 @@ export function PropertyCard({
         return t('bedrooms', { count: bedrooms });
     };
 
+    const listingHref = `/listings/${encodeURIComponent(id)}`;
+
     return (
-        <Link href={`/listings/${id}`}>
+        <Link href={listingHref}>
             <article className="flex flex-col rounded-2xl cursor-pointer border border-[#E8E8E8] overflow-hidden bg-white shadow-[0px_3px_8px_0px_rgba(0,0,0,0.08)] hover:shadow-[0px_8px_20px_0px_rgba(0,0,0,0.12)] transition-all duration-300 group">
                 {/* Image Section */}
                 <div className="relative w-full h-[165px] sm:h-[304px]">

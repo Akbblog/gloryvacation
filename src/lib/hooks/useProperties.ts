@@ -17,8 +17,25 @@ export type PublicProperty = {
 export function useProperties() {
     const { data, error, mutate } = useSWR<any[]>('/api/properties', fetcher, { shouldRetryOnError: false });
 
+    const normalizeId = (value: any): string | undefined => {
+        if (!value) return undefined;
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object') {
+            // Mongo extended JSON shape
+            if (typeof value.$oid === 'string') return value.$oid;
+            // Sometimes APIs may nest
+            if (typeof (value as any).id === 'string') return (value as any).id;
+        }
+        if (typeof value?.toString === 'function') {
+            const s = value.toString();
+            if (typeof s === 'string' && s !== '[object Object]') return s;
+        }
+        const fallback = String(value);
+        return fallback !== '[object Object]' ? fallback : undefined;
+    };
+
     const properties: PublicProperty[] = (data || []).map((p: any) => ({
-        id: p._id || p.id,
+        id: normalizeId(p._id) || normalizeId(p.id) || '',
         title: p.title,
         pricePerNight: p.pricePerNight || p.price,
         images: p.images && p.images.length ? p.images : ['/placeholder.jpg'],
