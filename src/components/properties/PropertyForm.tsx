@@ -94,7 +94,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
     const toggleAmenity = (amenity: string) => {
         setFormData(prev => {
             const amenities = prev.amenities.includes(amenity)
-                ? prev.amenities.filter(a => a !== amenity)
+                ? prev.amenities.filter((a: string) => a !== amenity)
                 : [...prev.amenities, amenity];
             return { ...prev, amenities };
         });
