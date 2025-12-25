@@ -16,11 +16,18 @@ interface PropertyFormProps {
     onCancel: () => void;
     onSuccess: () => void;
     isAdmin?: boolean;
+    // Optional initial data for edit mode
+    initial?: any;
+    // Optional endpoint and method override
+    submitUrl?: string;
+    submitMethod?: string;
 }
 
-export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps) {
+import { useEffect } from "react";
+
+export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl, submitMethod }: PropertyFormProps) {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(() => ({
         title: "",
         slug: "",
         description: "",
@@ -37,7 +44,15 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
         },
         images: [""],
         amenities: [] as string[],
-    });
+    } as any));
+
+    // Initialize from `initial` when provided
+    useEffect(() => {
+        if (initial) {
+            setFormData(prev => ({ ...prev, ...initial }));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initial]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -106,8 +121,11 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin }: PropertyFormProps
                 delete cleanData.pricePerNight;
             }
 
-            const res = await fetch("/api/properties", {
-                method: "POST",
+            const url = submitUrl || (initial ? `/api/admin/properties/update` : "/api/properties");
+            const method = submitMethod || (initial ? 'POST' : 'POST');
+
+            const res = await fetch(url, {
+                method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(cleanData),
             });
