@@ -51,27 +51,27 @@ async function fileToBase64(file: File): Promise<string> {
 }
 
 async function freeImageHostUpload(file: File, onProgress: (p: number) => void): Promise<{ url: string }> {
-    onProgress(10);
+    onProgress(5);
     const base64 = await fileToBase64(file);
-    onProgress(30);
-    const formData = new FormData();
-    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
-    formData.append('action', 'upload');
-    formData.append('source', base64);
-    formData.append('format', 'json');
-    onProgress(50);
-    const res = await fetch('https://freeimage.host/api/1/upload', {
+    onProgress(20);
+
+    // POST to local server proxy to avoid CORS restrictions in browser
+    const res = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64 }),
     });
-    onProgress(80);
+
+    if (!res.ok) {
+        onProgress(0);
+        throw new Error('Upload proxy failed');
+    }
+
     const data = await res.json();
     onProgress(100);
-    if (data && data.status_code === 200 && data.image && data.image.url) {
-        return { url: data.image.url };
-    } else {
-        throw new Error(data?.success?.message || 'Image upload failed');
-    }
+
+    if (data && data.url) return { url: data.url };
+    throw new Error('Upload failed');
 }
 
 export default function ImageUploader({
