@@ -35,8 +35,15 @@ export async function GET(req: Request) {
             }
             query = {}; // no isActive filter
         } else {
-            // Public listing endpoint - return active properties
-            query = { isActive: true };
+            // Public listing endpoint - return active and approved properties
+            // Also include properties that don't have isApprovedByAdmin field (backward compatibility)
+            query = { 
+                isActive: true,
+                $or: [
+                    { isApprovedByAdmin: true },
+                    { isApprovedByAdmin: { $exists: false } }
+                ]
+            };
         }
 
         const properties = await Property.find(query).sort({ createdAt: -1 });

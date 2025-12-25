@@ -18,7 +18,10 @@ export async function GET(req: Request, context: any) {
             property = await Property.findOne({ 
                 _id: id, 
                 isActive: true, 
-                isApprovedByAdmin: true 
+                $or: [
+                    { isApprovedByAdmin: true },
+                    { isApprovedByAdmin: { $exists: false } }
+                ]
             }).populate({ path: 'host', select: 'name image' }).lean();
         }
 
@@ -26,7 +29,10 @@ export async function GET(req: Request, context: any) {
             property = await Property.findOne({ 
                 slug: id, 
                 isActive: true, 
-                isApprovedByAdmin: true 
+                $or: [
+                    { isApprovedByAdmin: true },
+                    { isApprovedByAdmin: { $exists: false } }
+                ]
             }).populate({ path: 'host', select: 'name image' }).lean();
         }
 

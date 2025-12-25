@@ -23,10 +23,14 @@ async function getProperty(id: string) {
 
         if (isObjectId) {
             // For public access, only show active and approved properties
+            // Also include properties that don't have isApprovedByAdmin field (backward compatibility)
             property = await Property.findOne({ 
                 _id: id, 
                 isActive: true, 
-                isApprovedByAdmin: true 
+                $or: [
+                    { isApprovedByAdmin: true },
+                    { isApprovedByAdmin: { $exists: false } }
+                ]
             }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
@@ -38,7 +42,10 @@ async function getProperty(id: string) {
             property = await Property.findOne({ 
                 slug: id, 
                 isActive: true, 
-                isApprovedByAdmin: true 
+                $or: [
+                    { isApprovedByAdmin: true },
+                    { isApprovedByAdmin: { $exists: false } }
+                ]
             }).populate({
                 path: "host",
                 select: "name role bio image joinedAt"
