@@ -4,7 +4,7 @@ import { Property } from "@/models/Property";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, context: any) {
     try {
         const session = await getServerSession(authOptions as any) as any;
         const userRole = session?.user?.role;
@@ -13,8 +13,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         }
 
         await connectDB();
-
-        const id = params.id;
+        // `context.params` may be a plain object or a Promise depending on Next.js internals.
+        const rawParams = context?.params;
+        const params = rawParams && typeof rawParams.then === 'function' ? await rawParams : rawParams;
+        const id = params?.id;
         const property = await Property.findById(id).lean();
         if (!property) {
             return NextResponse.json({ message: 'Property not found' }, { status: 404 });
