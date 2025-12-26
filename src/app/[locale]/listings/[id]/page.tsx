@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
-import { notFound } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -49,17 +49,27 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     
     const listing = await getProperty(id);
 
-    if (!listing) {
-        notFound();
-    }
-
     return (
         <div className="min-h-screen flex flex-col">
             <Navbar />
 
             <main className="flex-1 container mx-auto px-4 md:px-6 py-8">
-                {/* Render server content and include a client child that uses SWR to revalidate */}
-                <PropertyDetailClient id={id} initialProperty={listing} />
+                {listing ? (
+                    <PropertyDetailClient id={id} initialProperty={listing} />
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center gap-4 py-20">
+                        <h1 className="text-3xl font-bold text-gray-900">Listing unavailable</h1>
+                        <p className="text-gray-600 max-w-xl">
+                            The property you tried to visit is not live yet. It may still be pending approval or has been archived.
+                        </p>
+                        <Link
+                            href="/listings"
+                            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-teal-500 to-teal-600 px-6 py-3 text-white font-semibold shadow-lg shadow-teal-200"
+                        >
+                            Browse available listings
+                        </Link>
+                    </div>
+                )}
             </main>
 
             <Footer />
