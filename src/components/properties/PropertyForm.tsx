@@ -21,11 +21,13 @@ interface PropertyFormProps {
     // Optional endpoint and method override
     submitUrl?: string;
     submitMethod?: string;
+    // Optional SWR key to mutate after save
+    mutateKey?: string;
 }
 
 import { useEffect } from "react";
 
-export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl, submitMethod }: PropertyFormProps) {
+export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl, submitMethod, mutateKey }: PropertyFormProps) {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<Record<string, any>>(() => ({
         title: "",
@@ -147,7 +149,7 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
 
             if (res.ok) {
                 // revalidate properties list
-                await mutate('/api/properties');
+                await mutate(mutateKey || '/api/properties');
                 onSuccess();
             } else {
                 const error = await res.json();

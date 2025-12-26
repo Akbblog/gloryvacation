@@ -49,6 +49,7 @@ export default function AdminEditListingPage() {
                     initial={initial}
                     submitUrl="/api/admin/properties/update"
                     submitMethod="POST"
+                    mutateKey="/api/properties?all=1"
                 />
             </div>
         </div>
