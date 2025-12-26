@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, Suspense, useRef } from "react";
-import { useProperties } from "@/lib/hooks/useProperties";
+import { useProperties, useFilteredProperties } from "@/lib/hooks/useProperties";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { Navbar } from "@/components/layout/Navbar";
@@ -321,7 +321,9 @@ function SearchPageContent() {
     const [bedrooms, setBedrooms] = useState(searchParams.get("bedrooms") || "");
     const [priceRange, setPriceRange] = useState(searchParams.get("price") || "");
     const [sortBy, setSortBy] = useState(searchParams.get("sort") || "featured");
-    const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+    const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
+        searchParams.get("amenities") ? searchParams.get("amenities")!.split(",") : []
+    );
 
     // UI States for dropdowns
     const [showDestinations, setShowDestinations] = useState(false);
@@ -345,12 +347,34 @@ function SearchPageContent() {
     const [searchInput, setSearchInput] = useState("");
     const [filteredAreas, setFilteredAreas] = useState(DUBAI_AREAS);
 
+    // General search query
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+
     // Loading and pagination
     const [isLoading, setIsLoading] = useState(false);
     const [visibleCount, setVisibleCount] = useState(8);
-    const { properties: fetchedProperties, isLoading: propsLoading, isError } = useProperties();
+
+    // Use filtered properties hook
+    const {
+        properties: fetchedProperties,
+        pagination,
+        isLoading: propsLoading,
+        isError
+    } = useFilteredProperties({
+        area: area !== "Any Area" ? area : undefined,
+        propertyType,
+        bedrooms,
+        priceRange,
+        guests: guests > 1 ? guests : undefined,
+        sortBy: sortBy !== "featured" ? sortBy : undefined,
+        search: searchQuery || undefined,
+        amenities: selectedAmenities.length > 0 ? selectedAmenities : undefined,
+        page: 1, // Start with page 1, can be extended for pagination
+        limit: 50 // Load more properties for better UX
+    });
+
     const [properties, setProperties] = useState<any[]>([]);
-    const [totalCount, setTotalCount] = useState(MOCK_PROPERTIES.length);
+    const [totalCount, setTotalCount] = useState(0);
 
     // Handle Click Outside
     useEffect(() => {
@@ -385,87 +409,11 @@ function SearchPageContent() {
 
     const today = new Date();
 
-    // Filter properties based on current filters
-    const filterProperties = useCallback(() => {
-        let filtered = [...MOCK_PROPERTIES];
-
-        // Filter by area
-        if (area && area !== "Any Area") {
-            // Check if area matches value or label
-            filtered = filtered.filter((p) =>
-                p.area.toLowerCase().includes(area.toLowerCase()) ||
-                DUBAI_AREAS.find(a => a.value === area)?.label.toLowerCase().includes(p.area.toLowerCase())
-            );
-        }
-
-        // Filter by property type
-        if (propertyType) {
-            filtered = filtered.filter((p) => p.propertyType === propertyType);
-        }
-
-        // Filter by bedrooms
-        if (bedrooms) {
-            const bedroomNum = parseInt(bedrooms);
-            if (bedroomNum === 4) {
-                filtered = filtered.filter((p) => p.bedrooms >= 4);
-            } else {
-                filtered = filtered.filter((p) => p.bedrooms === bedroomNum);
-            }
-        }
-
-        // Filter by price range
-        if (priceRange) {
-            const [min, max] = priceRange.split("-").map(Number);
-            filtered = filtered.filter(
-                (p) => p.pricePerNight >= min && p.pricePerNight <= max
-            );
-        }
-
-        // Filter by amenities
-        if (selectedAmenities.length > 0) {
-            filtered = filtered.filter((p) =>
-                selectedAmenities.every((amenity) =>
-                    p.amenities.some((a) => a.toLowerCase().includes(amenity.toLowerCase()))
-                )
-            );
-        }
-
-        // Filter by guests
-        if (guests) {
-            filtered = filtered.filter((p) => p.guests >= guests);
-        }
-
-        // Sort
-        switch (sortBy) {
-            case "price-asc":
-                filtered.sort((a, b) => a.pricePerNight - b.pricePerNight);
-                break;
-            case "price-desc":
-                filtered.sort((a, b) => b.pricePerNight - a.pricePerNight);
-                break;
-            case "newest":
-                filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-                break;
-            case "rating":
-                // For demo, just shuffle
-                break;
-            default:
-                // featured - no additional sorting
-                break;
-        }
-
-        setProperties(filtered);
-        setTotalCount(filtered.length);
-    }, [area, propertyType, bedrooms, priceRange, selectedAmenities, guests, sortBy]);
-
-    useEffect(() => {
-        filterProperties();
-    }, [filterProperties]);
-
-    // Update properties from SWR hook
+    // Update properties from filtered hook
     useEffect(() => {
         if (propsLoading) return;
         if (isError) {
+            // Fallback to mock data in development if API fails
             if (process.env.NODE_ENV !== 'production') {
                 setProperties(MOCK_PROPERTIES);
                 setTotalCount(MOCK_PROPERTIES.length);
@@ -479,8 +427,8 @@ function SearchPageContent() {
         }));
 
         setProperties(normalized);
-        setTotalCount(normalized.length || 0);
-    }, [fetchedProperties, propsLoading, isError]);
+        setTotalCount(pagination?.totalCount || normalized.length);
+    }, [fetchedProperties, propsLoading, isError, pagination]);
 
     // Update URL with filters
     const updateURL = useCallback(() => {
@@ -493,16 +441,17 @@ function SearchPageContent() {
         if (bedrooms) params.set("bedrooms", bedrooms);
         if (priceRange) params.set("price", priceRange);
         if (sortBy && sortBy !== "featured") params.set("sort", sortBy);
+        if (searchQuery) params.set("search", searchQuery);
+        if (selectedAmenities.length > 0) params.set("amenities", selectedAmenities.join(","));
 
         const queryString = params.toString();
         router.push(`/listings${queryString ? `?${queryString}` : ""}`, { scroll: false });
-    }, [area, checkInDate, checkOutDate, guests, propertyType, bedrooms, priceRange, sortBy, router]);
+    }, [area, checkInDate, checkOutDate, guests, propertyType, bedrooms, priceRange, sortBy, searchQuery, selectedAmenities, router]);
 
     const handleSearch = () => {
         setIsLoading(true);
         updateURL();
         setTimeout(() => {
-            filterProperties();
             setIsLoading(false);
         }, 500);
     };
@@ -947,6 +896,30 @@ function SearchPageContent() {
                                     </option>
                                 ))}
                             </select>
+
+                            {/* Search Input */}
+                            <div className="relative flex-1 max-w-md">
+                                <MagnifyingGlass weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search properties, locations..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-full bg-white text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => {
+                                            setSearchQuery("");
+                                            handleSearch();
+                                        }}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                    >
+                                        <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
+                                    </button>
+                                )}
+                            </div>
 
                             {/* More Filters */}
                             <button

@@ -30,6 +30,18 @@ export async function GET(req: Request) {
         const hostId = searchParams.get("hostId");
         const all = searchParams.get("all");
 
+        // New filter parameters
+        const area = searchParams.get("area");
+        const propertyType = searchParams.get("type");
+        const bedrooms = searchParams.get("bedrooms");
+        const priceRange = searchParams.get("price");
+        const guests = searchParams.get("guests");
+        const sortBy = searchParams.get("sort");
+        const search = searchParams.get("search");
+        const amenities = searchParams.get("amenities")?.split(",") || [];
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "12");
+
         // If client requests a host's properties, require the requester to be the host or an admin.
         const session = await getServerSession(authOptions);
 
@@ -53,7 +65,7 @@ export async function GET(req: Request) {
         } else {
             // Public listing endpoint - return active and approved properties
             // Also include properties that don't have isApprovedByAdmin field (backward compatibility)
-            query = { 
+            query = {
                 isActive: true,
                 $or: [
                     { isApprovedByAdmin: true },
@@ -62,8 +74,94 @@ export async function GET(req: Request) {
             };
         }
 
-        const properties = await Property.find(query).sort({ createdAt: -1 });
-        return NextResponse.json(properties);
+        // Apply filters
+        if (area && area !== "Any Area") {
+            query["location.area"] = { $regex: area, $options: "i" };
+        }
+
+        if (propertyType) {
+            query.propertyType = propertyType;
+        }
+
+        if (bedrooms) {
+            const bedroomNum = parseInt(bedrooms);
+            if (bedroomNum === 4) {
+                query.bedrooms = { $gte: 4 };
+            } else {
+                query.bedrooms = bedroomNum;
+            }
+        }
+
+        if (priceRange) {
+            const [min, max] = priceRange.split("-").map(Number);
+            if (max && max < 99999) {
+                query.pricePerNight = { $gte: min, $lte: max };
+            } else {
+                query.pricePerNight = { $gte: min };
+            }
+        }
+
+        if (guests) {
+            query.guests = { $gte: parseInt(guests) };
+        }
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { description: { $regex: search, $options: "i" } },
+                { "location.area": { $regex: search, $options: "i" } },
+                { "location.city": { $regex: search, $options: "i" } },
+            ];
+        }
+
+        if (amenities.length > 0) {
+            query.amenities = { $in: amenities };
+        }
+
+        // Build sort options
+        let sortOptions: any = { createdAt: -1 }; // default sort
+        switch (sortBy) {
+            case "price-asc":
+                sortOptions = { pricePerNight: 1 };
+                break;
+            case "price-desc":
+                sortOptions = { pricePerNight: -1 };
+                break;
+            case "newest":
+                sortOptions = { createdAt: -1 };
+                break;
+            case "rating":
+                sortOptions = { rating: -1, reviewCount: -1 };
+                break;
+            case "featured":
+            default:
+                sortOptions = { isFeatured: -1, createdAt: -1 };
+                break;
+        }
+
+        // Get total count for pagination
+        const totalCount = await Property.countDocuments(query);
+        const totalPages = Math.ceil(totalCount / limit);
+        const skip = (page - 1) * limit;
+
+        // Fetch properties with pagination
+        const properties = await Property.find(query)
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(limit)
+            .populate({ path: 'host', select: 'name' });
+
+        return NextResponse.json({
+            properties,
+            pagination: {
+                page,
+                limit,
+                totalCount,
+                totalPages,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        });
     } catch (error) {
         console.error("Error fetching properties:", error);
         return NextResponse.json({ message: "Internal server error" }, { status: 500 });
