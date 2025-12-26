@@ -77,7 +77,31 @@ export async function POST(req: Request) {
       } catch (ftpErr) {
         console.error('FTP upload error', ftpErr);
         try { client.close(); } catch (e) {}
-        return NextResponse.json({ message: 'FTP upload failed', detail: String(ftpErr) }, { status: 500 });
+
+        // If FTP fails (common on serverless hosts), fallback to freeimage.host proxy
+        try {
+          console.warn('FTP upload failed — falling back to freeimage.host proxy');
+          const formDataFb = new FormData();
+          formDataFb.append('key', FREEIMAGE_KEY);
+          formDataFb.append('action', 'upload');
+          formDataFb.append('source', base64);
+          formDataFb.append('format', 'json');
+
+          const resFb = await fetch('https://freeimage.host/api/1/upload', {
+            method: 'POST',
+            body: formDataFb,
+          });
+          const dataFb = await resFb.json();
+          console.log('freeimage.host fallback response:', dataFb);
+          if (dataFb && dataFb.status_code === 200 && dataFb.image && dataFb.image.url) {
+            return NextResponse.json({ url: dataFb.image.url, fallback: 'freeimage.host', detail: dataFb });
+          }
+          // fallback failed too — return combined error
+          return NextResponse.json({ message: 'FTP upload failed and fallback also failed', ftpError: String(ftpErr), fallbackDetail: dataFb }, { status: 500 });
+        } catch (fbErr) {
+          console.error('Fallback upload error', fbErr);
+          return NextResponse.json({ message: 'FTP upload failed and fallback errored', ftpError: String(ftpErr), fallbackError: String(fbErr) }, { status: 500 });
+        }
       }
     }
 
