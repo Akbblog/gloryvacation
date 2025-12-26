@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
+import { User } from "@/models/User";
 import { Link } from "@/i18n/navigation";
 
 export const dynamic = 'force-dynamic';

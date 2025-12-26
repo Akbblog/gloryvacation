@@ -31,7 +31,12 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
     if (!p && isLoading) return <LoadingSkeleton />;
     if (!p && !isLoading) return <div className="p-8 text-center text-gray-500">Property not found</div>;
 
-        const allImages: string[] = p.images || [];
+    // Ensure p is an object and has expected properties
+    if (typeof p !== 'object' || Array.isArray(p)) {
+        return <div className="p-8 text-center text-gray-500">Invalid property data</div>;
+    }
+
+        const allImages: string[] = Array.isArray(p.images) ? p.images : [];
         // Filter out transient blob/data URLs that may have been stored by mistake
         const imagesFiltered = allImages.filter((u: string) => !!u && !u.startsWith('blob:') && !u.startsWith('data:'));
         // Fallback placeholder (small SVG data URI) so EnhancedImageGallery never receives an empty src
@@ -40,7 +45,7 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
         if (typeof window !== 'undefined' && imagesFiltered.length !== allImages.length) {
             console.warn('Some listing images were transient (blob/data URLs) and were ignored. Please upload images to a permanent host.');
         }
-    const amenities = p.amenities || [];
+    const amenities = Array.isArray(p.amenities) ? p.amenities : [];
     const groupedAmenities = groupAmenities(amenities);
     const visibleAmenities = showAllAmenities ? amenities : amenities.slice(0, 8);
 

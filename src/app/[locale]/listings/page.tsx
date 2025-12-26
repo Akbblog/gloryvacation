@@ -421,10 +421,12 @@ function SearchPageContent() {
             return;
         }
 
-        const normalized = (fetchedProperties || []).map((p: any) => ({
-            ...p,
-            id: p.id || p._id || (p._id && p._id.toString && p._id.toString()) || p.slug || (p.slug && p.slug.toString && p.slug.toString()),
-        }));
+        const normalized = Array.isArray(fetchedProperties)
+            ? fetchedProperties.map((p: any) => ({
+                ...p,
+                id: p.id || p._id || (p._id && p._id.toString && p._id.toString()) || p.slug || (p.slug && p.slug.toString && p.slug.toString()),
+            }))
+            : [];
 
         setProperties(normalized);
         setTotalCount(pagination?.totalCount || normalized.length);

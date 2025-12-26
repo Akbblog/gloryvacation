@@ -28,7 +28,7 @@ export interface PropertiesResponse {
 }
 
 export function useProperties(url?: string) {
-    const { data, error, mutate } = useSWR<PropertiesResponse>(url || '/api/properties', fetcher, { shouldRetryOnError: false });
+    const { data, error, mutate } = useSWR<any>(url || '/api/properties', fetcher, { shouldRetryOnError: false });
 
     const normalizeId = (value: any): string | undefined => {
         if (!value) return undefined;
@@ -47,7 +47,10 @@ export function useProperties(url?: string) {
         return fallback !== '[object Object]' ? fallback : undefined;
     };
 
-    const properties: PublicProperty[] = (data?.properties || []).map((p: any) => ({
+    // Handle both old array format and new object format with pagination
+    const propertiesArray = Array.isArray(data) ? data : (Array.isArray(data?.properties) ? data.properties : []);
+
+    const properties: PublicProperty[] = propertiesArray.map((p: any) => ({
         id: normalizeId(p._id) || normalizeId(p.id) || '',
         slug: p.slug || '',
         title: p.title,
