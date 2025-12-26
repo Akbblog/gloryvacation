@@ -5,7 +5,7 @@ import React from "react";
 interface ConfirmModalProps {
   open: boolean;
   title?: string;
-  message?: string;
+  message?: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void;
@@ -30,7 +30,11 @@ export default function ConfirmModal({
       <div className="relative z-10 w-full max-w-lg mx-4">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-600 mt-2">{message}</p>
+          {typeof message === 'string' ? (
+            <p className="text-sm text-gray-600 mt-2">{message}</p>
+          ) : (
+            <div className="text-sm text-gray-600 mt-2">{message}</div>
+          )}
 
           <div className="mt-6 flex justify-end gap-3">
             <button

@@ -156,6 +156,15 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
             })();
 
             if (res.ok) {
+                // Persist raw API response so the listings page can display it after navigation
+                try {
+                    if (typeof window !== 'undefined') {
+                        sessionStorage.setItem('propertyUpdateResponse', JSON.stringify(resJson || { message: 'Property updated', property: null }));
+                    }
+                } catch (e) {
+                    console.warn('Failed to persist update response for toast', e);
+                }
+
                 // revalidate the most-likely cache keys so listing cards update across pages
                 try {
                     await Promise.all([
