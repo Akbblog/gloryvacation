@@ -125,6 +125,11 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
             }
             const images = imagesRaw;
             const cleanData: any = { ...formData, images };
+
+            // Include the id required by the admin update route so edits persist
+            if (initial) {
+                cleanData.propertyId = initial._id || initial.id;
+            }
             if (formData.pricePerNight !== "" && formData.pricePerNight != null) {
                 cleanData.pricePerNight = Number(formData.pricePerNight);
             } else {
