@@ -11,57 +11,34 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 async function getProperty(id: string) {
-    console.log(`[getProperty] Starting lookup for id: '${id}'`);
+    console.log(`[getProperty] Looking up property for slug: '${id}'`);
     
     try {
         await connectDB();
-        
-        // Prefer lookup by ObjectId when id looks like one, otherwise try slug.
-        // Updated query to include backward compatibility for properties without isApprovedByAdmin field
-        const isObjectId = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
 
-        let property: any = null;
-
-        if (isObjectId) {
-            // For public access, only show active and approved properties
-            // Also include properties that don't have isApprovedByAdmin field (backward compatibility)
-            property = await Property.findOne({ 
-                _id: id, 
-                isActive: true, 
-                $or: [
-                    { isApprovedByAdmin: true },
-                    { isApprovedByAdmin: { $exists: false } }
-                ]
-            }).populate({
+        // Single slug-based lookup keeps the logic simple and deterministic
+        const property = await Property.findOne({
+            slug: id,
+            isActive: true,
+            $or: [
+                { isApprovedByAdmin: true },
+                { isApprovedByAdmin: { $exists: false } },
+            ],
+        })
+            .populate({
                 path: "host",
-                select: "name role bio image joinedAt"
-            }).lean();
-        }
-
-        // If not found by _id or id wasn't an ObjectId, try slug lookup as a fallback
-        if (!property) {
-            property = await Property.findOne({ 
-                slug: id, 
-                isActive: true, 
-                $or: [
-                    { isApprovedByAdmin: true },
-                    { isApprovedByAdmin: { $exists: false } }
-                ]
-            }).populate({
-                path: "host",
-                select: "name role bio image joinedAt"
-            }).lean();
-        }
+                select: "name role bio image joinedAt",
+            })
+            .lean();
 
         if (!property) {
-            console.log(`[getProperty] Property not found or not approved/active for id/slug: '${id}'`);
+            console.log(`[getProperty] Property missing or not visible for slug: '${id}'`);
             return null;
         }
 
-        // Serialize strictly because of Mongoose hydration issues in Next.js
         return JSON.parse(JSON.stringify(property));
     } catch (e) {
-        console.error(`[getProperty] Error fetching property:`, e);
+        console.error("[getProperty] Error fetching property:", e);
         return null;
     }
 }
