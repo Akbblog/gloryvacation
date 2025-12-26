@@ -10,9 +10,8 @@ export async function GET(req: Request, context: any) {
 
         await connectDB();
 
-        // Try ObjectId lookup first when id looks like a 24-hex string, otherwise fall back to slug
-        let property: any = null;
-        property = await Property.findOne({ 
+        // Always fetch by slug (all listings now publish slug-based URLs)
+        const property = await Property.findOne({ 
             slug,
             isActive: true, 
             $or: [
