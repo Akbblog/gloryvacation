@@ -132,10 +132,11 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
             if (initial) {
                 cleanData.propertyId = initial._id || initial.id;
             }
-            if (formData.pricePerNight !== "" && formData.pricePerNight != null) {
-                cleanData.pricePerNight = Number(formData.pricePerNight);
+            // If user cleared the price field, send explicit null so server can unset it.
+            if (formData.pricePerNight === "" || formData.pricePerNight == null) {
+                cleanData.pricePerNight = null;
             } else {
-                delete cleanData.pricePerNight;
+                cleanData.pricePerNight = Number(formData.pricePerNight);
             }
 
             const url = submitUrl || (initial ? `/api/admin/properties/update` : "/api/properties");

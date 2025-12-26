@@ -21,15 +21,30 @@ export async function POST(req: Request) {
         await connectDB();
 
         // Remove any immutable keys
-        const update = { ...body };
-        delete update._id;
-        delete update.id;
-        delete update.propertyId;
+        const updatePayload = { ...body };
+        delete updatePayload._id;
+        delete updatePayload.id;
+        delete updatePayload.propertyId;
+
+        // Convert explicit nulls into $unset operations so fields are removed when cleared
+        const setOps: any = {};
+        const unsetOps: any = {};
+        for (const [k, v] of Object.entries(updatePayload)) {
+            if (v === null) {
+                unsetOps[k] = "";
+            } else {
+                setOps[k] = v;
+            }
+        }
+
+        const mongoUpdate: any = {};
+        if (Object.keys(setOps).length > 0) mongoUpdate.$set = setOps;
+        if (Object.keys(unsetOps).length > 0) mongoUpdate.$unset = unsetOps;
 
         // Use validators and return the updated document
         let updated;
         try {
-            updated = await Property.findByIdAndUpdate(propertyId, update, { new: true, runValidators: true });
+            updated = await Property.findByIdAndUpdate(propertyId, mongoUpdate, { new: true, runValidators: true });
         } catch (err: any) {
             // Handle duplicate key (e.g., slug) with a clear message
             if (err && err.code === 11000) {

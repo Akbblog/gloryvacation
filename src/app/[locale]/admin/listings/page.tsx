@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Plus, Home, MapPin, DollarSign, Star, Eye, Pencil } from "lucide-react";
 import Image from "next/image";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import ApiResponseModal from "@/components/ui/ApiResponseModal";
+import ApiResponseToast from "@/components/ui/ApiResponseToast";
 
 interface Property {
     _id: string;
@@ -61,7 +61,7 @@ export default function ListingsPage() {
 
     return (
         <div className="p-6">
-            <ApiResponseModal />
+            <ApiResponseToast />
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Property Listings</h1>
                 <Link
@@ -112,6 +112,7 @@ export default function ListingsPage() {
                 {items.map((property) => (
                     <div
                         key={property._id}
+                        data-property-id={property._id}
                         className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
                     >
                         <div className="relative h-48 bg-slate-100">
