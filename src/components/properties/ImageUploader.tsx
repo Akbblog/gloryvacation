@@ -208,16 +208,27 @@ export default function ImageUploader({
             if (newImages.length > 0 && !newImages.some(img => img.isCover)) {
                 newImages[0].isCover = true;
             }
-            onChange?.(newImages.map(img => img.url));
+            // Emit ordered URLs with cover first
+            const ordered = [
+                ...newImages.filter(img => img.isCover).map(img => img.url),
+                ...newImages.filter(img => !img.isCover).map(img => img.url),
+            ];
+            onChange?.(ordered);
             return newImages;
         });
     }, [onChange]);
 
     const setCoverImage = useCallback((id: string) => {
-        setImages(prev => prev.map(img => ({
-            ...img,
-            isCover: img.id === id
-        })));
+        setImages(prev => {
+            const next = prev.map(img => ({ ...img, isCover: img.id === id }));
+            // Emit ordered URLs with cover first
+            const ordered = [
+                ...next.filter(img => img.isCover).map(img => img.url),
+                ...next.filter(img => !img.isCover).map(img => img.url),
+            ];
+            onChange?.(ordered);
+            return next;
+        });
     }, []);
 
     return (
