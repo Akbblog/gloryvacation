@@ -26,7 +26,20 @@ export async function POST(req: Request) {
         delete update.id;
         delete update.propertyId;
 
-        const updated = await Property.findByIdAndUpdate(propertyId, update, { new: true });
+        // Use validators and return the updated document
+        let updated;
+        try {
+            updated = await Property.findByIdAndUpdate(propertyId, update, { new: true, runValidators: true });
+        } catch (err: any) {
+            // Handle duplicate key (e.g., slug) with a clear message
+            if (err && err.code === 11000) {
+                const field = Object.keys(err.keyValue || {}).join(', ');
+                return NextResponse.json({ message: `Duplicate value for field(s): ${field}` }, { status: 409 });
+            }
+            console.error('Error during Property.findByIdAndUpdate', err);
+            throw err;
+        }
+
         if (!updated) {
             return NextResponse.json({ message: 'Property not found' }, { status: 404 });
         }

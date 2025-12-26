@@ -147,13 +147,31 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
                 body: JSON.stringify(cleanData),
             });
 
+            const resJson = await (async () => {
+                try {
+                    return await res.json();
+                } catch (e) {
+                    return null;
+                }
+            })();
+
             if (res.ok) {
-                // revalidate properties list
-                await mutate(mutateKey || '/api/properties');
+                // revalidate the most-likely cache keys so listing cards update across pages
+                try {
+                    await Promise.all([
+                        mutate(mutateKey || '/api/properties?all=1'),
+                        mutate('/api/properties'),
+                        mutate('/api/properties?all=1')
+                    ]);
+                } catch (mErr) {
+                    // don't block on mutate failures
+                    console.warn('SWR mutate warning', mErr);
+                }
+
                 onSuccess();
             } else {
-                const error = await res.json();
-                alert(error.message || "Failed to create property");
+                console.error('Property save failed', res.status, resJson);
+                alert((resJson && resJson.message) || `Failed to save property (${res.status})`);
             }
         } catch (error) {
             console.error(error);
