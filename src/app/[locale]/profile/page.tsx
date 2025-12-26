@@ -90,11 +90,11 @@ export default function ProfilePage() {
             </div>
 
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 min-h-[300px] flex flex-col items-center justify-center text-center">
-                {(bookingsData || []).length > 0 ? (
+            {(Array.isArray(bookingsData) && bookingsData.length > 0) ? (
                     <div className="w-full text-left space-y-4">
                         <h3 className="text-xl font-bold text-[#1C1C1C]">Recent Bookings</h3>
                         <div className="space-y-4">
-                            {(bookingsData || []).slice(0, 3).map((booking) => (
+                            {(Array.isArray(bookingsData) ? bookingsData : []).slice(0, 3).map((booking) => (
                                 <div key={booking._id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
                                     <div className="w-24 h-24 bg-gray-200 rounded-lg relative overflow-hidden flex-shrink-0">
                                         {/* Image placeholder */}
@@ -133,9 +133,9 @@ export default function ProfilePage() {
     const BookingsView = () => (
         <div className="space-y-6 animate-in fade-in duration-500">
             <h2 className="text-2xl font-bold text-[#1C1C1C]">My Bookings</h2>
-            {(bookingsData || []).length > 0 ? (
+            {(Array.isArray(bookingsData) && bookingsData.length > 0) ? (
                 <div className="grid gap-4">
-                    {(bookingsData || []).map((booking) => (
+                    {(Array.isArray(bookingsData) ? bookingsData : []).map((booking) => (
                         <div key={booking._id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
                             <div className="w-full md:w-48 h-32 bg-gray-200 rounded-xl relative overflow-hidden flex-shrink-0">
                                 <Image src={booking.property?.images?.[0] || "/placeholder.jpg"} alt={booking.property?.title} fill className="object-cover" />

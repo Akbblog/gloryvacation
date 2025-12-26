@@ -98,11 +98,11 @@ export default function ImageUploader({
     className
 }: ImageUploaderProps) {
     const [images, setImages] = useState<ImageItem[]>(() =>
-        initial.map((url, index) => ({
+        Array.isArray(initial) ? initial.map((url, index) => ({
             id: generateId(),
             url,
             isCover: index === 0
-        }))
+        })) : []
     );
     const [isDragOver, setIsDragOver] = useState(false);
     const [isUploading, setIsUploading] = useState(false);

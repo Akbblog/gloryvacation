@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Star, Calendar } from "lucide-react";
+import { Star, Calendar, CheckCircle, X } from "lucide-react";
 import { useState } from "react";
 import { mutate } from 'swr';
 import { useSession } from "next-auth/react";
@@ -19,6 +19,7 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
     const [checkIn, setCheckIn] = useState("");
     const [checkOut, setCheckOut] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [guestDetails, setGuestDetails] = useState({
         name: "",
         email: "",
@@ -65,8 +66,8 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
             if (res.ok) {
                 // revalidate reservations list
                 await mutate('/api/reservations');
-                alert("Reservation request submitted! Our team will contact you shortly.");
-                router.push("/profile");
+                setShowSuccessModal(true);
+                // router.push("/profile"); // Will navigate after modal closes
             } else {
                 const error = await res.json();
                 alert(error.message || "Failed to create reservation");
@@ -80,7 +81,8 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
     };
 
     return (
-        <div className="rounded-2xl shadow-xl p-6 bg-white sticky top-24 w-full max-w-sm border border-gray-100">
+        <>
+            <div className="rounded-2xl shadow-xl p-6 bg-white sticky top-24 w-full max-w-sm border border-gray-100">
             {/* No price display here */}
             <div className="flex justify-between items-start mb-4">
                 <div>
@@ -154,5 +156,43 @@ export function BookingForm({ propertyId, maxGuests = 4 }: BookingFormProps) {
                 </div>
             )}
         </div>
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 bg-black/50" onClick={() => setShowSuccessModal(false)} />
+
+                <div className="relative z-10 w-full max-w-md mx-4">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CheckCircle className="w-8 h-8 text-green-600" />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Reservation Request Submitted!</h3>
+                        <p className="text-gray-600 mb-6">
+                            Our team will contact you shortly with availability and pricing information.
+                        </p>
+
+                        <button
+                            onClick={() => {
+                                setShowSuccessModal(false);
+                                router.push("/profile");
+                            }}
+                            className="w-full px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                        >
+                            View My Reservations
+                        </button>
+
+                        <button
+                            onClick={() => setShowSuccessModal(false)}
+                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        >
+                            <X className="w-5 h-5 text-gray-400" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
