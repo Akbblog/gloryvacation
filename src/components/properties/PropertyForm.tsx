@@ -348,10 +348,11 @@ export function PropertyForm({ onCancel, onSuccess, isAdmin, initial, submitUrl,
                 <div className="space-y-3">
                     {/* ImageUploader handles uploads and returns URLs via onChange */}
                     <ImageUploader 
-                        key={JSON.stringify(formData.images)} 
-                        initial={formData.images} 
-                        onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))} 
-                    />
+                            key={JSON.stringify(formData.images)} 
+                            initial={formData.images} 
+                            onChange={(urls) => setFormData(prev => ({ ...prev, images: urls }))} 
+                            uploadFolder={(formData.slug && String(formData.slug)) || (initial && (initial.slug || initial._id)) || `property-${Date.now()}`}
+                        />
                 </div>
             </div>
 

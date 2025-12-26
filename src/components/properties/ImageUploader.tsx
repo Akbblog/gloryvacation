@@ -52,7 +52,7 @@ async function fileToBase64(file: File): Promise<string> {
     });
 }
 
-async function freeImageHostUpload(file: File, onProgress: (p: number) => void): Promise<{ url: string }> {
+async function freeImageHostUpload(file: File, onProgress: (p: number) => void, folder?: string): Promise<{ url: string }> {
     onProgress(10);
 
     try {
@@ -61,10 +61,12 @@ async function freeImageHostUpload(file: File, onProgress: (p: number) => void):
 
         onProgress(30);
 
+        const payload: any = { base64 };
+        if (folder) payload.folder = folder;
         const res = await fetch('/api/upload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ base64 }),
+            body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
@@ -89,13 +91,15 @@ interface ImageUploaderProps {
     onChange?: (images: string[]) => void;
     maxFiles?: number;
     className?: string;
+    uploadFolder?: string;
 }
 
 export default function ImageUploader({
     initial = [],
     onChange,
     maxFiles = 12,
-    className
+    className,
+    uploadFolder
 }: ImageUploaderProps) {
     const [images, setImages] = useState<ImageItem[]>(() =>
         Array.isArray(initial) ? initial.map((url, index) => ({
@@ -154,7 +158,7 @@ export default function ImageUploader({
                                 ? { ...img, progress }
                                 : img
                         ));
-                    });
+                    }, uploadFolder);
 
                     // Replace preview URL with uploaded URL
                     setImages(prev => prev.map(img =>
