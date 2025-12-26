@@ -4,6 +4,22 @@ import { Property } from "@/models/Property";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
+const VALID_IMAGE_URL_PATTERN = /^(https?:\/\/|\/)/i;
+
+function isValidImageUrl(url: string): boolean {
+    const trimmed = url.trim();
+    if (!trimmed.length) return false;
+    if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) return false;
+    return VALID_IMAGE_URL_PATTERN.test(trimmed);
+}
+
+function sanitizeImageUrls(images: unknown): string[] {
+    if (!Array.isArray(images)) return [];
+    return images
+        .map((value) => (typeof value === "string" ? value.trim() : ""))
+        .filter((url) => url.length > 0 && isValidImageUrl(url));
+}
+
 // Force dynamic to prevent Next.js from caching API responses
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +84,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
         }
 
+        const rawImages = sanitizeImageUrls(body.images);
+        if (Array.isArray(body.images) && body.images.length > 0 && rawImages.length === 0) {
+            return NextResponse.json({
+                message: "Please provide valid image URLs (no blob or data URIs).",
+            }, { status: 400 });
+        }
+
         await connectDB();
 
         // Create property with current user as host
@@ -76,6 +99,10 @@ export async function POST(req: Request) {
         const toCreate: any = { ...body, host: session.user.id, isActive: true, isApprovedByAdmin: true };
         if (typeof body.pricePerNight !== 'undefined' && body.pricePerNight !== null) {
             toCreate.pricePerNight = body.pricePerNight;
+        }
+
+        if (rawImages.length > 0) {
+            toCreate.images = rawImages;
         }
 
         const property = await Property.create(toCreate);

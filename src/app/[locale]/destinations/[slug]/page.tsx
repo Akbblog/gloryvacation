@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { PropertyCard } from "@/components/listings/PropertyCard";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
@@ -57,57 +57,6 @@ const DESTINATIONS_DATA: Record<string, {
     },
 };
 
-// Mock properties for the destination
-const MOCK_PROPERTIES = [
-    {
-        id: "1",
-        slug: "modern-studio-amazing-views",
-        title: "Modern Studio with Amazing Views",
-        pricePerNight: 295,
-        images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1980&auto=format&fit=crop"],
-        guests: 2,
-        bedrooms: 0,
-        propertyType: "studio" as const,
-        amenities: ["Pool", "Gym"],
-        isNew: true,
-    },
-    {
-        id: "2",
-        slug: "elegant-1-bedroom-apartment",
-        title: "Elegant 1-Bedroom Apartment",
-        pricePerNight: 380,
-        images: ["https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?q=80&w=2070&auto=format&fit=crop"],
-        guests: 2,
-        bedrooms: 1,
-        propertyType: "apartment" as const,
-        amenities: ["Pool", "Parking"],
-        isNew: true,
-    },
-    {
-        id: "3",
-        slug: "spacious-2br-balcony",
-        title: "Spacious 2BR with Balcony",
-        pricePerNight: 520,
-        images: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop"],
-        guests: 4,
-        bedrooms: 2,
-        propertyType: "apartment" as const,
-        amenities: ["Pool", "Gym", "Balcony"],
-        isNew: true,
-    },
-    {
-        id: "4",
-        slug: "luxury-3br-family-apartment",
-        title: "Luxury 3BR Family Apartment",
-        pricePerNight: 850,
-        images: ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop"],
-        guests: 6,
-        bedrooms: 3,
-        propertyType: "apartment" as const,
-        amenities: ["Pool", "Beach Access"],
-        isNew: true,
-    },
-];
 
 export default async function DestinationPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -160,21 +109,16 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
                     <h2 className="text-2xl font-bold text-[#1C1C1C] mb-8">
                         Properties in {destination.name}
                     </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                        {MOCK_PROPERTIES.map((property) => (
-                            <PropertyCard
-                                key={property.id}
-                                id={property.id}
-                                slug={property.slug}
-                                title={property.title}
-                                images={property.images}
-                                guests={property.guests}
-                                bedrooms={property.bedrooms}
-                                propertyType={property.propertyType}
-                                amenities={property.amenities}
-                                isNew={property.isNew}
-                            />
-                        ))}
+                    <div className="bg-white rounded-3xl border border-gray-100 p-8 md:p-10 shadow-lg shadow-gray-100">
+                        <p className="text-gray-600 text-lg mb-4">
+                            This destination page highlights curated neighborhoods. For the latest available listings, visit the main listings page and filter by destination.
+                        </p>
+                        <Link
+                            href="/listings"
+                            className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold shadow-lg shadow-teal-200"
+                        >
+                            Browse all listings
+                        </Link>
                     </div>
                 </div>
             </section>
