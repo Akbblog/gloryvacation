@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "slug": "test-property",
+    "images": [
+      "https://via.placeholder.com/800x600.png?text=Image1",
+      "https://via.placeholder.com/800x600.png?text=Image2"
+    ]
+  }
+]
