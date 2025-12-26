@@ -37,7 +37,8 @@ export default function Home() {
 
   // Filter properties based on selected category
   const filteredProperties = useMemo(() => {
-    return properties.filter((property) => {
+    const safeProperties = Array.isArray(properties) ? properties : [];
+    return safeProperties.filter((property) => {
       if (selectedCategory === "all") return true;
 
       // Bedroom filters

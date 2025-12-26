@@ -9,6 +9,7 @@ interface EnhancedImageGalleryProps {
 }
 
 export default function EnhancedImageGallery({ images, title }: EnhancedImageGalleryProps) {
+  const validImages = Array.isArray(images) ? images : [];
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -23,14 +24,14 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
   }, []);
 
   const nextImage = () => {
-    if (images.length > 0) {
-      setActiveImageIdx((activeImageIdx + 1) % images.length);
+    if (validImages.length > 0) {
+      setActiveImageIdx((activeImageIdx + 1) % validImages.length);
     }
   };
 
   const prevImage = () => {
-    if (images.length > 0) {
-      setActiveImageIdx((activeImageIdx - 1 + images.length) % images.length);
+    if (validImages.length > 0) {
+      setActiveImageIdx((activeImageIdx - 1 + validImages.length) % validImages.length);
     }
   };
 
@@ -75,7 +76,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
   };
 
   // Mobile carousel view
-  if (isMobile && images.length > 0) {
+  if (isMobile && validImages.length > 0) {
     return (
       <>
         <div className="relative h-96 w-full overflow-hidden rounded-2xl bg-gray-200 shadow-lg" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
@@ -93,7 +94,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
             }}
           />
           
-          {images.length > 1 && (
+          {validImages.length > 1 && (
             <>
               <button
                 onClick={prevImage}
@@ -109,7 +110,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
               </button>
               
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
-                {activeImageIdx + 1} / {images.length}
+                {activeImageIdx + 1} / {validImages.length}
               </div>
             </>
           )}
@@ -139,7 +140,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
                 className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
               />
               
-              {images.length > 1 && (
+              {validImages.length > 1 && (
                 <>
                   <button
                     onClick={prevImage}
@@ -157,7 +158,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
               )}
               
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm">
-                {activeImageIdx + 1} / {images.length}
+                {activeImageIdx + 1} / {validImages.length}
               </div>
             </div>
           </div>
@@ -192,7 +193,7 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
         </div>
 
         {/* Thumbnail images with hover effects */}
-        {images.slice(1, 5).map((img, idx) => (
+        {validImages.slice(1, 5).map((img, idx) => (
           <div
             key={idx}
             onClick={() => openLightbox(idx + 1)}
@@ -213,13 +214,13 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
         ))}
 
         {/* Show all photos button */}
-        {images.length > 5 && (
+        {validImages.length > 5 && (
           <div 
             className="relative bg-gradient-to-br from-gray-300 to-gray-400 overflow-hidden cursor-pointer flex items-center justify-center group hover:from-gray-400 hover:to-gray-500 transition-all"
             onClick={() => openLightbox(0)}
           >
             <div className="text-white font-bold text-lg">
-              +{images.length - 5}
+              +{validImages.length - 5}
             </div>
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
           </div>
@@ -238,12 +239,12 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
           
           <div className="relative w-full max-w-6xl">
             <img
-              src={getImageUrl(images[activeImageIdx]) || ''}
+              src={getImageUrl(validImages[activeImageIdx]) || ''}
               alt={title}
               className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
             />
             
-            {images.length > 1 && (
+            {validImages.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
@@ -261,12 +262,12 @@ export default function EnhancedImageGallery({ images, title }: EnhancedImageGal
             )}
             
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
-              {activeImageIdx + 1} / {images.length}
+              {activeImageIdx + 1} / {validImages.length}
             </div>
             
             {/* Thumbnail strip */}
             <div className="absolute bottom-6 left-6 right-6 flex gap-2 overflow-x-auto pb-2">
-              {images.map((img, idx) => (
+              {validImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIdx(idx)}

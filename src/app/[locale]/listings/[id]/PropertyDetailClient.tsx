@@ -48,6 +48,7 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
     const amenities = Array.isArray(p.amenities) ? p.amenities : [];
     const groupedAmenities = groupAmenities(amenities);
     const visibleAmenities = showAllAmenities ? amenities : amenities.slice(0, 8);
+    const safeVisibleAmenities = Array.isArray(visibleAmenities) ? visibleAmenities : [];
 
     // Helper to get valid image URL and normalize relative paths
     const getImageUrl = (url: string): string | undefined => {
@@ -207,7 +208,7 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                 )}
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {visibleAmenities.map((amenity: string, idx: number) => (
+                                    {safeVisibleAmenities.map((amenity: string, idx: number) => (
                                         <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-teal-50 transition-all duration-300 group">
                                             <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-teal-600 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
                                                 {getAmenityIcon(amenity)}

@@ -81,7 +81,7 @@ export function PropertyCard({
                 <div className="relative w-full h-[165px] sm:h-[304px]">
                     <div className="relative w-full h-full overflow-hidden" ref={emblaRef}>
                         <div className="flex h-full">
-                            {images.slice(0, 5).map((img, idx) => (
+                            {(Array.isArray(images) ? images.slice(0, 5) : []).map((img, idx) => (
                                 <div key={idx} className="min-w-0 shrink-0 grow-0 basis-full relative h-full">
                                     <Image
                                         src={img}

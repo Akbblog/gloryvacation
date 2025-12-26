@@ -1030,40 +1030,43 @@ function SearchPageContent() {
                         </div>
                     ) : (
                         <>
-                            {properties.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                                    {properties.slice(0, visibleCount).map((property) => (
-                                        <PropertyCard
-                                            key={property.id}
-                                            id={property.id}
-                                            slug={property.slug}
-                                            title={property.title}
-                                            images={property.images}
-                                            guests={property.guests}
-                                            bedrooms={property.bedrooms}
-                                            propertyType={property.propertyType}
-                                            amenities={property.amenities}
-                                            isNew={property.isNew}
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-16">
-                                    <MapPin weight="duotone" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                    <h3 className="text-xl font-semibold text-[#1C1C1C] mb-2">
-                                        No Properties Found
-                                    </h3>
-                                    <p className="text-[#7E7E7E] mb-6">
-                                        Try adjusting your filters or search criteria.
-                                    </p>
-                                    <button
-                                        onClick={clearFilters}
-                                        className="inline-block px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
-                                    >
-                                        Clear Filters
-                                    </button>
-                                </div>
-                            )}
+                            {(() => {
+                                const safeProperties = Array.isArray(properties) ? properties : [];
+                                return safeProperties.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                                        {safeProperties.slice(0, visibleCount).map((property) => (
+                                            <PropertyCard
+                                                key={property.id}
+                                                id={property.id}
+                                                slug={property.slug}
+                                                title={property.title}
+                                                images={property.images}
+                                                guests={property.guests}
+                                                bedrooms={property.bedrooms}
+                                                propertyType={property.propertyType}
+                                                amenities={property.amenities}
+                                                isNew={property.isNew}
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16">
+                                        <MapPin weight="duotone" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                        <h3 className="text-xl font-semibold text-[#1C1C1C] mb-2">
+                                            No Properties Found
+                                        </h3>
+                                        <p className="text-[#7E7E7E] mb-6">
+                                            Try adjusting your filters or search criteria.
+                                        </p>
+                                        <button
+                                            onClick={clearFilters}
+                                            className="inline-block px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
+                                        >
+                                            Clear Filters
+                                        </button>
+                                    </div>
+                                );
+                            })()}
 
                             {/* Load More */}
                             {visibleCount < totalCount && (
