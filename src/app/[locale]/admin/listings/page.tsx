@@ -23,12 +23,15 @@ interface Property {
 
 export default function ListingsPage() {
     const [loading, setLoading] = useState(true);
-    const fetcher = async (url: string) => {
+    const fetcher = async (url: string): Promise<Property[]> => {
         const res = await fetch(url);
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        return res.json();
+        const json = await res.json();
+        if (Array.isArray(json)) return json;
+        if (Array.isArray(json?.properties)) return json.properties;
+        return [];
     };
     const { data: properties, error, mutate } = useSWR<Property[]>(
         '/api/properties?all=1',
@@ -53,7 +56,7 @@ export default function ListingsPage() {
         );
     }
 
-    const items = properties ?? [];
+    const items = Array.isArray(properties) ? properties : [];
 
     return (
         <div className="p-6">
