@@ -6,7 +6,6 @@ import { Link } from "@/i18n/navigation";
 import { Plus, Home, MapPin, DollarSign, Star, Eye, Pencil } from "lucide-react";
 import Image from "next/image";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import { useLocale } from "next-intl";
 
 interface Property {
     _id: string;
@@ -24,8 +23,14 @@ interface Property {
 
 export default function ListingsPage() {
     const [loading, setLoading] = useState(true);
-    const fetcher = (url: string) => fetch(url).then((res) => res.json());
-    const { data: properties, mutate } = useSWR<Property[]>(
+    const fetcher = async (url: string) => {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+    };
+    const { data: properties, error, mutate } = useSWR<Property[]>(
         '/api/properties?all=1',
         fetcher,
         { shouldRetryOnError: false }
@@ -36,6 +41,17 @@ export default function ListingsPage() {
     useEffect(() => setLoading(false), []);
 
     if (loading) return <div className="p-8">Loading...</div>;
+
+    if (error) {
+        return (
+            <div className="p-8">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h2 className="text-red-800 font-semibold">Error loading listings</h2>
+                    <p className="text-red-600 mt-1">{error.message}</p>
+                </div>
+            </div>
+        );
+    }
 
     const items = properties ?? [];
 
