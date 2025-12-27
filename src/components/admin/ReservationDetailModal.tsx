@@ -129,63 +129,63 @@ export default function ReservationDetailModal({
         JSON.stringify(tags) !== JSON.stringify(reservation.internalTags || []);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4">
             {/* Backdrop */}
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative z-10 w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="relative z-10 w-full md:max-w-4xl max-h-[95vh] md:max-h-[90vh] bg-white rounded-t-2xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                    <div>
-                        <h2 className="text-xl font-semibold">Reservation Details</h2>
-                        <p className="text-sm text-blue-100 mt-0.5">ID: {reservation._id}</p>
+                <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                    <div className="min-w-0 flex-1">
+                        <h2 className="text-base md:text-xl font-semibold">Reservation Details</h2>
+                        <p className="text-[10px] md:text-sm text-blue-100 mt-0.5 truncate">ID: {reservation._id}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                        className="p-1.5 md:p-2 hover:bg-white/20 rounded-lg transition-colors ml-2"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b bg-gray-50">
+                <div className="flex border-b bg-gray-50 overflow-x-auto">
                     {[
                         { id: "details", label: "Details", icon: Users },
-                        { id: "email", label: "Email & Notes", icon: Mail },
+                        { id: "email", label: "Email", icon: Mail },
                         { id: "history", label: "History", icon: History },
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2.5 md:py-3 text-xs md:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap ${
                                 activeTab === tab.id
                                     ? "border-blue-600 text-blue-600 bg-white"
                                     : "border-transparent text-gray-500 hover:text-gray-700"
                             }`}
                         >
-                            <tab.icon className="w-4 h-4" />
+                            <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
                             {tab.label}
                         </button>
                     ))}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
                     {activeTab === "details" && (
-                        <div className="space-y-6">
+                        <div className="space-y-4 md:space-y-6">
                             {/* Status & Priority Row */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-4 md:gap-6">
                                 {/* Status */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Status</label>
+                                    <div className="grid grid-cols-3 gap-1.5 md:gap-2">
                                         {statusOptions.map(opt => (
                                             <button
                                                 key={opt.value}
                                                 onClick={() => setStatus(opt.value)}
-                                                className={`px-3 py-2 text-sm font-medium rounded-lg border transition-all ${
+                                                className={`px-2 md:px-3 py-1.5 md:py-2 text-[10px] md:text-sm font-medium rounded-lg border transition-all ${
                                                     status === opt.value
                                                         ? `${opt.color} border-2 ring-2 ring-offset-1 ring-current/20`
                                                         : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"
@@ -198,6 +198,25 @@ export default function ReservationDetailModal({
                                 </div>
 
                                 {/* Priority */}
+                                <div>
+                                    <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">Priority</label>
+                                    <div className="flex gap-1.5 md:gap-2">
+                                        {priorityOptions.map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => setPriority(opt.value)}
+                                                className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 text-[10px] md:text-sm font-medium rounded-lg transition-all ${
+                                                    priority === opt.value
+                                                        ? `${opt.color} ring-2 ring-offset-1 ring-current/20`
+                                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                                }`}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                                     <div className="flex gap-2">
@@ -219,31 +238,31 @@ export default function ReservationDetailModal({
                             </div>
 
                             {/* Guest & Property Info */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
                                 {/* Guest Info */}
-                                <div className="bg-gray-50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-blue-600" />
+                                <div className="bg-gray-50 rounded-xl p-3 md:p-5">
+                                    <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-2 md:mb-4 flex items-center gap-1.5 md:gap-2">
+                                        <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
                                         Guest Information
                                     </h3>
-                                    <div className="space-y-3">
+                                    <div className="space-y-2 md:space-y-3">
                                         <div>
-                                            <p className="text-lg font-semibold text-gray-900">
+                                            <p className="text-sm md:text-lg font-semibold text-gray-900">
                                                 {reservation.guestDetails?.name || "N/A"}
                                             </p>
                                         </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Mail className="w-4 h-4" />
+                                        <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-gray-600">
+                                            <Mail className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                             <a 
                                                 href={`mailto:${reservation.guestDetails?.email}`}
-                                                className="text-blue-600 hover:underline"
+                                                className="text-blue-600 hover:underline truncate"
                                             >
                                                 {reservation.guestDetails?.email}
                                             </a>
                                         </div>
                                         {reservation.guestDetails?.phone && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Phone className="w-4 h-4" />
+                                            <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-gray-600">
+                                                <Phone className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                 <a 
                                                     href={`tel:${reservation.guestDetails.phone}`}
                                                     className="text-blue-600 hover:underline"
@@ -253,8 +272,8 @@ export default function ReservationDetailModal({
                                             </div>
                                         )}
                                         {reservation.guestDetails?.nationality && (
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <MapPin className="w-4 h-4" />
+                                            <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-gray-600">
+                                                <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                 {reservation.guestDetails.nationality}
                                             </div>
                                         )}
@@ -262,23 +281,23 @@ export default function ReservationDetailModal({
                                 </div>
 
                                 {/* Property Info */}
-                                <div className="bg-gray-50 rounded-xl p-5">
-                                    <h3 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                        <MapPin className="w-4 h-4 text-green-600" />
+                                <div className="bg-gray-50 rounded-xl p-3 md:p-5">
+                                    <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-2 md:mb-4 flex items-center gap-1.5 md:gap-2">
+                                        <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
                                         Property
                                     </h3>
                                     {reservation.property ? (
-                                        <div className="space-y-3">
-                                            <p className="text-lg font-semibold text-gray-900">
+                                        <div className="space-y-2 md:space-y-3">
+                                            <p className="text-sm md:text-lg font-semibold text-gray-900">
                                                 {reservation.property.title}
                                             </p>
                                             {reservation.property.location && (
-                                                <p className="text-sm text-gray-600">
+                                                <p className="text-xs md:text-sm text-gray-600">
                                                     {reservation.property.location.area}, {reservation.property.location.city}
                                                 </p>
                                             )}
                                             {reservation.property.pricePerNight && (
-                                                <p className="text-sm font-medium text-green-600">
+                                                <p className="text-xs md:text-sm font-medium text-green-600">
                                                     AED {reservation.property.pricePerNight}/night
                                                 </p>
                                             )}
@@ -286,47 +305,47 @@ export default function ReservationDetailModal({
                                                 href={`/en/listings/${reservation.property._id}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                                                className="inline-flex items-center gap-1 text-xs md:text-sm text-blue-600 hover:underline"
                                             >
-                                                View property <ExternalLink className="w-3 h-3" />
+                                                View property <ExternalLink className="w-2.5 h-2.5 md:w-3 md:h-3" />
                                             </a>
                                         </div>
                                     ) : (
-                                        <p className="text-gray-500">Property not found</p>
+                                        <p className="text-gray-500 text-xs md:text-sm">Property not found</p>
                                     )}
                                 </div>
                             </div>
 
                             {/* Booking Details */}
-                            <div className="bg-blue-50 rounded-xl p-5">
-                                <h3 className="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-blue-600" />
+                            <div className="bg-blue-50 rounded-xl p-3 md:p-5">
+                                <h3 className="text-xs md:text-sm font-semibold text-gray-800 mb-2 md:mb-4 flex items-center gap-1.5 md:gap-2">
+                                    <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
                                     Booking Details
                                 </h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                                     <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Check-in</p>
-                                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                                        <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wide">Check-in</p>
+                                        <p className="text-xs md:text-sm font-semibold text-gray-900 mt-0.5 md:mt-1">
                                             {format(new Date(reservation.checkIn), "MMM d, yyyy")}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Check-out</p>
-                                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                                        <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wide">Check-out</p>
+                                        <p className="text-xs md:text-sm font-semibold text-gray-900 mt-0.5 md:mt-1">
                                             {reservation.checkOut 
                                                 ? format(new Date(reservation.checkOut), "MMM d, yyyy") 
                                                 : "N/A"}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Guests</p>
-                                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                                        <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wide">Guests</p>
+                                        <p className="text-xs md:text-sm font-semibold text-gray-900 mt-0.5 md:mt-1">
                                             {reservation.guests}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 uppercase tracking-wide">Duration</p>
-                                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                                        <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-wide">Duration</p>
+                                        <p className="text-xs md:text-sm font-semibold text-gray-900 mt-0.5 md:mt-1">
                                             {reservation.durationNights 
                                                 ? `${reservation.durationNights} nights`
                                                 : "N/A"}
@@ -337,16 +356,16 @@ export default function ReservationDetailModal({
 
                             {/* Total Amount */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    <DollarSign className="w-4 h-4 inline mr-1" />
-                                    Total Amount ({reservation.currency || "AED"})
+                                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
+                                    <DollarSign className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1" />
+                                    Total ({reservation.currency || "AED"})
                                 </label>
                                 <input
                                     type="number"
                                     value={totalAmount}
                                     onChange={e => setTotalAmount(e.target.value)}
-                                    placeholder="Enter total amount"
-                                    className="w-full md:w-1/3 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    placeholder="Enter amount"
+                                    className="w-full md:w-1/3 px-3 md:px-4 py-2 md:py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                                 />
                             </div>
 
@@ -552,33 +571,33 @@ export default function ReservationDetailModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50">
-                    <div className="text-sm text-gray-500">
+                <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-t bg-gray-50 gap-3">
+                    <div className="text-xs md:text-sm text-gray-500 hidden sm:block">
                         {hasChanges && (
-                            <span className="text-amber-600 font-medium">• Unsaved changes</span>
+                            <span className="text-amber-600 font-medium">• Unsaved</span>
                         )}
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 md:gap-3 flex-1 sm:flex-none justify-end">
                         <button
                             onClick={onClose}
-                            className="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                            className="px-3 md:px-5 py-2 md:py-2.5 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-xs md:text-sm"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSave}
                             disabled={!hasChanges || isUpdating}
-                            className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-4 md:px-5 py-2 md:py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
                         >
                             {isUpdating ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Saving...
+                                    <div className="w-3.5 h-3.5 md:w-4 md:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <span className="hidden sm:inline">Saving...</span>
                                 </>
                             ) : (
                                 <>
-                                    <Send className="w-4 h-4" />
-                                    Save Changes
+                                    <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                                    Save
                                 </>
                             )}
                         </button>

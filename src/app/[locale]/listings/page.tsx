@@ -535,16 +535,17 @@ function SearchPageContent() {
             <Navbar />
             <style>{css}</style>
 
-            {/* Search Header */}
-            <section className="relative md:sticky md:top-0 z-40 bg-white border-b border-gray-100 shadow-sm pt-20">
-                {/* Main Search Bar (Pill Design) */}
-                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-6">
-                    <div className="bg-white rounded-[60px] py-2 px-2 shadow-[0px_6px_22px_0px_rgba(139,80,17,0.17)] flex items-center max-w-6xl mx-auto border border-gray-100">
+            {/* Search Header - Modern Design */}
+            <section className="relative md:sticky md:top-0 z-40 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100/80 pt-20">
+                {/* Main Search Bar - Modern Pill Design */}
+                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-4 md:py-6">
+                    {/* Desktop Search Bar */}
+                    <div className="hidden lg:flex bg-white rounded-full py-1.5 px-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1),0_2px_8px_-2px_rgba(0,0,0,0.06)] items-center max-w-5xl mx-auto border border-gray-200/60 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-shadow duration-300">
 
                         {/* 1. Destination */}
-                        <div ref={destRef} className="relative flex-1 min-w-[180px]">
+                        <div ref={destRef} className="relative flex-1">
                             <div
-                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showDestinations ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showDestinations ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
                                 onClick={() => {
                                     setShowDestinations(!showDestinations);
                                     setShowCheckIn(false);
@@ -553,7 +554,7 @@ function SearchPageContent() {
                                     setShowType(false);
                                 }}
                             >
-                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                     <MapPin weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
                                     Where
                                 </div>
@@ -567,7 +568,7 @@ function SearchPageContent() {
                                             setShowDestinations(true);
                                         }}
                                         onFocus={() => setShowDestinations(true)}
-                                        className="w-full bg-transparent border-none text-sm text-neutral-600 font-medium outline-none placeholder:text-neutral-400 p-0"
+                                        className="w-full bg-transparent border-none text-sm text-gray-900 font-medium outline-none placeholder:text-gray-400 p-0"
                                     />
                                     {(searchInput || area) && (
                                         <button
@@ -586,25 +587,38 @@ function SearchPageContent() {
 
                             {/* Destination Dropdown */}
                             {showDestinations && (
-                                <div className="absolute top-full left-0 mt-2 w-[340px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="max-h-[320px] overflow-y-auto">
+                                <div className="absolute top-full left-0 mt-3 w-[360px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="p-2 border-b border-gray-100">
+                                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Popular Destinations</div>
+                                    </div>
+                                    <div className="max-h-[300px] overflow-y-auto p-2">
                                         {filteredAreas.length > 0 ? (
                                             filteredAreas.map((item) => {
                                                 const IconComponent = item.Icon;
+                                                const isSelected = area === item.value;
                                                 return (
                                                     <button
                                                         key={item.value}
-                                                        className="w-full px-4 py-3.5 text-left hover:bg-[#F5A623]/5 flex items-center gap-3 transition-colors border-b border-gray-50 last:border-b-0"
+                                                        className={`w-full px-3 py-3 text-left rounded-xl flex items-center gap-3 transition-all ${isSelected ? 'bg-[#F5A623]/10' : 'hover:bg-gray-50'}`}
                                                         onClick={() => {
                                                             setArea(item.value);
                                                             setSearchInput("");
                                                             setShowDestinations(false);
                                                         }}
                                                     >
-                                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/20 to-[#F5A623]/5 flex items-center justify-center">
-                                                            <IconComponent weight="duotone" className="w-5 h-5 text-[#F5A623]" />
+                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isSelected ? 'bg-[#F5A623] shadow-md' : 'bg-gradient-to-br from-gray-100 to-gray-50'}`}>
+                                                            <IconComponent weight="duotone" className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-[#F5A623]'}`} />
                                                         </div>
-                                                        <span className="text-sm text-[#1C1C1C] font-medium">{item.label}</span>
+                                                        <div className="flex-1">
+                                                            <span className={`text-sm font-medium ${isSelected ? 'text-[#E09000]' : 'text-gray-900'}`}>{item.label}</span>
+                                                        </div>
+                                                        {isSelected && (
+                                                            <div className="w-5 h-5 rounded-full bg-[#F5A623] flex items-center justify-center">
+                                                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                            </div>
+                                                        )}
                                                     </button>
                                                 );
                                             })
@@ -619,12 +633,12 @@ function SearchPageContent() {
                             )}
                         </div>
 
-                        <div className="w-px h-8 bg-neutral-200" />
+                        <div className="w-px h-10 bg-gray-200/80" />
 
                         {/* 2. Check In */}
-                        <div ref={checkInRef} className="relative flex-1">
+                        <div ref={checkInRef} className="relative flex-[0.9]">
                             <div
-                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showCheckIn ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showCheckIn ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
                                 onClick={() => {
                                     setShowCheckIn(!showCheckIn);
                                     setShowDestinations(false);
@@ -633,17 +647,17 @@ function SearchPageContent() {
                                     setShowType(false);
                                 }}
                             >
-                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                     <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
                                     Check In
                                 </div>
-                                <div className={`text-sm font-medium ${checkInDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
-                                    {formatDateDisplay(checkInDate) || "Add Dates"}
+                                <div className={`text-sm font-medium ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {formatDateDisplay(checkInDate) || "Add dates"}
                                 </div>
                             </div>
 
                             {showCheckIn && (
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                     <DayPicker
                                         mode="single"
                                         selected={checkInDate}
@@ -668,12 +682,12 @@ function SearchPageContent() {
                             )}
                         </div>
 
-                        <div className="w-px h-8 bg-neutral-200" />
+                        <div className="w-px h-10 bg-gray-200/80" />
 
                         {/* 3. Check Out */}
-                        <div ref={checkOutRef} className="relative flex-1">
+                        <div ref={checkOutRef} className="relative flex-[0.9]">
                             <div
-                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showCheckOut ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showCheckOut ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
                                 onClick={() => {
                                     setShowCheckOut(!showCheckOut);
                                     setShowDestinations(false);
@@ -682,17 +696,17 @@ function SearchPageContent() {
                                     setShowType(false);
                                 }}
                             >
-                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                     <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
                                     Check Out
                                 </div>
-                                <div className={`text-sm font-medium ${checkOutDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
-                                    {formatDateDisplay(checkOutDate) || "Add Dates"}
+                                <div className={`text-sm font-medium ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {formatDateDisplay(checkOutDate) || "Add dates"}
                                 </div>
                             </div>
 
                             {showCheckOut && (
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                     <DayPicker
                                         mode="single"
                                         selected={checkOutDate}
@@ -711,12 +725,12 @@ function SearchPageContent() {
                             )}
                         </div>
 
-                        <div className="w-px h-8 bg-neutral-200" />
+                        <div className="w-px h-10 bg-gray-200/80" />
 
                         {/* 4. Guests */}
-                        <div ref={guestsRef} className="relative flex-[0.8]">
+                        <div ref={guestsRef} className="relative flex-[0.7]">
                             <div
-                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showGuests ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showGuests ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
                                 onClick={() => {
                                     setShowGuests(!showGuests);
                                     setShowDestinations(false);
@@ -725,24 +739,24 @@ function SearchPageContent() {
                                     setShowType(false);
                                 }}
                             >
-                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                     <UsersThree weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Who
+                                    Guests
                                 </div>
-                                <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-neutral-800' : 'text-neutral-400'}`}>
-                                    {guests > 1 ? `${guests} Guests` : "Add Guests"}
+                                <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {guests > 1 ? `${guests} guests` : "Add guests"}
                                 </div>
                             </div>
 
                             {showGuests && (
-                                <div className="absolute top-full right-0 mt-2 w-[300px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full right-0 mt-3 w-[320px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                     {/* Adults */}
                                     <div className="flex items-center justify-between py-4 border-b border-gray-100">
                                         <div>
-                                            <div className="text-sm font-semibold text-[#1C1C1C]">Adults</div>
+                                            <div className="text-sm font-semibold text-gray-900">Adults</div>
                                             <div className="text-xs text-gray-400 mt-0.5">Ages 13 or above</div>
                                         </div>
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => {
                                                     const newVal = Math.max(1, adults - 1);
@@ -750,11 +764,11 @@ function SearchPageContent() {
                                                     setGuests(newVal + children);
                                                 }}
                                                 disabled={adults <= 1}
-                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                             >
-                                                <Minus weight="bold" className="w-4 h-4" />
+                                                <Minus weight="bold" className="w-3.5 h-3.5" />
                                             </button>
-                                            <span className="w-6 text-center font-semibold text-[#1C1C1C] text-lg">{adults}</span>
+                                            <span className="w-8 text-center font-semibold text-gray-900 text-lg">{adults}</span>
                                             <button
                                                 onClick={() => {
                                                     const newVal = Math.min(10, adults + 1);
@@ -762,9 +776,9 @@ function SearchPageContent() {
                                                     setGuests(newVal + children);
                                                 }}
                                                 disabled={adults >= 10}
-                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                             >
-                                                <Plus weight="bold" className="w-4 h-4" />
+                                                <Plus weight="bold" className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     </div>
@@ -772,10 +786,10 @@ function SearchPageContent() {
                                     {/* Children */}
                                     <div className="flex items-center justify-between py-4">
                                         <div>
-                                            <div className="text-sm font-semibold text-[#1C1C1C]">Children</div>
+                                            <div className="text-sm font-semibold text-gray-900">Children</div>
                                             <div className="text-xs text-gray-400 mt-0.5">Ages 2–12</div>
                                         </div>
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-3">
                                             <button
                                                 onClick={() => {
                                                     const newVal = Math.max(0, children - 1);
@@ -783,11 +797,11 @@ function SearchPageContent() {
                                                     setGuests(adults + newVal);
                                                 }}
                                                 disabled={children <= 0}
-                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                             >
-                                                <Minus weight="bold" className="w-4 h-4" />
+                                                <Minus weight="bold" className="w-3.5 h-3.5" />
                                             </button>
-                                            <span className="w-6 text-center font-semibold text-[#1C1C1C] text-lg">{children}</span>
+                                            <span className="w-8 text-center font-semibold text-gray-900 text-lg">{children}</span>
                                             <button
                                                 onClick={() => {
                                                     const newVal = Math.min(10, children + 1);
@@ -795,16 +809,16 @@ function SearchPageContent() {
                                                     setGuests(adults + newVal);
                                                 }}
                                                 disabled={children >= 10}
-                                                className="w-9 h-9 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                             >
-                                                <Plus weight="bold" className="w-4 h-4" />
+                                                <Plus weight="bold" className="w-3.5 h-3.5" />
                                             </button>
                                         </div>
                                     </div>
 
                                     <button
                                         onClick={() => setShowGuests(false)}
-                                        className="w-full mt-3 px-4 py-2.5 bg-[#F5A623] text-white rounded-xl text-sm font-semibold hover:bg-[#E09000] transition-colors"
+                                        className="w-full mt-4 px-4 py-2.5 bg-[#F5A623] text-white rounded-xl text-sm font-semibold hover:bg-[#E09000] transition-all shadow-sm hover:shadow-md"
                                     >
                                         Done
                                     </button>
@@ -812,12 +826,12 @@ function SearchPageContent() {
                             )}
                         </div>
 
-                        <div className="w-px h-8 bg-neutral-200" />
+                        <div className="w-px h-10 bg-gray-200/80" />
 
-                        {/* 5. Property Type (Added to Pill) */}
-                        <div ref={typeRef} className="relative flex-[0.8]">
+                        {/* 5. Property Type */}
+                        <div ref={typeRef} className="relative flex-[0.7]">
                             <div
-                                className={`py-2 px-6 rounded-full transition-colors cursor-pointer ${showType ? 'bg-neutral-100' : 'hover:bg-neutral-100'}`}
+                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showType ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
                                 onClick={() => {
                                     setShowType(!showType);
                                     setShowDestinations(false);
@@ -826,21 +840,21 @@ function SearchPageContent() {
                                     setShowGuests(false);
                                 }}
                             >
-                                <div className="text-xs font-semibold text-neutral-800 mb-0.5 flex items-center gap-1.5">
+                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
                                     <House weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Kind
+                                    Type
                                 </div>
-                                <div className={`text-sm font-medium truncate ${propertyType ? 'text-neutral-800' : 'text-neutral-400'}`}>
-                                    {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any Type"}
+                                <div className={`text-sm font-medium truncate ${propertyType ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any type"}
                                 </div>
                             </div>
 
                             {showType && (
-                                <div className="absolute top-full right-0 mt-2 w-[240px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="absolute top-full right-0 mt-3 w-[240px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                     {PROPERTY_TYPES.map((type) => (
                                         <button
                                             key={type.value}
-                                            className="w-full px-4 py-3 text-left hover:bg-gray-50 text-[#1C1C1C] text-sm font-medium border-b border-gray-50 last:border-b-0"
+                                            className={`w-full px-4 py-3 text-left text-sm font-medium border-b border-gray-50 last:border-b-0 transition-colors ${propertyType === type.value ? 'bg-[#F5A623]/10 text-[#F5A623]' : 'hover:bg-gray-50 text-gray-900'}`}
                                             onClick={() => {
                                                 setPropertyType(type.value);
                                                 setShowType(false);
@@ -856,17 +870,211 @@ function SearchPageContent() {
                         {/* Search Button */}
                         <button
                             onClick={handleSearch}
-                            className="bg-[#F5A623] hover:bg-[#E09000] text-white rounded-full h-12 w-12 flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:scale-[1.05] active:scale-[0.98] mr-1"
+                            className="bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-full h-12 w-12 flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 ml-1"
                         >
                             <MagnifyingGlass weight="bold" className="w-5 h-5" />
                         </button>
                     </div>
+
+                    {/* Mobile Search Bar */}
+                    <div className="lg:hidden">
+                        <div className="bg-white rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.08)] border border-gray-200/60 p-4 space-y-3">
+                            {/* Location */}
+                            <div className="relative" ref={destRef}>
+                                <div
+                                    onClick={() => {
+                                        setShowDestinations(!showDestinations);
+                                        setShowCheckIn(false);
+                                        setShowCheckOut(false);
+                                        setShowGuests(false);
+                                    }}
+                                    className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-[#F5A623]/10 flex items-center justify-center flex-shrink-0">
+                                        <MapPin weight="fill" className="w-5 h-5 text-[#F5A623]" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Where</div>
+                                        <div className={`text-sm font-medium truncate ${area ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations"}
+                                        </div>
+                                    </div>
+                                    {area && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setArea("");
+                                                setSearchInput("");
+                                            }}
+                                            className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                                        >
+                                            <X weight="bold" className="w-4 h-4 text-gray-400" />
+                                        </button>
+                                    )}
+                                </div>
+                                {/* Mobile Destination Dropdown */}
+                                {showDestinations && (
+                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-[250px] overflow-y-auto">
+                                        {filteredAreas.map((item) => {
+                                            const IconComponent = item.Icon;
+                                            return (
+                                                <button
+                                                    key={item.value}
+                                                    className="w-full px-4 py-3 text-left hover:bg-[#F5A623]/5 flex items-center gap-3 border-b border-gray-50 last:border-b-0"
+                                                    onClick={() => {
+                                                        setArea(item.value);
+                                                        setSearchInput("");
+                                                        setShowDestinations(false);
+                                                    }}
+                                                >
+                                                    <IconComponent weight="duotone" className="w-5 h-5 text-[#F5A623]" />
+                                                    <span className="text-sm text-gray-900 font-medium">{item.label}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Dates Row */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div
+                                    ref={checkInRef}
+                                    onClick={() => {
+                                        setShowCheckIn(!showCheckIn);
+                                        setShowDestinations(false);
+                                        setShowCheckOut(false);
+                                        setShowGuests(false);
+                                    }}
+                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                >
+                                    <CalendarBlank weight="fill" className="w-5 h-5 text-[#F5A623]" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Check In</div>
+                                        <div className={`text-sm font-medium truncate ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {formatDateDisplay(checkInDate) || "Add date"}
+                                        </div>
+                                    </div>
+                                    {showCheckIn && (
+                                        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50">
+                                            <DayPicker
+                                                mode="single"
+                                                selected={checkInDate}
+                                                onSelect={(date) => {
+                                                    setCheckInDate(date);
+                                                    if (date && (!checkOutDate || date >= checkOutDate)) {
+                                                        const nextDay = addDays(date, 1);
+                                                        setCheckOutDate(nextDay);
+                                                        setShowCheckIn(false);
+                                                        setShowCheckOut(true);
+                                                    } else if (date) {
+                                                        setShowCheckIn(false);
+                                                        setShowCheckOut(true);
+                                                    }
+                                                }}
+                                                disabled={[{ before: today }]}
+                                                showOutsideDays
+                                                locale={dateLocale}
+                                                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                <div
+                                    ref={checkOutRef}
+                                    onClick={() => {
+                                        setShowCheckOut(!showCheckOut);
+                                        setShowDestinations(false);
+                                        setShowCheckIn(false);
+                                        setShowGuests(false);
+                                    }}
+                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                >
+                                    <CalendarBlank weight="fill" className="w-5 h-5 text-[#F5A623]" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Check Out</div>
+                                        <div className={`text-sm font-medium truncate ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {formatDateDisplay(checkOutDate) || "Add date"}
+                                        </div>
+                                    </div>
+                                    {showCheckOut && (
+                                        <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50">
+                                            <DayPicker
+                                                mode="single"
+                                                selected={checkOutDate}
+                                                onSelect={(date) => {
+                                                    setCheckOutDate(date);
+                                                    if (date) setShowCheckOut(false);
+                                                }}
+                                                disabled={[
+                                                    { before: checkInDate ? addDays(checkInDate, 1) : addDays(today, 1) }
+                                                ]}
+                                                showOutsideDays
+                                                locale={dateLocale}
+                                                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Guests & Type Row */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div
+                                    ref={guestsRef}
+                                    onClick={() => {
+                                        setShowGuests(!showGuests);
+                                        setShowDestinations(false);
+                                        setShowCheckIn(false);
+                                        setShowCheckOut(false);
+                                    }}
+                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                >
+                                    <UsersThree weight="fill" className="w-5 h-5 text-[#F5A623]" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Guests</div>
+                                        <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {guests > 1 ? `${guests} guests` : "Add guests"}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    ref={typeRef}
+                                    onClick={() => {
+                                        setShowType(!showType);
+                                        setShowDestinations(false);
+                                        setShowCheckIn(false);
+                                        setShowCheckOut(false);
+                                        setShowGuests(false);
+                                    }}
+                                    className="flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                                >
+                                    <House weight="fill" className="w-5 h-5 text-[#F5A623]" />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Type</div>
+                                        <div className={`text-sm font-medium truncate ${propertyType ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any type"}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Mobile Search Button */}
+                            <button
+                                onClick={handleSearch}
+                                className="w-full py-3.5 bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+                            >
+                                <MagnifyingGlass weight="bold" className="w-5 h-5" />
+                                Search Properties
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Filter Bar */}
-                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-3 border-t border-gray-100">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex flex-wrap items-center gap-3">
+                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-3 border-t border-gray-100/80 bg-white/50 backdrop-blur-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-2 md:gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
                             {/* Bedrooms */}
                             <select
                                 value={bedrooms}
@@ -874,7 +1082,7 @@ function SearchPageContent() {
                                     setBedrooms(e.target.value);
                                     handleSearch();
                                 }}
-                                className="px-4 py-2.5 border border-gray-200 rounded-full bg-white text-[#1C1C1C] text-sm outline-none hover:border-primary transition-colors cursor-pointer"
+                                className="px-3 md:px-4 py-2 md:py-2.5 border border-gray-200 rounded-full bg-white text-gray-900 text-xs md:text-sm outline-none hover:border-[#F5A623] focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all cursor-pointer"
                             >
                                 {BEDROOM_OPTIONS.map((option) => (
                                     <option key={option.value} value={option.value}>
@@ -890,7 +1098,7 @@ function SearchPageContent() {
                                     setPriceRange(e.target.value);
                                     handleSearch();
                                 }}
-                                className="px-4 py-2.5 border border-gray-200 rounded-full bg-white text-[#1C1C1C] text-sm outline-none hover:border-primary transition-colors cursor-pointer"
+                                className="px-3 md:px-4 py-2 md:py-2.5 border border-gray-200 rounded-full bg-white text-gray-900 text-xs md:text-sm outline-none hover:border-[#F5A623] focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all cursor-pointer"
                             >
                                 {PRICE_RANGES.map((range) => (
                                     <option key={range.value} value={range.value}>
@@ -899,16 +1107,16 @@ function SearchPageContent() {
                                 ))}
                             </select>
 
-                            {/* Search Input */}
-                            <div className="relative flex-1 max-w-md">
-                                <MagnifyingGlass weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            {/* Search Input - Hidden on mobile */}
+                            <div className="relative hidden md:block flex-1 max-w-xs">
+                                <MagnifyingGlass weight="bold" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Search properties, locations..."
+                                    placeholder="Search properties..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-full bg-white text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                    className="w-full pl-10 pr-4 py-2 md:py-2.5 border border-gray-200 rounded-full bg-white text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all"
                                 />
                                 {searchQuery && (
                                     <button
@@ -926,15 +1134,15 @@ function SearchPageContent() {
                             {/* More Filters */}
                             <button
                                 onClick={() => setShowFiltersModal(true)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm transition-colors ${activeFiltersCount > 0
-                                    ? "border-teal-500 bg-teal-50 text-teal-600"
-                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-teal-500"
+                                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 border rounded-full text-xs md:text-sm font-medium transition-all ${activeFiltersCount > 0
+                                    ? "border-[#F5A623] bg-[#F5A623]/10 text-[#E09000]"
+                                    : "border-gray-200 bg-white text-gray-700 hover:border-[#F5A623] hover:bg-[#F5A623]/5"
                                     }`}
                             >
                                 <FunnelSimple weight="bold" className="w-4 h-4" />
-                                <span>More Filters</span>
+                                <span className="hidden sm:inline">Filters</span>
                                 {activeFiltersCount > 0 && (
-                                    <span className="w-5 h-5 bg-teal-600 text-white text-xs rounded-full flex items-center justify-center">
+                                    <span className="w-5 h-5 bg-[#F5A623] text-white text-xs rounded-full flex items-center justify-center font-semibold">
                                         {activeFiltersCount}
                                     </span>
                                 )}
@@ -944,44 +1152,45 @@ function SearchPageContent() {
                             {(area || propertyType || bedrooms || priceRange || selectedAmenities.length > 0) && (
                                 <button
                                     onClick={clearFilters}
-                                    className="flex items-center gap-1 px-3 py-2.5 text-sm text-[#7E7E7E] hover:text-teal-600 transition-colors"
+                                    className="flex items-center gap-1 px-2.5 md:px-3 py-2 md:py-2.5 text-xs md:text-sm text-gray-500 hover:text-[#F5A623] transition-colors rounded-full hover:bg-[#F5A623]/5"
                                 >
-                                    <X weight="bold" className="w-4 h-4" />
-                                    Clear
+                                    <X weight="bold" className="w-3.5 h-3.5" />
+                                    <span className="hidden sm:inline">Clear</span>
                                 </button>
                             )}
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 md:gap-3">
                             {/* Map Toggle */}
                             <button
                                 onClick={() => setShowMap(!showMap)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm transition-colors ${showMap
-                                    ? "border-teal-600 bg-teal-600 text-white"
-                                    : "border-gray-200 bg-white text-[#1C1C1C] hover:border-teal-500"
+                                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 border rounded-full text-xs md:text-sm font-medium transition-all ${showMap
+                                    ? "border-[#F5A623] bg-[#F5A623] text-white shadow-md"
+                                    : "border-gray-200 bg-white text-gray-700 hover:border-[#F5A623] hover:bg-[#F5A623]/5"
                                     }`}
                             >
                                 {showMap ? <SquaresFour weight="bold" className="w-4 h-4" /> : <MapTrifold weight="fill" className="w-4 h-4" />}
-                                <span>{showMap ? "Show Grid" : "Show on map"}</span>
+                                <span className="hidden sm:inline">{showMap ? "Grid" : "Map"}</span>
                             </button>
 
                             {/* Sort */}
                             <div className="relative">
                                 <button
                                     onClick={() => setShowSortDropdown(!showSortDropdown)}
-                                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-full bg-white text-[#1C1C1C] text-sm hover:border-primary transition-colors"
+                                    className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 border border-gray-200 rounded-full bg-white text-gray-700 text-xs md:text-sm font-medium hover:border-[#F5A623] transition-all"
                                 >
-                                    <span>Sort: {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}</span>
-                                    <CaretDown weight="bold" className="w-4 h-4 text-gray-400" />
+                                    <span className="hidden sm:inline">Sort:</span>
+                                    <span className="text-gray-900">{SORT_OPTIONS.find((o) => o.value === sortBy)?.label}</span>
+                                    <CaretDown weight="bold" className={`w-3.5 h-3.5 text-gray-400 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
                                 </button>
                                 {showSortDropdown && (
-                                    <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[180px]">
+                                    <div className="absolute top-full right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] z-50 min-w-[180px] overflow-hidden">
                                         {SORT_OPTIONS.map((option) => (
                                             <button
                                                 key={option.value}
-                                                className={`w-full px-4 py-3 text-left text-sm transition-colors first:rounded-t-xl last:rounded-b-xl ${sortBy === option.value
-                                                    ? "bg-teal-50 text-teal-600"
-                                                    : "hover:bg-gray-50 text-[#1C1C1C]"
+                                                className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${sortBy === option.value
+                                                    ? "bg-[#F5A623]/10 text-[#E09000]"
+                                                    : "hover:bg-gray-50 text-gray-700"
                                                     }`}
                                                 onClick={() => {
                                                     setSortBy(option.value);
@@ -1001,29 +1210,31 @@ function SearchPageContent() {
             </section>
 
             {/* Main Content */}
-            <main className="flex-1">
-                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-8">
+            <main className="flex-1 bg-gray-50/50">
+                <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-6 md:py-8">
                     {/* Results Count */}
-                    <div className="flex items-center justify-between mb-6">
-                        <p className="text-[#7E7E7E]">
+                    <div className="flex items-center justify-between mb-4 md:mb-6">
+                        <p className="text-sm md:text-base text-gray-500 font-medium">
                             {isLoading ? (
                                 <span className="flex items-center gap-2">
-                                    <SpinnerGap weight="bold" className="w-4 h-8 animate-spin" />
+                                    <SpinnerGap weight="bold" className="w-4 h-4 animate-spin text-[#F5A623]" />
                                     Searching...
                                 </span>
                             ) : (
-                                `${totalCount} properties found`
+                                <>
+                                    <span className="text-gray-900 font-semibold">{totalCount}</span> properties found
+                                </>
                             )}
                         </p>
                     </div>
 
                     {/* Property Grid / Map View */}
                     {showMap ? (
-                        <div className="relative w-full h-[600px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#8ECAE6] to-[#E8E5DB] flex items-center justify-center">
-                            <div className="text-center">
-                                <MapTrifold weight="duotone" className="w-16 h-16 text-[#F5A623] mx-auto mb-4" />
-                                <h3 className="text-xl font-semibold text-[#1C1C1C] mb-2">Map View</h3>
-                                <p className="text-[#7E7E7E]">
+                        <div className="relative w-full h-[400px] md:h-[600px] rounded-2xl overflow-hidden bg-gradient-to-br from-[#8ECAE6] to-[#E8E5DB] flex items-center justify-center shadow-sm">
+                            <div className="text-center px-4">
+                                <MapTrifold weight="duotone" className="w-12 md:w-16 h-12 md:h-16 text-[#F5A623] mx-auto mb-4" />
+                                <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">Map View</h3>
+                                <p className="text-gray-500 text-sm md:text-base">
                                     Interactive map coming soon. Configure your Google Maps API key to enable.
                                 </p>
                             </div>
@@ -1033,7 +1244,7 @@ function SearchPageContent() {
                             {(() => {
                                 const safeProperties = Array.isArray(properties) ? properties : [];
                                 return safeProperties.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                                         {safeProperties.slice(0, visibleCount).map((property) => (
                                             <PropertyCard
                                                 key={property.id}
@@ -1050,17 +1261,17 @@ function SearchPageContent() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-16">
-                                        <MapPin weight="duotone" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                        <h3 className="text-xl font-semibold text-[#1C1C1C] mb-2">
+                                    <div className="text-center py-12 md:py-16">
+                                        <MapPin weight="duotone" className="w-12 md:w-16 h-12 md:h-16 text-gray-300 mx-auto mb-4" />
+                                        <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
                                             No Properties Found
                                         </h3>
-                                        <p className="text-[#7E7E7E] mb-6">
+                                        <p className="text-gray-500 mb-6 text-sm md:text-base">
                                             Try adjusting your filters or search criteria.
                                         </p>
                                         <button
                                             onClick={clearFilters}
-                                            className="inline-block px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
+                                            className="inline-block px-6 py-3 bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg text-sm md:text-base"
                                         >
                                             Clear Filters
                                         </button>
@@ -1070,10 +1281,10 @@ function SearchPageContent() {
 
                             {/* Load More */}
                             {visibleCount < totalCount && (
-                                <div className="mt-10 text-center">
+                                <div className="mt-8 md:mt-10 text-center">
                                     <button
                                         onClick={handleLoadMore}
-                                        className="px-8 py-3 border border-[#1C1C1C] rounded-full text-[#1C1C1C] font-semibold hover:bg-[#1C1C1C] hover:text-white transition-colors duration-300"
+                                        className="px-6 md:px-8 py-3 border-2 border-[#F5A623] rounded-full text-[#F5A623] font-semibold hover:bg-[#F5A623] hover:text-white transition-all duration-300 text-sm md:text-base"
                                     >
                                         Load More ({totalCount - visibleCount} remaining)
                                     </button>
@@ -1086,36 +1297,36 @@ function SearchPageContent() {
 
             {/* More Filters Modal */}
             {showFiltersModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                         onClick={() => setShowFiltersModal(false)}
                     />
-                    <div className="relative bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto mx-4 shadow-2xl">
+                    <div className="relative bg-white rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden mx-auto shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                         {/* Modal Header */}
-                        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-                            <h2 className="text-xl font-semibold text-[#1C1C1C]">Filters</h2>
+                        <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-gray-900">Filters</h2>
                             <button
                                 onClick={() => setShowFiltersModal(false)}
                                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                             >
-                                <X weight="bold" className="w-5 h-5 text-[#7E7E7E]" />
+                                <X weight="bold" className="w-5 h-5 text-gray-500" />
                             </button>
                         </div>
 
                         {/* Modal Content */}
-                        <div className="p-6 space-y-6">
+                        <div className="p-5 space-y-6 overflow-y-auto max-h-[calc(85vh-140px)]">
                             {/* Price Range */}
                             <div>
-                                <h3 className="font-semibold text-[#1C1C1C] mb-3">Price Range</h3>
-                                <div className="grid grid-cols-2 gap-3">
+                                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Price Range</h3>
+                                <div className="grid grid-cols-2 gap-2">
                                     {PRICE_RANGES.slice(1).map((range) => (
                                         <button
                                             key={range.value}
                                             onClick={() => setPriceRange(range.value)}
-                                            className={`px-4 py-3 border rounded-xl text-sm transition-colors ${priceRange === range.value
-                                                ? "border-teal-500 bg-teal-50 text-teal-600"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
+                                            className={`px-4 py-3 border rounded-xl text-sm font-medium transition-all ${priceRange === range.value
+                                                ? "border-[#F5A623] bg-[#F5A623]/10 text-[#E09000]"
+                                                : "border-gray-200 text-gray-700 hover:border-[#F5A623]"
                                                 }`}
                                         >
                                             {range.label}
@@ -1126,15 +1337,15 @@ function SearchPageContent() {
 
                             {/* Property Type */}
                             <div>
-                                <h3 className="font-semibold text-[#1C1C1C] mb-3">Property Type</h3>
-                                <div className="grid grid-cols-3 gap-3">
+                                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Property Type</h3>
+                                <div className="grid grid-cols-3 gap-2">
                                     {PROPERTY_TYPES.slice(1).map((type) => (
                                         <button
                                             key={type.value}
                                             onClick={() => setPropertyType(type.value)}
-                                            className={`px-4 py-3 border rounded-xl text-sm transition-colors ${propertyType === type.value
-                                                ? "border-teal-500 bg-teal-50 text-teal-600"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
+                                            className={`px-3 py-3 border rounded-xl text-xs font-medium transition-all ${propertyType === type.value
+                                                ? "border-[#F5A623] bg-[#F5A623]/10 text-[#E09000]"
+                                                : "border-gray-200 text-gray-700 hover:border-[#F5A623]"
                                                 }`}
                                         >
                                             {type.label}
@@ -1145,15 +1356,15 @@ function SearchPageContent() {
 
                             {/* Bedrooms */}
                             <div>
-                                <h3 className="font-semibold text-[#1C1C1C] mb-3">Bedrooms</h3>
+                                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Bedrooms</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {BEDROOM_OPTIONS.slice(1).map((option) => (
                                         <button
                                             key={option.value}
                                             onClick={() => setBedrooms(option.value)}
-                                            className={`px-4 py-2 border rounded-full text-sm transition-colors ${bedrooms === option.value
-                                                ? "border-teal-600 bg-teal-600 text-white"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
+                                            className={`px-4 py-2 border rounded-full text-sm font-medium transition-all ${bedrooms === option.value
+                                                ? "border-[#F5A623] bg-[#F5A623] text-white shadow-md"
+                                                : "border-gray-200 text-gray-700 hover:border-[#F5A623]"
                                                 }`}
                                         >
                                             {option.label}
@@ -1164,15 +1375,15 @@ function SearchPageContent() {
 
                             {/* Amenities */}
                             <div>
-                                <h3 className="font-semibold text-[#1C1C1C] mb-3">Amenities</h3>
+                                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Amenities</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {AMENITIES.map((amenity) => (
                                         <button
                                             key={amenity}
                                             onClick={() => toggleAmenity(amenity)}
-                                            className={`px-4 py-2 border rounded-full text-sm transition-colors ${selectedAmenities.includes(amenity)
-                                                ? "border-teal-600 bg-teal-600 text-white"
-                                                : "border-gray-200 text-[#1C1C1C] hover:border-teal-500"
+                                            className={`px-4 py-2 border rounded-full text-sm font-medium transition-all ${selectedAmenities.includes(amenity)
+                                                ? "border-[#F5A623] bg-[#F5A623] text-white shadow-md"
+                                                : "border-gray-200 text-gray-700 hover:border-[#F5A623]"
                                                 }`}
                                         >
                                             {amenity}
@@ -1183,7 +1394,7 @@ function SearchPageContent() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex items-center justify-between">
+                        <div className="sticky bottom-0 bg-white border-t border-gray-100 px-5 py-4 flex items-center justify-between gap-3">
                             <button
                                 onClick={() => {
                                     setPropertyType("");
@@ -1191,7 +1402,7 @@ function SearchPageContent() {
                                     setPriceRange("");
                                     setSelectedAmenities([]);
                                 }}
-                                className="text-[#7E7E7E] hover:text-[#1C1C1C] font-medium transition-colors"
+                                className="text-gray-500 hover:text-gray-900 font-medium transition-colors text-sm"
                             >
                                 Clear All
                             </button>
@@ -1200,7 +1411,7 @@ function SearchPageContent() {
                                     setShowFiltersModal(false);
                                     handleSearch();
                                 }}
-                                className="px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all"
+                                className="px-6 py-3 bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg text-sm"
                             >
                                 Show {totalCount} Properties
                             </button>

@@ -408,110 +408,147 @@ export default function ListingsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4">
         <button
           onClick={() => setStatusFilter('all')}
           className={cn(
-            "p-4 rounded-xl border-2 transition-all text-left",
+            "p-2.5 md:p-4 rounded-xl border-2 transition-all text-left active:scale-95",
             statusFilter === 'all' 
               ? "border-teal-500 bg-teal-50" 
               : "border-gray-100 bg-white hover:border-gray-200"
           )}
         >
-          <div className="flex items-center justify-between">
-            <Building className="w-5 h-5 text-gray-400" />
-            <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
+          <div className="flex items-center gap-1.5 md:gap-2 md:justify-between">
+            <Building className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+            <span className="text-lg md:text-2xl font-bold text-gray-900">{stats.total}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Total</p>
+          <p className="text-[10px] md:text-sm text-gray-500 mt-0.5 md:mt-1">Total</p>
         </button>
 
         <button
           onClick={() => setStatusFilter('active')}
           className={cn(
-            "p-4 rounded-xl border-2 transition-all text-left",
+            "p-2.5 md:p-4 rounded-xl border-2 transition-all text-left active:scale-95",
             statusFilter === 'active' 
               ? "border-green-500 bg-green-50" 
               : "border-gray-100 bg-white hover:border-gray-200"
           )}
         >
-          <div className="flex items-center justify-between">
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-            <span className="text-2xl font-bold text-green-600">{stats.active}</span>
+          <div className="flex items-center gap-1.5 md:gap-2 md:justify-between">
+            <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-green-500" />
+            <span className="text-lg md:text-2xl font-bold text-green-600">{stats.active}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Active</p>
+          <p className="text-[10px] md:text-sm text-gray-500 mt-0.5 md:mt-1">Active</p>
         </button>
 
         <button
           onClick={() => setStatusFilter('pending')}
           className={cn(
-            "p-4 rounded-xl border-2 transition-all text-left",
+            "p-2.5 md:p-4 rounded-xl border-2 transition-all text-left active:scale-95",
             statusFilter === 'pending' 
               ? "border-amber-500 bg-amber-50" 
               : "border-gray-100 bg-white hover:border-gray-200"
           )}
         >
-          <div className="flex items-center justify-between">
-            <Clock className="w-5 h-5 text-amber-500" />
-            <span className="text-2xl font-bold text-amber-600">{stats.pending}</span>
+          <div className="flex items-center gap-1.5 md:gap-2 md:justify-between">
+            <Clock className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+            <span className="text-lg md:text-2xl font-bold text-amber-600">{stats.pending}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Pending</p>
+          <p className="text-[10px] md:text-sm text-gray-500 mt-0.5 md:mt-1">Pending</p>
         </button>
 
         <button
           onClick={() => setStatusFilter('inactive')}
           className={cn(
-            "p-4 rounded-xl border-2 transition-all text-left",
+            "p-2.5 md:p-4 rounded-xl border-2 transition-all text-left active:scale-95 col-span-1 md:col-span-1",
             statusFilter === 'inactive' 
               ? "border-gray-500 bg-gray-50" 
               : "border-gray-100 bg-white hover:border-gray-200"
           )}
         >
-          <div className="flex items-center justify-between">
-            <XCircle className="w-5 h-5 text-gray-400" />
-            <span className="text-2xl font-bold text-gray-600">{stats.inactive}</span>
+          <div className="flex items-center gap-1.5 md:gap-2 md:justify-between">
+            <XCircle className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+            <span className="text-lg md:text-2xl font-bold text-gray-600">{stats.inactive}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Inactive</p>
+          <p className="text-[10px] md:text-sm text-gray-500 mt-0.5 md:mt-1">Inactive</p>
         </button>
 
         <button
           onClick={() => setStatusFilter('featured')}
           className={cn(
-            "p-4 rounded-xl border-2 transition-all text-left",
+            "p-2.5 md:p-4 rounded-xl border-2 transition-all text-left active:scale-95 col-span-2 md:col-span-1",
             statusFilter === 'featured' 
               ? "border-purple-500 bg-purple-50" 
               : "border-gray-100 bg-white hover:border-gray-200"
           )}
         >
-          <div className="flex items-center justify-between">
-            <Sparkles className="w-5 h-5 text-purple-500" />
-            <span className="text-2xl font-bold text-purple-600">{stats.featured}</span>
+          <div className="flex items-center gap-1.5 md:gap-2 md:justify-between">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-purple-500" />
+            <span className="text-lg md:text-2xl font-bold text-purple-600">{stats.featured}</span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Featured</p>
+          <p className="text-[10px] md:text-sm text-gray-500 mt-0.5 md:mt-1">Featured</p>
         </button>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by title, location, or type..."
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-            />
+      <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
+        <div className="flex flex-col gap-3 md:gap-4">
+          {/* Search Row */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                className="w-full pl-9 md:pl-10 pr-4 py-2 md:py-2.5 text-sm md:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+              />
+            </div>
+            {/* Mobile Filter Toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "flex md:hidden items-center gap-1.5 px-3 py-2 border rounded-lg text-sm font-medium transition-colors",
+                showFilters ? "bg-teal-50 border-teal-200 text-teal-700" : "bg-white border-gray-200 text-gray-600"
+              )}
+            >
+              <Filter className="w-4 h-4" />
+              <ChevronDown className={cn("w-4 h-4 transition-transform", showFilters && "rotate-180")} />
+            </button>
+            {/* View Toggle - Always visible */}
+            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  "p-2 md:p-2.5 transition-colors",
+                  viewMode === 'grid' ? "bg-teal-500 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
+                )}
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  "p-2 md:p-2.5 transition-colors",
+                  viewMode === 'list' ? "bg-teal-500 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
+                )}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Quick Filters */}
-          <div className="flex items-center gap-3">
+          {/* Filters - Collapsible on mobile, always visible on desktop */}
+          <div className={cn(
+            "flex-col md:flex-row gap-2 md:gap-3",
+            showFilters ? "flex" : "hidden md:flex"
+          )}>
             {/* Property Type Filter */}
             <select
               value={propertyTypeFilter}
               onChange={(e) => { setPropertyTypeFilter(e.target.value); setCurrentPage(1); }}
-              className="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none bg-white"
+              className="flex-1 md:flex-none px-3 md:px-4 py-2 md:py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none bg-white"
             >
               <option value="all">All Types</option>
               {propertyTypes.map(type => (
@@ -522,11 +559,11 @@ export default function ListingsPage() {
             </select>
 
             {/* Sort */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5 md:gap-1">
               <select
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value as SortField)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none bg-white"
+                className="flex-1 md:flex-none px-3 md:px-4 py-2 md:py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none bg-white"
               >
                 <option value="createdAt">Date Added</option>
                 <option value="title">Title</option>
@@ -536,31 +573,9 @@ export default function ListingsPage() {
               </select>
               <button
                 onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
-                className="p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-2 md:p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <ArrowUpDown className="w-4 h-4 text-gray-500" />
-              </button>
-            </div>
-
-            {/* View Toggle */}
-            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={cn(
-                  "p-2.5 transition-colors",
-                  viewMode === 'grid' ? "bg-teal-500 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
-                )}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={cn(
-                  "p-2.5 transition-colors",
-                  viewMode === 'list' ? "bg-teal-500 text-white" : "bg-white text-gray-500 hover:bg-gray-50"
-                )}
-              >
-                <List className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -592,15 +607,16 @@ export default function ListingsPage() {
       </div>
 
       {/* Results count */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs md:text-sm text-gray-500">
+        <div className="flex items-center gap-2 md:gap-4">
           <span>
-            Showing {paginatedProperties.length} of {filteredProperties.length} properties
-            {filteredProperties.length !== properties.length && ` (filtered from ${properties.length})`}
+            Showing {paginatedProperties.length} of {filteredProperties.length}
+            <span className="hidden sm:inline"> properties</span>
+            {filteredProperties.length !== properties.length && <span className="hidden md:inline"> (filtered from {properties.length})</span>}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span>Per page:</span>
+          <span className="hidden sm:inline">Per page:</span>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
@@ -616,20 +632,20 @@ export default function ListingsPage() {
 
       {/* Listings Grid/List */}
       {!data ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-pulse">
-              <div className="h-48 bg-gray-200" />
-              <div className="p-4 space-y-3">
-                <div className="h-5 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-                <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-32 md:h-48 bg-gray-200" />
+              <div className="p-3 md:p-4 space-y-2 md:space-y-3">
+                <div className="h-4 md:h-5 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 md:h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 md:h-4 bg-gray-200 rounded w-1/4" />
               </div>
             </div>
           ))}
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
           {paginatedProperties.map((property) => (
             <div
               key={property._id}
@@ -641,7 +657,7 @@ export default function ListingsPage() {
               )}
             >
               {/* Image */}
-              <div className="relative h-48 bg-gray-100">
+              <div className="relative h-28 md:h-48 bg-gray-100">
                 {property.images?.[0] ? (
                   <Image
                     src={property.images[0]}
@@ -651,16 +667,16 @@ export default function ListingsPage() {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-300">
-                    <Building2 className="w-12 h-12" />
+                    <Building2 className="w-8 h-8 md:w-12 md:h-12" />
                   </div>
                 )}
                 
                 {/* Overlay badges */}
-                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                <div className="absolute top-1.5 md:top-2 left-1.5 md:left-2 flex flex-col gap-0.5 md:gap-1">
                   {getStatusBadge(property)}
                   {property.isFeatured && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-500 text-white">
-                      <Sparkles className="w-3 h-3" /> Featured
+                    <span className="inline-flex items-center gap-0.5 md:gap-1 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-medium bg-purple-500 text-white">
+                      <Sparkles className="w-2.5 h-2.5 md:w-3 md:h-3" /> <span className="hidden md:inline">Featured</span>
                     </span>
                   )}
                 </div>
@@ -668,89 +684,89 @@ export default function ListingsPage() {
                 {/* Selection checkbox */}
                 <button
                   onClick={() => toggleSelect(property._id)}
-                  className="absolute top-2 right-2 p-1 bg-white/90 rounded-lg shadow-sm hover:bg-white transition-colors"
+                  className="absolute top-1.5 md:top-2 right-1.5 md:right-2 p-1 bg-white/90 rounded-lg shadow-sm hover:bg-white transition-colors"
                 >
                   {selectedIds.has(property._id) ? (
-                    <CheckSquare className="w-5 h-5 text-teal-500" />
+                    <CheckSquare className="w-4 h-4 md:w-5 md:h-5 text-teal-500" />
                   ) : (
-                    <Square className="w-5 h-5 text-gray-400" />
+                    <Square className="w-4 h-4 md:w-5 md:h-5 text-gray-400" />
                   )}
                 </button>
 
                 {/* Property type badge */}
-                <div className="absolute bottom-2 left-2">
-                  <span className="px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs rounded-md capitalize">
+                <div className="absolute bottom-1.5 md:bottom-2 left-1.5 md:left-2">
+                  <span className="px-1.5 md:px-2 py-0.5 md:py-1 bg-black/60 backdrop-blur-sm text-white text-[10px] md:text-xs rounded-md capitalize">
                     {property.propertyType}
                   </span>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 truncate group-hover:text-teal-600 transition-colors">
+              <div className="p-2.5 md:p-4">
+                <h3 className="font-semibold text-gray-900 text-xs md:text-base truncate group-hover:text-teal-600 transition-colors">
                   {property.title}
                 </h3>
                 
-                <div className="flex items-center text-gray-500 text-sm mt-1">
-                  <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
+                <div className="flex items-center text-gray-500 text-[10px] md:text-sm mt-0.5 md:mt-1">
+                  <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 mr-0.5 md:mr-1 flex-shrink-0" />
                   <span className="truncate">{property.location.area || property.location.city}</span>
                 </div>
 
                 {/* Property details */}
-                <div className="flex items-center gap-3 mt-3 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <Bed className="w-3.5 h-3.5" /> {property.bedrooms}
+                <div className="flex items-center gap-2 md:gap-3 mt-1.5 md:mt-3 text-[10px] md:text-sm text-gray-500">
+                  <span className="flex items-center gap-0.5 md:gap-1">
+                    <Bed className="w-3 h-3 md:w-3.5 md:h-3.5" /> {property.bedrooms}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Bath className="w-3.5 h-3.5" /> {property.bathrooms}
+                  <span className="flex items-center gap-0.5 md:gap-1">
+                    <Bath className="w-3 h-3 md:w-3.5 md:h-3.5" /> {property.bathrooms}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5" /> {property.guests}
+                  <span className="hidden sm:flex items-center gap-0.5 md:gap-1">
+                    <Users className="w-3 h-3 md:w-3.5 md:h-3.5" /> {property.guests}
                   </span>
                 </div>
 
                 {/* Price and rating */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                  <div className="font-bold text-teal-600">
+                <div className="flex items-center justify-between mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100">
+                  <div className="font-bold text-teal-600 text-xs md:text-base">
                     {property.pricePerNight ? (
-                      <>AED {property.pricePerNight}<span className="text-xs text-gray-400 font-normal">/night</span></>
+                      <>AED {property.pricePerNight}<span className="text-[8px] md:text-xs text-gray-400 font-normal">/n</span></>
                     ) : (
-                      <span className="text-gray-400 font-normal text-sm">Contact for price</span>
+                      <span className="text-gray-400 font-normal text-[10px] md:text-sm">Contact</span>
                     )}
                   </div>
-                  <div className="flex items-center text-amber-500 text-sm font-medium">
-                    <Star className="w-4 h-4 fill-current mr-0.5" />
+                  <div className="flex items-center text-amber-500 text-[10px] md:text-sm font-medium">
+                    <Star className="w-3 h-3 md:w-4 md:h-4 fill-current mr-0.5" />
                     {property.rating || 'New'}
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="mt-3 flex gap-2">
+                {/* Actions - Mobile: icon only, Desktop: with text */}
+                <div className="mt-2 md:mt-3 flex gap-1 md:gap-2">
                   {!property.isApprovedByAdmin && property.isActive && (
                     <button
                       onClick={() => handleApprove(property._id)}
                       disabled={actionLoading === property._id}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1 px-2 md:px-3 py-1.5 md:py-2 bg-green-500 text-white text-[10px] md:text-sm font-medium rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Approve
+                      <CheckCircle2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> <span className="hidden md:inline">Approve</span>
                     </button>
                   )}
                   <Link
                     href={`/listings/${property.slug || property._id}`}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1 px-2 md:px-3 py-1.5 md:py-2 bg-gray-100 text-gray-700 text-[10px] md:text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    <Eye className="w-3.5 h-3.5" /> View
+                    <Eye className="w-3 h-3 md:w-3.5 md:h-3.5" /> <span className="hidden md:inline">View</span>
                   </Link>
                   <Link
                     href={`/admin/listings/${property._id}`}
-                    className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1 px-2 md:px-3 py-1.5 md:py-2 bg-teal-500 text-white text-[10px] md:text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors"
                   >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
+                    <Pencil className="w-3 h-3 md:w-3.5 md:h-3.5" /> <span className="hidden md:inline">Edit</span>
                   </Link>
                 </div>
 
-                {/* Secondary actions */}
-                <div className="mt-2 flex gap-2">
+                {/* Secondary actions - Hidden on mobile, compact on desktop */}
+                <div className="hidden md:flex mt-2 gap-2">
                   <button
                     onClick={() => handleToggleFeatured(property)}
                     disabled={actionLoading === property._id}
