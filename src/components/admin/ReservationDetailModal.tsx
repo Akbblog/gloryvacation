@@ -216,25 +216,6 @@ export default function ReservationDetailModal({
                                         ))}
                                     </div>
                                 </div>
-                            </div>}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-                                    <div className="flex gap-2">
-                                        {priorityOptions.map(opt => (
-                                            <button
-                                                key={opt.value}
-                                                onClick={() => setPriority(opt.value)}
-                                                className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-all ${
-                                                    priority === opt.value
-                                                        ? `${opt.color} ring-2 ring-offset-1 ring-current/20`
-                                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                                                }`}
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
 
                             {/* Guest & Property Info */}

@@ -148,7 +148,11 @@ export default async function AdminDashboard() {
                         </Link>
                     </div>
                 </div>
-                        </Link>
+
+                {/* Recent Activity */}
+                <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                    <h3 className="font-semibold text-[#1C1C1C] mb-3 md:mb-4 text-sm md:text-base">Recent Activity</h3>
+                    <div className="space-y-2 md:space-y-3">
                         <Link href="/admin/settings" className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors group">
                             <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
                                 <Settings className="w-5 h-5 text-gray-600" />
