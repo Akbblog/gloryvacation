@@ -5,7 +5,7 @@ import { BookingForm } from '@/components/bookings/BookingForm';
 import ContactBox from '@/components/listings/ContactBox';
 import EnhancedImageGallery from '@/components/listings/EnhancedImageGallery';
 import { useProperty } from '@/lib/hooks/useProperty';
-import { Star, MapPin, Share2, Heart, Wifi, Car, Utensils, Tv, Coffee, Wind, Droplets, Dumbbell, ChevronLeft, ChevronRight, Home, Users, Sofa, Shield, Award, User, Clock, CheckCircle, MessageSquare } from 'lucide-react';
+import { Star, MapPin, Share2, Heart, Wifi, Car, Utensils, Tv, Coffee, Wind, Droplets, Dumbbell, ChevronLeft, ChevronRight, Home, Users, Sofa, Shield, Award, User, Clock, CheckCircle, MessageSquare, Calendar } from 'lucide-react';
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 
 interface Props {
@@ -18,6 +18,12 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [showAllAmenities, setShowAllAmenities] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [mobileAmenitiesExpanded, setMobileAmenitiesExpanded] = useState(false);
+    const bookingFormRef = React.useRef<HTMLDivElement>(null);
+
+    const scrollToBookingForm = () => {
+        bookingFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -172,6 +178,17 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
                     {/* Left Column */}
                     <div className="lg:col-span-2 space-y-8">
+                        {/* Mobile Reservation Section - Shown first on mobile */}
+                        {isMobile && (
+                            <section ref={bookingFormRef} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-fade-in-up">
+                                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+                                    <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
+                                    Reserve Your Stay
+                                </h2>
+                                <BookingForm propertyId={p._id || p.id} maxGuests={p.guests || 1} />
+                            </section>
+                        )}
+
                         {/* Description */}
                         {p.description && (
                             <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
@@ -185,57 +202,112 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                             </section>
                         )}
 
-                        {/* Enhanced Amenities Section */}
+                        {/* Enhanced Amenities Section - Collapsible on Mobile */}
                         {amenities.length > 0 && (
                             <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
-                                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                                    <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
-                                    What this place offers
-                                </h2>
-                                
-                                {/* Category Tabs */}
-                                {Object.keys(groupedAmenities).length > 1 && (
-                                    <div className="flex flex-wrap gap-2 mb-6">
-                                        {Object.keys(groupedAmenities).map(category => (
-                                            <button
-                                                key={category}
-                                                className="px-4 py-2 rounded-full bg-gray-100 hover:bg-teal-50 hover:text-teal-600 text-gray-700 text-sm font-medium transition-all duration-200"
-                                            >
-                                                {category}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {safeVisibleAmenities.map((amenity: string, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-teal-50 transition-all duration-300 group">
-                                            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-teal-600 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
-                                                {getAmenityIcon(amenity)}
-                                            </div>
-                                            <span className="text-gray-700 font-medium group-hover:text-teal-700 transition text-sm">{amenity}</span>
+                                <div 
+                                    className="flex items-center justify-between cursor-pointer md:cursor-default"
+                                    onClick={() => isMobile && setMobileAmenitiesExpanded(!mobileAmenitiesExpanded)}
+                                >
+                                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-3">
+                                        <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
+                                        What this place offers
+                                    </h2>
+                                    {/* Mobile collapse indicator */}
+                                    {isMobile && (
+                                        <div className="flex items-center gap-2 text-teal-600">
+                                            <span className="text-sm font-medium">{amenities.length} amenities</span>
+                                            <ChevronRight className={`w-5 h-5 transition-transform duration-300 ${mobileAmenitiesExpanded ? 'rotate-90' : ''}`} />
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
                                 
-                                {amenities.length > 8 && (
-                                    <button
-                                        onClick={() => setShowAllAmenities(!showAllAmenities)}
-                                        className="mt-6 px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-                                    >
-                                        {showAllAmenities ? 'Show less' : `Show all ${amenities.length} amenities`}
-                                    </button>
+                                {/* Mobile: Summarized view with expansion */}
+                                {isMobile ? (
+                                    <div className={`overflow-hidden transition-all duration-300 ${mobileAmenitiesExpanded ? 'max-h-[2000px] mt-6' : 'max-h-32 mt-4'}`}>
+                                        {!mobileAmenitiesExpanded ? (
+                                            // Compact summary view
+                                            <div className="flex flex-wrap gap-2">
+                                                {amenities.slice(0, 6).map((amenity: string, idx: number) => (
+                                                    <div key={idx} className="flex items-center gap-2 px-3 py-2 rounded-full bg-gray-50 border border-gray-100">
+                                                        <span className="text-teal-600">{getAmenityIcon(amenity)}</span>
+                                                        <span className="text-gray-700 text-sm">{amenity}</span>
+                                                    </div>
+                                                ))}
+                                                {amenities.length > 6 && (
+                                                    <div className="flex items-center px-3 py-2 rounded-full bg-teal-50 border border-teal-100 text-teal-600 text-sm font-medium">
+                                                        +{amenities.length - 6} more
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            // Expanded full view
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {amenities.map((amenity: string, idx: number) => (
+                                                    <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-teal-50 transition-all duration-300 group">
+                                                        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-teal-600 flex-shrink-0 shadow-sm">
+                                                            {getAmenityIcon(amenity)}
+                                                        </div>
+                                                        <span className="text-gray-700 font-medium text-sm">{amenity}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    // Desktop: Original layout
+                                    <>
+                                        {Object.keys(groupedAmenities).length > 1 && (
+                                            <div className="flex flex-wrap gap-2 mb-6 mt-6">
+                                                {Object.keys(groupedAmenities).map(category => (
+                                                    <button
+                                                        key={category}
+                                                        className="px-4 py-2 rounded-full bg-gray-100 hover:bg-teal-50 hover:text-teal-600 text-gray-700 text-sm font-medium transition-all duration-200"
+                                                    >
+                                                        {category}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6">
+                                            {safeVisibleAmenities.map((amenity: string, idx: number) => (
+                                                <div key={idx} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-teal-50 transition-all duration-300 group">
+                                                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-teal-600 flex-shrink-0 shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all">
+                                                        {getAmenityIcon(amenity)}
+                                                    </div>
+                                                    <span className="text-gray-700 font-medium group-hover:text-teal-700 transition text-sm">{amenity}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        
+                                        {amenities.length > 8 && (
+                                            <button
+                                                onClick={() => setShowAllAmenities(!showAllAmenities)}
+                                                className="mt-6 px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                                            >
+                                                {showAllAmenities ? 'Show less' : `Show all ${amenities.length} amenities`}
+                                            </button>
+                                        )}
+                                    </>
                                 )}
                             </section>
                         )}
 
-                        {/* Enhanced Map Section */}
+                        {/* Mobile: Contact Host Section (above map) */}
+                        {isMobile && (
+                            <section className="bg-white rounded-2xl shadow-sm border border-gray-100 animate-fade-in-up">
+                                <ContactBox propertyId={p._id || p.id} />
+                            </section>
+                        )}
+
+                        {/* Enhanced Map Section - At bottom on mobile */}
                         <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 animate-fade-in-up">
                             <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                                 <span className="w-1 h-6 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full"></span>
                                 Where you'll be
                             </h2>
-                            <div className="w-full h-80 md:h-96 rounded-2xl overflow-hidden bg-gray-100 relative">
+                            <div className="w-full h-64 md:h-96 rounded-2xl overflow-hidden bg-gray-100 relative">
                                 {p.location?.lat && p.location?.lng ? (
                                     <>
                                         <iframe
@@ -271,11 +343,11 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                         </section>
                     </div>
 
-                    {/* Right Sidebar */}
-                    <aside>
+                    {/* Right Sidebar - Hidden on mobile (shown inline above) */}
+                    <aside className="hidden lg:block">
                         <div className="sticky top-24 space-y-6">
                             {/* Enhanced Booking Form */}
-                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg">
+                            <div ref={bookingFormRef} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg">
                                 <BookingForm propertyId={p._id || p.id} maxGuests={p.guests || 1} />
                             </div>
 
@@ -305,21 +377,11 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                                 </div>
                             </div>
 
-                            {/* Enhanced Host Section */}
-                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm group">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Hosted by {p.host?.role === 'admin' ? 'Glory Vacations' : (p.host?.name || 'Host')}</h3>
-                                <div className="flex items-center gap-4 mb-5">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-teal-200 group-hover:scale-105 transition-transform">
-                                        <User className="w-7 h-7 text-white" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-500">
-                                            {p.host?.role === 'admin' ? 'Official Partner' : `Joined ${p.host?.joinedAt ? new Date(p.host.joinedAt).toLocaleDateString() : 'recently'}`}
-                                        </p>
-                                    </div>
-                                </div>
+                            {/* Streamlined Host Section - Only metrics shown */}
+                            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">Host Information</h3>
                                 
-                                {/* Host Metrics */}
+                                {/* Host Metrics - Key information only */}
                                 <div className="grid grid-cols-2 gap-4 mb-5 p-4 bg-gray-50 rounded-xl">
                                     <div className="text-center">
                                         <div className="text-xl font-bold text-teal-600">95%</div>
@@ -348,11 +410,15 @@ export default function PropertyDetailClient({ id, initialProperty }: Props) {
                 </div>
             </div>
 
-            {/* Mobile Sticky Footer */}
+            {/* Mobile Sticky Footer - Functional Request Booking Button */}
             {isMobile && (
                 <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-2xl p-4 z-40">
                     <div className="flex items-center justify-center">
-                        <button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-teal-200">
+                        <button 
+                            onClick={scrollToBookingForm}
+                            className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg shadow-teal-200 flex items-center justify-center gap-2"
+                        >
+                            <Calendar className="w-5 h-5" />
                             Request Booking
                         </button>
                     </div>

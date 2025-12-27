@@ -47,57 +47,57 @@ export function Footer() {
     return (
         <footer className="bg-white border-t border-gray-200">
             {/* Main Footer */}
-            <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px] py-12 md:py-16">
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
+            <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px] py-8 md:py-16">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8 lg:gap-12">
                     {/* Brand Column */}
-                    <div className="col-span-2 md:col-span-4 lg:col-span-2">
-                        <Link href="/" className="inline-block mb-6">
-                            <span className="text-2xl font-bold text-teal-600">Glory Vacation</span>
+                    <div className="col-span-2">
+                        <Link href="/" className="inline-block mb-4 md:mb-6">
+                            <span className="text-xl md:text-2xl font-bold text-teal-600">Glory Vacation</span>
                         </Link>
-                        <p className="text-[#7E7E7E] text-sm leading-relaxed mb-6 max-w-[320px]">
+                        <p className="text-[#7E7E7E] text-xs md:text-sm leading-relaxed mb-4 md:mb-6 max-w-[280px] md:max-w-[320px]">
                             {t('description')}
                         </p>
 
                         {/* Contact Info */}
-                        <div className="space-y-3 text-sm text-[#7E7E7E]">
+                        <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-[#7E7E7E]">
                             <a href="mailto:info@gloryvacation.com" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
-                                <Mail className="w-4 h-4" />
-                                <span className={/* Use dir="ltr" for email/phone if mostly latin */ "dir-ltr"}>info@gloryvacation.com</span>
+                                <Mail className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                                <span className="dir-ltr truncate">info@gloryvacation.com</span>
                             </a>
                             <a href="tel:+971503505752" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
-                                <Phone className="w-4 h-4" />
+                                <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                                 <span className="dir-ltr">+971 50 350 5752</span>
                             </a>
                             <div className="flex items-start gap-2">
-                                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                                <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 mt-0.5 shrink-0" />
                                 <span>{t('dubai')}</span>
                             </div>
                         </div>
 
                         {/* Social Links */}
-                        <div className="flex items-center gap-3 mt-6">
+                        <div className="flex items-center gap-2 md:gap-3 mt-4 md:mt-6">
                             {SOCIAL_LINKS.map((social) => (
                                 <a
                                     key={social.name}
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-10 h-10 rounded-full bg-[#F5A623] hover:bg-[#E09615] text-white flex items-center justify-center transition-colors"
+                                    className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#F5A623] hover:bg-[#E09615] text-white flex items-center justify-center transition-colors"
                                     aria-label={social.name}
                                 >
-                                    <social.icon className="w-4 h-4" />
+                                    <social.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                 </a>
                             ))}
                         </div>
                     </div>
 
-                    {/* Link Columns */}
+                    {/* Link Columns - Stack on mobile */}
                     {Object.entries(FOOTER_LINKS).map(([key, section]) => (
-                        <div key={key}>
-                            <h3 className="font-semibold text-[#1C1C1C] mb-4 text-sm">
+                        <div key={key} className="col-span-1">
+                            <h3 className="font-semibold text-[#1C1C1C] mb-3 md:mb-4 text-xs md:text-sm">
                                 {section.title}
                             </h3>
-                            <ul className="space-y-3">
+                            <ul className="space-y-2 md:space-y-3">
                                 {section.links.map((link) => (
                                     <li key={link.name}>
                                         {link.external ? (
@@ -105,14 +105,14 @@ export function Footer() {
                                                 href={link.href}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-sm"
+                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-xs md:text-sm"
                                             >
                                                 {link.name}
                                             </a>
                                         ) : (
                                             <Link
                                                 href={link.href}
-                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-sm"
+                                                className="text-[#7E7E7E] hover:text-teal-600 transition-colors text-xs md:text-sm"
                                             >
                                                 {link.name}
                                             </Link>
@@ -127,14 +127,13 @@ export function Footer() {
 
             {/* Bottom Bar */}
             <div className="border-t border-gray-200">
-                <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px] py-4">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#7E7E7E]">
-                        <p>© {new Date().getFullYear()} Glory Vacation. {t('rights')}</p>
-                        <div className="flex items-center gap-4">
-                            {/* Payment Methods / Certifications could go here */}
-                            <span className="text-xs">{t('licensed')}</span>
-                            <span className="text-xs">|</span>
-                            <span className="text-xs">4.6★ {t('rated')}</span>
+                <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px] py-3 md:py-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4 text-[10px] md:text-sm text-[#7E7E7E]">
+                        <p className="text-center md:text-left">© {new Date().getFullYear()} Glory Vacation. {t('rights')}</p>
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <span>{t('licensed')}</span>
+                            <span>|</span>
+                            <span>4.6★ {t('rated')}</span>
                         </div>
                     </div>
                 </div>

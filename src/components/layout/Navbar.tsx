@@ -283,18 +283,32 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         </div>
 
                         {/* Mobile Menu Button */}
-                        <button
-                            ref={burgerRef}
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            className={cn(
-                                "md:hidden flex items-center justify-center p-2 rounded-full transition-all duration-300",
-                                showSolid
-                                    ? "bg-gray-100 text-[#1C1C1C] hover:bg-gray-200"
-                                    : "bg-white/20 backdrop-blur-md text-white hover:bg-white/30"
-                            )}
-                        >
-                            <List weight="bold" className="w-6 h-6" />
-                        </button>
+                        <div className="flex md:hidden items-center gap-2">
+                            {/* Mobile Language Toggle */}
+                            <button
+                                onClick={() => handleLanguageChange(locale === 'en' ? 'ar' : 'en')}
+                                className={cn(
+                                    "flex items-center justify-center w-9 h-9 rounded-full font-semibold text-xs transition-all duration-300",
+                                    showSolid
+                                        ? "bg-gray-100 text-[#1C1C1C] hover:bg-gray-200"
+                                        : "bg-white/20 backdrop-blur-md text-white hover:bg-white/30"
+                                )}
+                            >
+                                {locale === 'en' ? 'AR' : 'EN'}
+                            </button>
+                            <button
+                                ref={burgerRef}
+                                onClick={() => setMenuOpen(!menuOpen)}
+                                className={cn(
+                                    "flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300",
+                                    showSolid
+                                        ? "bg-gray-100 text-[#1C1C1C] hover:bg-gray-200"
+                                        : "bg-white/20 backdrop-blur-md text-white hover:bg-white/30"
+                                )}
+                            >
+                                <List weight="bold" className="w-5 h-5" />
+                            </button>
+                        </div>
                     </nav>
                 </div>
             </div>
@@ -304,14 +318,13 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] md:hidden animate-in fade-in duration-300" onClick={() => setMenuOpen(false)}>
                     <div
                         ref={mobileMenuRef}
-                        className="absolute right-0 top-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col"
+                        className="absolute right-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Mobile Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                        <div className="flex items-center justify-between p-4 border-b border-gray-100">
                             <div>
-                                <h2 className="text-xl font-bold text-[#1C1C1C]">{t('menu')}</h2>
-                                <p className="text-xs text-gray-400 mt-1">{t('explore')}</p>
+                                <h2 className="text-lg font-bold text-[#1C1C1C]">{t('menu')}</h2>
                             </div>
                             <button
                                 onClick={() => setMenuOpen(false)}
@@ -321,8 +334,19 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                             </button>
                         </div>
 
+                        {/* Mobile Search Button */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <button
+                                onClick={() => handleMenuItemClick('/listings')}
+                                className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl text-left hover:bg-gray-100 transition-colors"
+                            >
+                                <MagnifyingGlass weight="bold" className="w-5 h-5 text-[#F5A623]" />
+                                <span className="text-sm text-gray-600">{tHero('searchDestinations')}</span>
+                            </button>
+                        </div>
+
                         {/* Scrollable Content */}
-                        <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
                             {!session ? (
                                     <button
                                         onClick={() => handleMenuItemClick('/auth/signin')}
@@ -386,16 +410,13 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         </div>
 
                         {/* Mobile Footer */}
-                        <div className="p-5 border-t border-gray-100 bg-gray-50/50">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-gray-500">{t('currency')}</span>
-                                <div className="flex gap-2">
-                                    {["AED", "USD", "EUR"].map(c => (
-                                        <button key={c} className="px-2 py-1 text-xs font-bold text-gray-400 hover:text-[#F5A623] hover:bg-white rounded border border-transparent hover:border-gray-200 transition-all">
-                                            {c}
-                                        </button>
-                                    ))}
-                                </div>
+                        <div className="p-4 border-t border-gray-100 bg-gray-50/50 safe-area-bottom">
+                            <div className="flex items-center justify-center gap-4">
+                                {["AED", "USD", "EUR"].map(c => (
+                                    <button key={c} className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:text-[#F5A623] hover:bg-white rounded-lg border border-transparent hover:border-gray-200 transition-all">
+                                        {c}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>

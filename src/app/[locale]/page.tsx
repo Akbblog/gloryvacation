@@ -72,7 +72,7 @@ export default function Home() {
       />
 
       {/* 3. Property Grid */}
-      <section className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] py-8 md:py-12 max-w-[1440px]">
+      <section className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-[50px] xl:px-[70px] py-6 md:py-12 max-w-[1440px]">
         {isLoading && (
           <div className="flex justify-center items-center py-20">
             <SpinnerGap weight="bold" className="w-8 h-8 animate-spin text-orange-500" />
@@ -80,7 +80,7 @@ export default function Home() {
         )}
         {!isLoading && filteredProperties.length > 0 && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-5">
               {filteredProperties.map((property) => (
                 <PropertyCard
                   key={property.id}
@@ -98,8 +98,8 @@ export default function Home() {
             </div>
 
             {/* Load More Button */}
-            <div className="mt-10 text-center">
-              <Link href="/listings" className="inline-block px-8 py-3 border border-[#1C1C1C] rounded-full text-[#1C1C1C] font-semibold hover:bg-[#1C1C1C] hover:text-white transition-colors duration-300">
+            <div className="mt-8 md:mt-10 text-center">
+              <Link href="/listings" className="inline-block px-6 py-2.5 md:px-8 md:py-3 border border-[#1C1C1C] rounded-full text-[#1C1C1C] font-semibold hover:bg-[#1C1C1C] hover:text-white transition-colors duration-300 text-sm md:text-base active:scale-95">
                 {tListing('loadMore')}
               </Link>
             </div>

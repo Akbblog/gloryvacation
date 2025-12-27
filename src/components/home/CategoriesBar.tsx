@@ -142,8 +142,8 @@ export function CategoriesBar({ onCategoryChange, onFilterClick }: CategoriesBar
                                 })}
                             </div>
 
-                            {/* Mobile horizontal scroll categories */}
-                            <div className="flex md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4 gap-3 py-1">
+                            {/* Mobile horizontal scroll categories - Improved sizing */}
+                            <div className="flex md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4 gap-2 py-1 snap-x snap-mandatory">
                                 {CATEGORIES.map((cat) => {
                                     const IconComponent = cat.Icon;
                                     const isActive = activeCategory === cat.id;
@@ -152,17 +152,17 @@ export function CategoriesBar({ onCategoryChange, onFilterClick }: CategoriesBar
                                             key={cat.id}
                                             onClick={() => handleCategoryClick(cat.id)}
                                             className={cn(
-                                                "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all border",
+                                                "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all border snap-start",
                                                 isActive
                                                     ? "bg-[#1C1C1C] text-white border-[#1C1C1C] shadow-md"
-                                                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 shadow-sm"
+                                                    : "bg-white text-gray-600 border-gray-200 active:scale-95 shadow-sm"
                                             )}
                                         >
                                             <IconComponent
                                                 weight={isActive ? "fill" : "regular"}
-                                                className="w-4 h-4"
+                                                className="w-3.5 h-3.5"
                                             />
-                                            <span>{t(cat.id)}</span>
+                                            <span>{cat.shortName}</span>
                                         </button>
                                     );
                                 })}
