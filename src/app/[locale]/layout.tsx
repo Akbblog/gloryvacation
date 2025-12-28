@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import SWRProvider from '@/components/providers/SWRProvider';
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import MaintenanceWrapper from "@/components/MaintenanceWrapper";
 
 export const metadata: Metadata = {
   title: "Glory Vacation Homes | Luxury Vacation Rentals in Dubai",
@@ -47,8 +48,10 @@ export default async function RootLayout({
         <SWRProvider>
           <NextIntlClientProvider messages={messages}>
             <AuthProvider>
-              {children}
-              <WhatsAppButton />
+              <MaintenanceWrapper>
+                {children}
+                <WhatsAppButton />
+              </MaintenanceWrapper>
             </AuthProvider>
           </NextIntlClientProvider>
         </SWRProvider>
