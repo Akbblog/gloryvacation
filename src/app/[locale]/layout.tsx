@@ -5,10 +5,14 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import SWRProvider from '@/components/providers/SWRProvider';
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
 
 export const metadata: Metadata = {
-  title: "Glory Vacation | Luxury Vacation Rentals in Dubai",
-  description: "Book your dream holiday home with Glory Vacation. Experience luxury, comfort, and unforgettable memories.",
+  title: "Glory Vacation Homes | Luxury Vacation Rentals in Dubai",
+  description: "Book your dream holiday home with Glory Vacation Homes. Experience luxury, comfort, and unforgettable memories.",
+  icons: {
+    icon: '/glory-icon.svg',
+  },
 };
 
 export default async function RootLayout({
@@ -44,6 +48,7 @@ export default async function RootLayout({
           <NextIntlClientProvider messages={messages}>
             <AuthProvider>
               {children}
+              <WhatsAppButton />
             </AuthProvider>
           </NextIntlClientProvider>
         </SWRProvider>

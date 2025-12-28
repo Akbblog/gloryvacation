@@ -1,8 +1,10 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { Facebook, Instagram, Linkedin, Youtube, Twitter, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, Twitter, MapPin, Phone, Mail, MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
 
 const SOCIAL_LINKS = [
     { name: "Facebook", icon: Facebook, href: "https://facebook.com" },
@@ -14,6 +16,7 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
     const t = useTranslations('Footer');
+    const { data: settings } = useSWR('/api/settings', fetcher);
 
     const FOOTER_LINKS: Record<string, { title: string; links: Array<{ name: string; href: string; external?: boolean }> }> = {
         explore: {
@@ -52,7 +55,7 @@ export function Footer() {
                     {/* Brand Column */}
                     <div className="col-span-2">
                         <Link href="/" className="inline-block mb-4 md:mb-6">
-                            <span className="text-xl md:text-2xl font-bold text-teal-600">Glory Vacation</span>
+                            <span className="text-xl md:text-2xl font-bold text-teal-600">Glory Vacation Homes</span>
                         </Link>
                         <p className="text-[#7E7E7E] text-xs md:text-sm leading-relaxed mb-4 md:mb-6 max-w-[280px] md:max-w-[320px]">
                             {t('description')}
@@ -67,6 +70,10 @@ export function Footer() {
                             <a href="tel:+971503505752" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
                                 <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
                                 <span className="dir-ltr">+971 50 350 5752</span>
+                            </a>
+                            <a href={`https://wa.me/${(settings?.general?.whatsappNumber || "+92 345 2140314").replace(/\s+/g, '').replace(/\+/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-teal-600 transition-colors">
+                                <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                                <span className="dir-ltr">{settings?.general?.whatsappNumber || "+92 345 2140314"}</span>
                             </a>
                             <div className="flex items-start gap-2">
                                 <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 mt-0.5 shrink-0" />
@@ -129,7 +136,7 @@ export function Footer() {
             <div className="border-t border-gray-200">
                 <div className="container mx-auto px-4 md:px-6 lg:px-[50px] xl:px-[70px] max-w-[1440px] py-3 md:py-4">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4 text-[10px] md:text-sm text-[#7E7E7E]">
-                        <p className="text-center md:text-left">© {new Date().getFullYear()} Glory Vacation. {t('rights')}</p>
+                        <p className="text-center md:text-left">© {new Date().getFullYear()} Glory Vacation Homes. {t('rights')}</p>
                         <div className="flex items-center gap-3 md:gap-4">
                             <span>{t('licensed')}</span>
                             <span>|</span>

@@ -7,10 +7,11 @@ import mongoose from "mongoose";
 // Default settings
 const defaultSettings = {
   general: {
-    siteName: "Glory Vacation",
+    siteName: "Glory Vacation Homes",
     tagline: "Your Perfect Holiday Awaits",
     contactEmail: "info@gloryvacation.com",
     contactPhone: "+971 50 350 5752",
+    whatsappNumber: "+92 345 2140314",
     address: "Business Bay, Dubai, UAE",
     currency: "AED",
   },

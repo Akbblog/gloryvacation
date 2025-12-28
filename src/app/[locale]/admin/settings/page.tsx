@@ -9,6 +9,7 @@ interface Settings {
     tagline: string;
     contactEmail: string;
     contactPhone: string;
+    whatsappNumber: string;
     address: string;
     currency: string;
   };
@@ -439,6 +440,16 @@ export default function SettingsPage() {
                                     value={settings.general.contactPhone}
                                     onChange={(e) => updateSetting("general", "contactPhone", e.target.value)}
                                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
+                                <input
+                                    type="tel"
+                                    value={settings.general.whatsappNumber}
+                                    onChange={(e) => updateSetting("general", "whatsappNumber", e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors"
+                                    placeholder="+1234567890"
                                 />
                             </div>
                         </div>

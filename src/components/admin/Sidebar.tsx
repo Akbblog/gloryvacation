@@ -42,7 +42,7 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
                         <Home className="w-5 h-5 md:w-6 md:h-6 text-[#F5A623]" />
                     </div>
                     <div>
-                        <h2 className="text-base md:text-lg font-bold tracking-tight">Glory Vacation</h2>
+                        <h2 className="text-base md:text-lg font-bold tracking-tight">Glory Vacation Homes</h2>
                         <p className="text-[10px] md:text-xs text-white/60">Admin Panel</p>
                     </div>
                 </Link>
