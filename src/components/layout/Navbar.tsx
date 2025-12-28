@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import {
     Globe,
     List,
@@ -172,6 +173,11 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                             <span className="text-[#7E7E7E] mx-1">|</span>
                             <span className={cn("text-sm transition-colors", locale === 'ar' ? "text-[#1C1C1C] font-bold" : "text-[#B4B4B4]")}>AR</span>
                         </button>
+
+                        {/* Notifications - Desktop */}
+                        {session && (
+                            <NotificationDropdown className="hidden md:block" />
+                        )}
 
                         {/* Profile Menu Button - Desktop */}
                         <div className="relative" ref={menuRef}>

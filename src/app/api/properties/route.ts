@@ -4,6 +4,7 @@ import { Property } from "@/models/Property";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NotificationService } from "@/lib/notifications/NotificationService";
 
 const VALID_IMAGE_URL_PATTERN = /^(https?:\/\/|\/)/i;
 
@@ -204,7 +205,23 @@ export async function POST(req: Request) {
             toCreate.images = rawImages;
         }
 
-        const property = await Property.create(toCreate);
+        const property = await Property.create(toCreate) as any;
+
+        // Notify all admins about new property listing
+        try {
+            const host = await User.findById(session.user.id);
+            const admins = await User.find({ role: "admin" });
+            for (const admin of admins) {
+                await NotificationService.notifyNewPropertyListing(
+                    admin._id.toString(),
+                    property.title,
+                    host?.name || "Property Owner"
+                );
+            }
+        } catch (notificationError) {
+            console.error("Error sending new property listing notification:", notificationError);
+            // Don't fail property creation if notification fails
+        }
 
         return NextResponse.json(property, { status: 201 });
     } catch (error) {

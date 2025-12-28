@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
+import { NotificationService } from "@/lib/notifications/NotificationService";
 
 export async function POST(req: Request) {
     try {
@@ -35,6 +36,20 @@ export async function POST(req: Request) {
             role: role || "guest",
             isApproved: true,
         });
+
+        // Notify all admins about new user registration
+        try {
+            const admins = await User.find({ role: "admin" });
+            for (const admin of admins) {
+                await NotificationService.notifyNewUserRegistration(
+                    admin._id.toString(),
+                    user.name
+                );
+            }
+        } catch (notificationError) {
+            console.error("Error sending new user registration notification:", notificationError);
+            // Don't fail registration if notification fails
+        }
 
         return NextResponse.json(
             { message: "User created successfully", user: { id: user._id, name: user.name, email: user.email, role: user.role } },

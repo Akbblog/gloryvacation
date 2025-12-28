@@ -3,6 +3,9 @@ import connectDB from "@/lib/mongodb";
 import { Booking } from "@/models/Booking";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NotificationService } from "@/lib/notifications/NotificationService";
+import { Property } from "@/models/Property";
+import { User } from "@/models/User";
 
 export async function POST(req: Request) {
     try {
@@ -32,6 +35,23 @@ export async function POST(req: Request) {
             status: "pending",
             paymentStatus: "pending",
         });
+
+        // Notify the property owner about the new booking
+        try {
+            const property = await Property.findById(propertyId);
+            const guest = await User.findById(session.user.id);
+
+            if (property && guest) {
+                await NotificationService.notifyNewBooking(
+                    property.host.toString(),
+                    property.title,
+                    guest.name || "Guest"
+                );
+            }
+        } catch (notificationError) {
+            console.error("Error sending new booking notification:", notificationError);
+            // Don't fail booking creation if notification fails
+        }
 
         return NextResponse.json({ message: "Booking created successfully", booking }, { status: 201 });
     } catch (error) {

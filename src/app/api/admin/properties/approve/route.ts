@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import { Property } from "@/models/Property";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NotificationService } from "@/lib/notifications/NotificationService";
 
 export async function POST(req: Request) {
     try {
@@ -23,6 +24,17 @@ export async function POST(req: Request) {
         const updated = await Property.findByIdAndUpdate(propertyId, { isActive: true, isApprovedByAdmin: true }, { new: true });
         if (!updated) {
             return NextResponse.json({ message: 'Property not found' }, { status: 404 });
+        }
+
+        // Send notification to the property owner
+        try {
+            await NotificationService.notifyPropertyApproved(
+                updated.host.toString(),
+                updated.title || "Property"
+            );
+        } catch (notificationError) {
+            console.error("Error sending property approval notification:", notificationError);
+            // Don't fail the approval if notification fails
         }
 
         return NextResponse.json({ message: 'Property approved', property: updated });

@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { NotificationService } from "@/lib/notifications/NotificationService";
 
 export async function POST(req: Request) {
     try {
@@ -30,6 +31,16 @@ export async function POST(req: Request) {
 
         if (!user) {
             return NextResponse.json({ message: "User not found" }, { status: 404 });
+        }
+
+        // Send notification to the user if they were approved
+        if (isApproved) {
+            try {
+                await NotificationService.notifyUserApproved(user._id.toString(), user.name || "User");
+            } catch (notificationError) {
+                console.error("Error sending approval notification:", notificationError);
+                // Don't fail the approval if notification fails
+            }
         }
 
         const action = isApproved ? "approved" : "revoked";
