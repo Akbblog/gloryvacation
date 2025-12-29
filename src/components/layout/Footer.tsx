@@ -1,17 +1,16 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { Facebook, Instagram, Linkedin, Youtube, Twitter, MapPin, Phone, Mail, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Youtube, Camera, MapPin, Phone, Mail, MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 
 const SOCIAL_LINKS = [
-    { name: "Facebook", icon: Facebook, href: "https://facebook.com" },
-    { name: "Instagram", icon: Instagram, href: "https://instagram.com" },
-    { name: "LinkedIn", icon: Linkedin, href: "https://linkedin.com" },
-    { name: "YouTube", icon: Youtube, href: "https://youtube.com" },
-    { name: "Twitter", icon: Twitter, href: "https://twitter.com" },
+    { name: "Facebook", icon: Facebook, href: "https://web.facebook.com/gloryvacationhomes" },
+    { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/gloryvacationhomes" },
+    { name: "YouTube", icon: Youtube, href: "https://www.youtube.com/@gloryvacationhomes" },
+    { name: "Snapchat", icon: Camera, href: "https://www.snapchat.com/@gloryvacation" },
 ];
 
 export function Footer() {

@@ -47,6 +47,7 @@ const defaultSettings = {
     adminApproval: true,
     twoFactorAuth: false,
     rateLimiting: true,
+    maintenanceMode: false,
   },
 };
 

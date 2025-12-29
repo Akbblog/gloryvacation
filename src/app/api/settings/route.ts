@@ -49,6 +49,9 @@ export async function GET() {
         primaryColor: settings.branding?.primaryColor || defaultPublicSettings.branding.primaryColor,
         secondaryColor: settings.branding?.secondaryColor || defaultPublicSettings.branding.secondaryColor,
       },
+      security: {
+        maintenanceMode: settings.security?.maintenanceMode || false,
+      },
     };
 
     return NextResponse.json(publicSettings);

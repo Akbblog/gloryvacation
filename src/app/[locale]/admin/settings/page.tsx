@@ -82,8 +82,6 @@ export default function SettingsPage() {
             const response = await fetch("/api/admin/settings");
             if (response.ok) {
                 const data = await response.json();
-                // Override maintenance mode with localStorage value
-                data.security.maintenanceMode = localStorage.getItem('site-maintenance-mode') === 'true';
                 setSettings(data);
             } else {
                 console.error("Failed to load settings");
@@ -105,11 +103,6 @@ export default function SettingsPage() {
                 [field]: value,
             },
         });
-
-        // Special handling for maintenance mode - update localStorage immediately
-        if (section === "security" && field === "maintenanceMode") {
-            localStorage.setItem('site-maintenance-mode', value.toString());
-        }
 
         // Clear any errors for this field
         if (errors[`${section}.${field}`]) {
