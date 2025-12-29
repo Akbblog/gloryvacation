@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Wrench, Clock, LogIn, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 interface MaintenanceScreenProps {
   onExit?: () => void;
@@ -59,7 +59,7 @@ export default function MaintenanceScreen({ onExit }: MaintenanceScreenProps) {
 
         {/* Admin Login Button */}
         <Link
-          href="/auth/signin?callbackUrl=/admin"
+          href={`/auth/signin?callbackUrl=/admin`}
           className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl"
         >
           <LogIn className="w-4 h-4" />

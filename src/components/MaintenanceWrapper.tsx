@@ -16,17 +16,18 @@ export default function MaintenanceWrapper({ children }: MaintenanceWrapperProps
   const pathname = usePathname();
   const { data: settings, isLoading } = useSWR('/api/settings', fetcher);
 
-  // Don't show maintenance screen for admin routes if user is admin
+  // Don't show maintenance screen for admin routes if user is admin, or for auth routes
   const isAdminRoute = pathname.startsWith('/admin') || pathname.includes('/admin');
+  const isAuthRoute = pathname.startsWith('/auth') || pathname.includes('/auth');
   const isAdminUser = session?.user?.role === 'admin';
 
   const isMaintenanceMode = settings?.security?.maintenanceMode === true;
 
   // Show maintenance screen if:
   // 1. Maintenance mode is on
-  // 2. User is not admin OR not on admin route
+  // 2. Not on admin routes (for admin users) OR not on auth routes (for everyone)
   // 3. Session and settings have loaded (to avoid flash)
-  if (!isLoading && status !== 'loading' && isMaintenanceMode && (!isAdminUser || !isAdminRoute)) {
+  if (!isLoading && status !== 'loading' && isMaintenanceMode && !isAuthRoute && (!isAdminUser || !isAdminRoute)) {
     return <MaintenanceScreen />;
   }
 
