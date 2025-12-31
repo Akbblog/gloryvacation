@@ -14,35 +14,51 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
-                    throw new Error("Invalid credentials");
+                try {
+                    if (!credentials?.email || !credentials?.password) {
+                        console.log("Auth attempt with missing credentials");
+                        return null;
+                    }
+
+                    console.log("Auth attempt for:", credentials.email);
+
+                    await connectDB();
+
+                    const user = await User.findOne({ email: credentials.email });
+
+                    if (!user) {
+                        console.log("User not found for email:", credentials.email);
+                        return null;
+                    }
+
+                    console.log("User found:", user.email, user.role, user.isApproved, !!user.password);
+
+                    const isPasswordMatch = await bcrypt.compare(credentials.password, user.password || "");
+
+                    if (!isPasswordMatch) {
+                        console.log("Password mismatch for user:", user.email);
+                        return null;
+                    }
+
+                    if (!user.isApproved) {
+                        console.log("Account not approved for user:", user.email);
+                        return null;
+                    }
+
+                    console.log("Auth successful for user:", user.email, user.role);
+
+                    return {
+                        id: user._id.toString(),
+                        name: user.name,
+                        email: user.email,
+                        image: user.image,
+                        role: user.role,
+                        permissions: user.permissions,
+                    };
+                } catch (err) {
+                    console.error("authorize error:", err);
+                    return null;
                 }
-
-                await connectDB();
-
-                const user = await User.findOne({ email: credentials.email });
-
-                if (!user) {
-                    throw new Error("User not found");
-                }
-
-                const isPasswordMatch = await bcrypt.compare(credentials.password, user.password || "");
-
-                if (!isPasswordMatch) {
-                    throw new Error("Invalid password");
-                }
-
-                if (!user.isApproved) {
-                    throw new Error("Account pending approval");
-                }
-
-                return {
-                    id: user._id.toString(),
-                    name: user.name,
-                    email: user.email,
-                    image: user.image,
-                    role: user.role,
-                };
             },
         }),
     ],
@@ -51,6 +67,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
+                token.permissions = user.permissions;
             }
             return token;
         },
@@ -58,6 +75,7 @@ export const authOptions: NextAuthOptions = {
             if (session?.user) {
                 session.user.role = token.role;
                 session.user.id = token.id;
+                session.user.permissions = token.permissions;
             }
             return session;
         },

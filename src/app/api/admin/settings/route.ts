@@ -54,8 +54,21 @@ const defaultSettings = {
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "admin") {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userRole = session.user.role;
+    const userPermissions = session.user.permissions;
+
+    // Check permissions
+    if (userRole !== "admin" && userRole !== "sub-admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Sub-admins need specific permission for settings
+    if (userRole === "sub-admin" && !userPermissions?.canManageSettings) {
+      return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
     }
 
     await connectDB();
@@ -80,6 +93,17 @@ export async function GET() {
 
     // Remove database fields and return only settings
     const { _id, type, createdAt, updatedAt, ...settingsData } = settings;
+
+    // For sub-admins, remove maintenance mode from security settings
+    if (userRole === "sub-admin") {
+      const filteredSettings = { ...settingsData };
+      if (filteredSettings.security) {
+        const { maintenanceMode, ...securityWithoutMaintenance } = filteredSettings.security;
+        filteredSettings.security = securityWithoutMaintenance;
+      }
+      return NextResponse.json(filteredSettings);
+    }
+
     return NextResponse.json(settingsData);
   } catch (error) {
     console.error("Error fetching settings:", error);
@@ -90,8 +114,21 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "admin") {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userRole = session.user.role;
+    const userPermissions = session.user.permissions;
+
+    // Check permissions
+    if (userRole !== "admin" && userRole !== "sub-admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Sub-admins need specific permission for settings
+    if (userRole === "sub-admin" && !userPermissions?.canManageSettings) {
+      return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -101,12 +138,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
+    // For sub-admins, prevent updating maintenance mode
+    let updateData = body;
+    if (userRole === "sub-admin") {
+      updateData = { ...body };
+      if (updateData.security) {
+        const { maintenanceMode, ...securityWithoutMaintenance } = updateData.security;
+        updateData.security = securityWithoutMaintenance;
+      }
+    }
+
     // Update settings in database
     await db.collection("settings").updateOne(
       { type: "site" },
       {
         $set: {
-          ...body,
+          ...updateData,
           updatedAt: new Date(),
         },
       },

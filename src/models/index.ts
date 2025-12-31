@@ -7,3 +7,4 @@ export { PropertyInquiry } from './PropertyInquiry';
 export { Reservation } from './Reservation';
 export { Review } from './Review';
 export { default as Notification } from './Notification';
+export { PendingUserDeletion } from './PendingUserDeletion';

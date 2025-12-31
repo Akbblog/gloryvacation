@@ -4,14 +4,25 @@ import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Force rebuild comment
-
 export async function GET(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || session.user.role !== "admin") {
+        if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userRole = session.user.role;
+        const userPermissions = session.user.permissions;
+
+        // Check permissions
+        if (userRole !== "admin" && userRole !== "sub-admin") {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        // Sub-admins need specific permission
+        if (userRole === "sub-admin" && !userPermissions?.canApproveUsers) {
+            return NextResponse.json({ message: "Insufficient permissions" }, { status: 403 });
         }
 
         await connectDB();

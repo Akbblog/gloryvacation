@@ -154,7 +154,10 @@ export default function ProfilePage() {
         if (status === "unauthenticated") {
             router.push("/auth/signin");
         }
-    }, [status, router]);
+        if (session?.user?.role === "admin" || session?.user?.role === "sub-admin") {
+            router.push("/web-admin");
+        }
+    }, [status, router, session]);
 
     if (status === "loading") {
         return (

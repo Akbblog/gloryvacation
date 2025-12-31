@@ -35,7 +35,10 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "admin") {
+        // Allow main admins or any sub-admin (web-admin) to access messages
+        const isAdmin = session?.user?.role === "admin";
+        const isSubAdmin = session?.user?.role === "sub-admin";
+        if (!session || !(isAdmin || isSubAdmin)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 

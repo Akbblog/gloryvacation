@@ -8,7 +8,10 @@ export async function GET(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || session.user.role !== "admin") {
+        // Allow main admins or sub-admins with the canViewBookings permission
+        const isAdmin = session?.user?.role === "admin";
+        const canView = session?.user?.role === "sub-admin" && session?.user?.permissions?.canViewBookings;
+        if (!session || !(isAdmin || canView)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -38,7 +41,10 @@ export async function PATCH(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || session.user.role !== "admin") {
+        // Allow main admins or sub-admins with the canViewBookings permission to update status
+        const isAdminPatch = session?.user?.role === "admin";
+        const canViewPatch = session?.user?.role === "sub-admin" && session?.user?.permissions?.canViewBookings;
+        if (!session || !(isAdminPatch || canViewPatch)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 

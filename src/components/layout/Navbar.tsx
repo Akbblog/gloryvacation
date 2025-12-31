@@ -143,7 +143,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                             showNavButtons ? "opacity-100" : "opacity-0 pointer-events-none"
                         )}>
                             <button
-                                onClick={() => router.push(session?.user?.role === 'admin' ? "/admin" : "/profile")}
+                                onClick={() => router.push((session?.user?.role === 'admin' || session?.user?.role === 'sub-admin') ? "/web-admin" : "/profile")}
                                 className="bg-[#2D2D2D]/80 backdrop-blur-sm hover:bg-[#2D2D2D] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                             >
                                 {t('ownersPortal')}
@@ -233,7 +233,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                                             { label: t('becomeHost'), icon: House, href: "/list-your-property" },
                                             { label: t('furnish'), icon: Armchair, href: "/list-your-property" },
                                             { label: t('buyProperty'), icon: Buildings, href: "/listings" },
-                                            { label: t('manage'), icon: GearSix, href: session?.user?.role === 'admin' ? "/admin" : "/profile" },
+                                            { label: t('manage'), icon: GearSix, href: (session?.user?.role === 'admin' || session?.user?.role === 'sub-admin') ? "/web-admin" : "/profile" },
                                         ].map((item) => (
                                             <button
                                                 key={item.label}
@@ -395,7 +395,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                                 { label: t('becomeHost'), icon: House, href: "/list-your-property" },
                                 { label: t('furnish'), icon: Armchair, href: "/list-your-property" },
                                 { label: t('buyProperty'), icon: Buildings, href: "/listings" },
-                                { label: t('manage'), icon: GearSix, href: session?.user?.role === 'admin' ? "/admin" : "/profile" },
+                                { label: t('manage'), icon: GearSix, href: (session?.user?.role === 'admin' || session?.user?.role === 'sub-admin') ? "/web-admin" : "/profile" },
                             ].map((item) => (
                                 <button
                                     key={item.label}

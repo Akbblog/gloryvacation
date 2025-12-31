@@ -60,7 +60,10 @@ export async function GET(req: Request) {
             query = { host: hostId };
         } else if (all === "1") {
             // Admin-only path to fetch all listings (active + inactive)
-            if (!session || session.user?.role !== "admin") {
+            // Allow main admins or sub-admins with listing permission (web-admins)
+            const isAdmin = session?.user?.role === "admin";
+            const isWebAdmin = session?.user?.role === "sub-admin" && session?.user?.permissions?.canManageListings;
+            if (!session || !(isAdmin || isWebAdmin)) {
                 return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
             }
             query = {}; // no isActive filter

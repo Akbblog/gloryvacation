@@ -2,28 +2,47 @@
 
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, Home, Calendar, ClipboardList, Users, Settings, LogOut, PlusCircle, ChevronRight, MessageSquare, Menu, X } from "lucide-react";
+import { LayoutDashboard, Home, Calendar, ClipboardList, Users, Settings, LogOut, PlusCircle, ChevronRight, MessageSquare, Menu, X, ShieldCheck, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
-const MENU_ITEMS = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-    { name: "Listings", href: "/admin/listings", icon: Home },
-    { name: "Add Property", href: "/admin/listings/add", icon: PlusCircle },
-    { name: "Bookings", href: "/admin/bookings", icon: Calendar },
-    { name: "Reservations", href: "/admin/reservations", icon: ClipboardList },
-    { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Messages", href: "/admin/messages", icon: MessageSquare },
-    { name: "Settings", href: "/admin/settings", icon: Settings },
+const getMenuItems = (basePath = "/admin") => [
+    { name: "Dashboard", href: `${basePath}`, icon: LayoutDashboard, permission: null },
+    { name: "Listings", href: `${basePath}/listings`, icon: Home, permission: "canManageListings" },
+    { name: "Add Property", href: `${basePath}/listings/add`, icon: PlusCircle, permission: "canManageListings" },
+    { name: "Bookings", href: `${basePath}/bookings`, icon: Calendar, permission: "canViewBookings" },
+    { name: "Reservations", href: `${basePath}/reservations`, icon: ClipboardList, permission: "canViewBookings" },
+    { name: "Users", href: `${basePath}/users`, icon: Users, permission: "canApproveUsers" },
+    { name: "Messages", href: `${basePath}/messages`, icon: MessageSquare, permission: null },
+    { name: "Settings", href: `${basePath}/settings`, icon: Settings, permission: "canManageSettings" },
+    { name: "Web Admins", href: `${basePath}/web-admins`, icon: ShieldCheck, permission: null, mainAdminOnly: true },
+    { name: "Pending Deletions", href: `${basePath}/pending-deletions`, icon: AlertTriangle, permission: null, mainAdminOnly: true },
 ];
 
 interface AdminSidebarProps {
     isOpen?: boolean;
     onClose?: () => void;
+    basePath?: string;
 }
 
-export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen = false, onClose, basePath = "/admin" }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const { data: session } = useSession();
+
+    const MENU_ITEMS = getMenuItems(basePath);
+
+    const userRole = session?.user?.role;
+    const userPermissions = session?.user?.permissions;
+    const isMainAdmin = session?.user?.email === "akb@tool.com";
+
+    // Filter menu items based on permissions
+    const filteredMenuItems = MENU_ITEMS.filter(item => {
+        if (userRole === "admin" && isMainAdmin) return true;
+        if (item.mainAdminOnly && !isMainAdmin) return false;
+        if (!item.permission) return true;
+        return userPermissions?.[item.permission as keyof typeof userPermissions];
+    });
 
     const handleSignOut = async () => {
         await signOut({ callbackUrl: "/" });
@@ -60,8 +79,8 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
             {/* Navigation */}
             <nav className="flex-1 p-3 md:p-4 space-y-1 overflow-y-auto">
                 <p className="text-[10px] md:text-xs font-semibold text-white/40 uppercase tracking-wider px-3 md:px-4 mb-2 md:mb-3">Menu</p>
-                {MENU_ITEMS.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+                {filteredMenuItems.map((item) => {
+                    const isActive = pathname === item.href || (item.href !== basePath && pathname.startsWith(item.href));
                     return (
                         <Link
                             key={item.href}
@@ -141,13 +160,14 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
 }
 
 // Mobile Header Component
-export function MobileAdminHeader({ onMenuClick }: { onMenuClick: () => void }) {
+export function MobileAdminHeader({ onMenuClick, basePath = "/admin" }: { onMenuClick: () => void; basePath?: string }) {
     const pathname = usePathname();
-    
+
     // Get current page title
     const getPageTitle = () => {
-        const currentItem = MENU_ITEMS.find(item => 
-            pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
+        const items = getMenuItems(basePath);
+        const currentItem = items.find(item => 
+            pathname === item.href || (item.href !== basePath && pathname.startsWith(item.href))
         );
         return currentItem?.name || "Admin";
     };

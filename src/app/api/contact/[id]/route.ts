@@ -8,7 +8,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function GET(req: Request, { params }: any) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "admin") {
+        const isAdmin = session?.user?.role === "admin";
+        const isSubAdmin = session?.user?.role === "sub-admin";
+        if (!session || !(isAdmin || isSubAdmin)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -33,7 +35,9 @@ export async function GET(req: Request, { params }: any) {
 export async function PATCH(req: Request, { params }: any) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "admin") {
+        const isAdmin = session?.user?.role === "admin";
+        const isSubAdmin = session?.user?.role === "sub-admin";
+        if (!session || !(isAdmin || isSubAdmin)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
@@ -69,7 +73,9 @@ export async function PATCH(req: Request, { params }: any) {
 export async function DELETE(req: Request, { params }: any) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "admin") {
+        const isAdmin = session?.user?.role === "admin";
+        const isSubAdmin = session?.user?.role === "sub-admin";
+        if (!session || !(isAdmin || isSubAdmin)) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 

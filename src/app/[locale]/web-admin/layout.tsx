@@ -29,9 +29,9 @@ export default function AdminLayout({
 
     return (
         <div className="flex min-h-screen bg-[#F9FAFB]">
-            <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} basePath="/admin" />
+            <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} basePath="/web-admin" />
             <div className="flex-1 flex flex-col min-w-0">
-                <MobileAdminHeader onMenuClick={() => setSidebarOpen(true)} basePath="/admin" />
+                <MobileAdminHeader onMenuClick={() => setSidebarOpen(true)} basePath="/web-admin" />
                 <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
                     {children}
                 </main>

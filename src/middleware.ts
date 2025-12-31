@@ -32,6 +32,7 @@ export default function middleware(req: NextRequest) {
 
     const isProtected =
         pathnameWithoutLocale.startsWith("/admin") ||
+        pathnameWithoutLocale.startsWith("/web-admin") ||
         pathnameWithoutLocale.startsWith("/profile") ||
         pathnameWithoutLocale.startsWith("/add-property");
 

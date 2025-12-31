@@ -9,8 +9,21 @@ export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || session.user.role !== "admin") {
+        if (!session) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userRole = session.user.role;
+        const userPermissions = session.user.permissions;
+
+        // Check permissions
+        if (userRole !== "admin" && userRole !== "sub-admin") {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        // Sub-admins need specific permission
+        if (userRole === "sub-admin" && !userPermissions?.canApproveUsers) {
+            return NextResponse.json({ message: "Insufficient permissions" }, { status: 403 });
         }
 
         const { userId, revoke } = await req.json();
@@ -24,8 +37,8 @@ export async function POST(req: Request) {
         // If revoke is true, set isApproved to false, otherwise set to true
         const isApproved = !revoke;
         const user = await User.findByIdAndUpdate(
-            userId, 
-            { isApproved }, 
+            userId,
+            { isApproved },
             { new: true }
         ).select("-password");
 
