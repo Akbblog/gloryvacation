@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "@/i18n/navigation";
 import { Bell, Check, CheckCheck, Trash2, X } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -29,6 +30,8 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     const { data, mutate } = useSWR('/api/notifications?limit=10', fetcher, {
         refreshInterval: 30000, // Refresh every 30 seconds
     });
+
+    const router = useRouter();
 
     useEffect(() => {
         if (data) {
@@ -218,7 +221,10 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
                     {notifications.length > 0 && (
                         <div className="p-3 border-t border-gray-200 text-center">
                             <button
-                                onClick={() => setIsOpen(false)}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    router.push('/notifications');
+                                }}
                                 className="text-sm text-blue-600 hover:text-blue-800"
                             >
                                 View all notifications
