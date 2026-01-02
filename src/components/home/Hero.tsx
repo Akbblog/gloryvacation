@@ -28,6 +28,7 @@ import {
     SoccerBall,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
+import { SearchModal } from "./SearchModal";
 
 // Dubai Areas Configuration
 const DUBAI_AREAS = [
@@ -69,6 +70,7 @@ export function Hero() {
     const [showGuests, setShowGuests] = useState(false);
     const [filteredAreas, setFilteredAreas] = useState(DUBAI_AREAS);
     const [searchInput, setSearchInput] = useState("");
+    const [showSearchModal, setShowSearchModal] = useState(false);
 
     // Refs for click outside
     const destRef = useRef<HTMLDivElement>(null);
@@ -333,6 +335,18 @@ export function Hero() {
                                 <div className={`text-sm font-medium ${checkInDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
                                     {formatDateDisplay(checkInDate) || t('addDate')}
                                 </div>
+                                {checkInDate && (
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setCheckInDate(undefined);
+                                            setCheckOutDate(undefined);
+                                        }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                    >
+                                        <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
+                                    </button>
+                                )}
                             </div>
 
                             {/* Check-in Calendar */}
@@ -384,6 +398,17 @@ export function Hero() {
                                 <div className={`text-sm font-medium ${checkOutDate ? 'text-neutral-800' : 'text-neutral-400'}`}>
                                     {formatDateDisplay(checkOutDate) || t('addDate')}
                                 </div>
+                                {checkOutDate && (
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setCheckOutDate(undefined);
+                                        }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                    >
+                                        <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
+                                    </button>
+                                )}
                             </div>
 
                             {/* Check-out Calendar */}
@@ -506,7 +531,7 @@ export function Hero() {
                 {/* Mobile Search Bar - Compact and intuitive */}
                 <div className="md:hidden mt-6 w-full max-w-sm px-2">
                     <button
-                        onClick={handleSearch}
+                        onClick={() => setShowSearchModal(true)}
                         className="w-full bg-white rounded-2xl p-3 flex items-center gap-3 shadow-lg border border-neutral-100 hover:shadow-xl transition-all active:scale-[0.98]"
                     >
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E09000] flex items-center justify-center shadow-md flex-shrink-0">
@@ -523,6 +548,8 @@ export function Hero() {
                     </button>
                 </div>
             </div>
+
+            <SearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
         </section>
     );
 }

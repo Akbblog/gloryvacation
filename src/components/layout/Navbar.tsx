@@ -22,6 +22,7 @@ import {
     MagnifyingGlass,
     UserCircle,
 } from "@phosphor-icons/react";
+import { SearchModal } from "@/components/home/SearchModal";
 
 interface NavbarProps {
     variant?: "home" | "inner";
@@ -31,6 +32,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
     const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
     const [isScrolledStart, setIsScrolledStart] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [showSearchModal, setShowSearchModal] = useState(false);
 
     const [currencyOpen, setCurrencyOpen] = useState(false);
     const { data: session } = useSession();
@@ -124,7 +126,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                     {showSolid ? (
                         <div className="hidden lg:flex items-center flex-1 max-w-xl mx-8 animate-in fade-in zoom-in-95 duration-300">
                             <div className="flex items-center w-full bg-gray-100 rounded-full px-4 py-2.5 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                                onClick={() => router.push("/listings")}
+                                onClick={() => setShowSearchModal(true)}
                             >
                                 <MagnifyingGlass weight="bold" className="w-4 h-4 text-gray-500 mr-3" />
                                 <span className="text-sm text-gray-500">{tHero('searchDestinations')}</span>
@@ -357,7 +359,10 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         {/* Mobile Search Button */}
                         <div className="px-4 py-3 border-b border-gray-100">
                             <button
-                                onClick={() => handleMenuItemClick('/listings')}
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    setShowSearchModal(true);
+                                }}
                                 className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl text-left hover:bg-gray-100 transition-colors"
                             >
                                 <MagnifyingGlass weight="bold" className="w-5 h-5 text-[#F5A623]" />
@@ -442,6 +447,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                     </div>
                 </div>
             )}
+
+            <SearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
         </header>
     );
 }
