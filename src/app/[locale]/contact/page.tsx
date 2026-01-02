@@ -92,7 +92,7 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-semibold text-[#1C1C1C] mb-1">Email</h3>
                                         <p className="text-[#7E7E7E]">info@gloryvacation.com</p>
-                                        <p className="text-[#7E7E7E]">bookings@gloryvacation.com</p>
+                                        <p className="text-[#7E7E7E]">reservation@gloryvacation.com</p>
                                     </div>
                                 </div>
 

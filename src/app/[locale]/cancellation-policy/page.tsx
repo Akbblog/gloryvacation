@@ -103,7 +103,7 @@ export default function CancellationPolicyPage() {
                             <li>You will receive a confirmation email with refund details</li>
                         </ol>
                         <p>
-                            Alternatively, contact our support team at bookings@gloryvacation.com or call +971 50 350 5752.
+                            Alternatively, contact our support team at reservation@gloryvacation.com or call +971 50 350 5752.
                         </p>
 
                         <h3>Refund Processing</h3>
