@@ -98,7 +98,7 @@ export default function WebAdminDashboard() {
 
   // Fetch data based on active tab
   const { data: usersData, error: usersError, mutate: mutateUsers } = useSWR<User[]>(
-    activeTab === 'users' ? '/api/admin/users' : null,
+    '/api/admin/users',
     fetcher,
     { revalidateOnFocus: false, dedupingInterval: 5000 }
   );
@@ -315,7 +315,8 @@ export default function WebAdminDashboard() {
   // Derived lists for manage tab
   const filteredWebAdmins = useMemo(() => {
     const data = usersData || [];
-    let list = data.filter(u => u.role === 'sub-admin');
+    // Treat both main admins and sub-admins as web-admins for management
+    let list = data.filter(u => u.role === 'sub-admin' || u.role === 'admin');
     const q = searchQuery.trim().toLowerCase();
     if (q) {
       list = list.filter(w => (w.name || '').toLowerCase().includes(q) || (w.email || '').toLowerCase().includes(q));
@@ -396,19 +397,19 @@ export default function WebAdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white p-6 rounded-xl border border-gray-100">
               <p className="text-sm text-gray-500">Total Web Admins</p>
-              <p className="text-2xl font-bold mt-2">{(usersData || []).filter(u => u.role === 'sub-admin').length}</p>
+              <p className="text-2xl font-bold mt-2">{(usersData || []).filter(u => u.role === 'sub-admin' || u.role === 'admin').length}</p>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-100">
               <p className="text-sm text-gray-500">Approved</p>
-              <p className="text-2xl font-bold mt-2">{(usersData || []).filter(u => u.role === 'sub-admin' && u.isApproved).length}</p>
+              <p className="text-2xl font-bold mt-2">{(usersData || []).filter(u => (u.role === 'sub-admin' || u.role === 'admin') && u.isApproved).length}</p>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-100">
               <p className="text-sm text-gray-500">Recent Web Admins</p>
               <div className="mt-3 space-y-2">
-                {(usersData || []).filter(u => u.role === 'sub-admin').slice(0,5).length === 0 ? (
+                {(usersData || []).filter(u => u.role === 'sub-admin' || u.role === 'admin').slice(0,5).length === 0 ? (
                   <p className="text-sm text-gray-400">No web admins yet</p>
                 ) : (
-                  (usersData || []).filter(u => u.role === 'sub-admin').slice(0,5).map(w => (
+                  (usersData || []).filter(u => u.role === 'sub-admin' || u.role === 'admin').slice(0,5).map(w => (
                     <div key={w._id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -465,7 +466,7 @@ export default function WebAdminDashboard() {
               <ShieldCheck className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#1C1C1C]">{(usersData || []).filter(u => u.role === 'sub-admin').length}</p>
+              <p className="text-2xl font-bold text-[#1C1C1C]">{(usersData || []).filter(u => u.role === 'sub-admin' || u.role === 'admin').length}</p>
               <p className="text-sm text-gray-600">Total Web Admins</p>
             </div>
           </div>
