@@ -414,24 +414,6 @@ function SearchPageContent() {
         }
     }, [area]);
 
-    // Auto-update URL when filters change (debounced)
-    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    useEffect(() => {
-        // Clear any pending timeout
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
-        // Debounce the URL update to avoid too many navigations
-        searchTimeoutRef.current = setTimeout(() => {
-            updateURL();
-        }, 300);
-        return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-        };
-    }, [area, checkInDate, checkOutDate, guests, propertyType, updateURL]);
-
     // Format date for display
     const formatDateDisplay = (date: Date | undefined) => {
         if (!date) return null;
@@ -480,6 +462,24 @@ function SearchPageContent() {
         const queryString = params.toString();
         router.push(`/listings${queryString ? `?${queryString}` : ""}`, { scroll: false });
     }, [area, checkInDate, checkOutDate, guests, propertyType, bedrooms, priceRange, sortBy, searchQuery, selectedAmenities, router]);
+
+    // Auto-update URL when filters change (debounced)
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        // Clear any pending timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        // Debounce the URL update to avoid too many navigations
+        searchTimeoutRef.current = setTimeout(() => {
+            updateURL();
+        }, 300);
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [area, checkInDate, checkOutDate, guests, propertyType, updateURL]);
 
     const handleSearch = () => {
         setIsLoading(true);
