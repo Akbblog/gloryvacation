@@ -126,6 +126,9 @@ export function Hero() {
 
         if (destination) {
             params.set("area", destinationLabel || destination);
+        } else if (searchInput) {
+            // If user typed free text but didn't select a destination, use it as a general search query
+            params.set("search", searchInput);
         }
         if (checkInDate) {
             params.set("checkIn", format(checkInDate, "yyyy-MM-dd"));
@@ -503,7 +506,7 @@ export function Hero() {
                 {/* Mobile Search Bar - Compact and intuitive */}
                 <div className="md:hidden mt-6 w-full max-w-sm px-2">
                     <button
-                        onClick={() => router.push("/listings")}
+                        onClick={handleSearch}
                         className="w-full bg-white rounded-2xl p-3 flex items-center gap-3 shadow-lg border border-neutral-100 hover:shadow-xl transition-all active:scale-[0.98]"
                     >
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E09000] flex items-center justify-center shadow-md flex-shrink-0">
