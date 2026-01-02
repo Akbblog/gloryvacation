@@ -124,19 +124,39 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
 
                     {/* Center Search Bar - Only shows on scroll */}
                     {showSolid ? (
-                        <div className="hidden lg:flex items-center flex-1 max-w-xl mx-8 animate-in fade-in zoom-in-95 duration-300">
-                            <div className="flex items-center w-full bg-gray-100 rounded-full px-4 py-2.5 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                        <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8 animate-in fade-in zoom-in-95 duration-300">
+                            <div 
+                                className="flex items-center w-full bg-white rounded-full pl-5 pr-2 py-1.5 border border-gray-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group"
                                 onClick={() => setShowSearchModal(true)}
                             >
-                                <MagnifyingGlass weight="bold" className="w-4 h-4 text-gray-500 mr-3" />
-                                <span className="text-sm text-gray-500">{tHero('searchDestinations')}</span>
-                                <div className="ml-auto flex items-center gap-2">
-                                    <span className="text-xs text-gray-400">{tHero('dubai')}</span>
-                                    <span className="text-gray-300">|</span>
-                                    <span className="text-xs text-gray-400">{tHero('addDate')}</span>
-                                    <span className="text-gray-300">|</span>
-                                    <span className="text-xs text-gray-400">{tHero('guests')}</span>
+                                {/* Where Section */}
+                                <div className="flex-1 min-w-0 pr-4 border-r border-gray-200">
+                                    <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{tHero('where')}</div>
+                                    <div className="text-sm font-medium text-gray-800 truncate">{tHero('searchDestinations')}</div>
                                 </div>
+                                
+                                {/* Check In Section */}
+                                <div className="flex-shrink-0 px-4 border-r border-gray-200">
+                                    <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{tHero('checkIn')}</div>
+                                    <div className="text-sm font-medium text-gray-400">{tHero('addDate')}</div>
+                                </div>
+                                
+                                {/* Check Out Section */}
+                                <div className="flex-shrink-0 px-4 border-r border-gray-200">
+                                    <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{tHero('checkOut')}</div>
+                                    <div className="text-sm font-medium text-gray-400">{tHero('addDate')}</div>
+                                </div>
+                                
+                                {/* Guests Section */}
+                                <div className="flex-shrink-0 px-4">
+                                    <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{tHero('who')}</div>
+                                    <div className="text-sm font-medium text-gray-400">{tHero('addGuests')}</div>
+                                </div>
+                                
+                                {/* Search Button */}
+                                <button className="ml-2 w-10 h-10 bg-[#F5A623] hover:bg-[#E09000] rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-105 shadow-md">
+                                    <MagnifyingGlass weight="bold" className="w-5 h-5 text-white" />
+                                </button>
                             </div>
                         </div>
                     ) : (
