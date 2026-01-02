@@ -25,9 +25,10 @@ import {
 
 interface NavbarProps {
     variant?: "home" | "inner";
+    hideSearchBar?: boolean;
 }
 
-export function Navbar({ variant = "inner" }: NavbarProps) {
+export function Navbar({ variant = "inner", hideSearchBar = false }: NavbarProps) {
     const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
     const [isScrolledStart, setIsScrolledStart] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -120,8 +121,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         </div>
                     </Link>
 
-                    {/* Center Search Bar - Only shows on scroll */}
-                    {showSolid ? (
+                    {/* Center Search Bar - Only shows on scroll (and not on pages with their own search bar) */}
+                    {showSolid && !hideSearchBar ? (
                         <div className="hidden lg:flex items-center flex-1 max-w-xl mx-8 animate-in fade-in zoom-in-95 duration-300">
                             <div className="flex items-center w-full bg-gray-100 rounded-full px-4 py-2.5 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
                                 onClick={() => router.push("/listings")}
@@ -137,6 +138,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                                 </div>
                             </div>
                         </div>
+                    ) : showSolid ? (
+                        <div className="flex-1" />
                     ) : (
                         /* Owner/Host Buttons - Only shows when NOT scrolled significantly */
                         <div className={cn(
@@ -156,8 +159,7 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                                 {t('listProperty')}
                             </button>
                         </div>
-                    )}
-
+                    )}                    {/* Note: hideSearchBar also hides the Owner buttons section by design */}
                     {/* Right Side Actions */}
                     <nav className="flex items-center gap-3 z-50">
                         {/* Language Switcher - Desktop */}
