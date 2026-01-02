@@ -532,7 +532,7 @@ function SearchPageContent() {
 
     return (
         <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
-            <Navbar />
+            <Navbar hideSearchBar />
             <style>{css}</style>
 
             {/* Search Header - Modern Design */}

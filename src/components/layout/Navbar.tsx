@@ -26,9 +26,10 @@ import { SearchModal } from "@/components/home/SearchModal";
 
 interface NavbarProps {
     variant?: "home" | "inner";
+    hideSearchBar?: boolean;
 }
 
-export function Navbar({ variant = "inner" }: NavbarProps) {
+export function Navbar({ variant = "inner", hideSearchBar = false }: NavbarProps) {
     const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
     const [isScrolledStart, setIsScrolledStart] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -122,8 +123,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
                         </div>
                     </Link>
 
-                    {/* Center Search Bar - Only shows on scroll */}
-                    {showSolid ? (
+                    {/* Center Search Bar - Only shows on scroll, hidden when hideSearchBar is true */}
+                    {showSolid && !hideSearchBar ? (
                         <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8 animate-in fade-in zoom-in-95 duration-300">
                             <div 
                                 className="flex items-center w-full bg-white rounded-full pl-5 pr-2 py-1.5 border border-gray-200 shadow-sm hover:shadow-lg transition-all cursor-pointer group"
