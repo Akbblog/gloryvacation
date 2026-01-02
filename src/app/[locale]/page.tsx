@@ -11,7 +11,7 @@ import { OurServicesSection } from "@/components/home/OurServicesSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { HostCTASection } from "@/components/home/HostCTASection";
 import { BlogsSection } from "@/components/home/BlogsSection";
-import { MobileAppSection } from "@/components/home/MobileAppSection";
+// MobileAppSection (coming soon) removed from homepage per request
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { useState, useMemo } from "react";
 import { Link } from "@/i18n/navigation";
@@ -130,8 +130,7 @@ export default function Home() {
       {/* 9. Blogs Section */}
       <BlogsSection />
 
-      {/* 10. Mobile App - "Full control coming soon!" */}
-      <MobileAppSection />
+      {/* 10. Mobile App - hidden (removed) */}
 
       {/* 11. Newsletter Subscription */}
       <NewsletterSection />
