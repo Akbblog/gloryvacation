@@ -7,6 +7,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PropertyCard } from "@/components/listings/PropertyCard";
+import { SearchModal } from "@/components/home/SearchModal";
 import { format, addDays } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -342,6 +343,7 @@ function SearchPageContent() {
     const [showMap, setShowMap] = useState(false);
     const [showFiltersModal, setShowFiltersModal] = useState(false);
     const [showSortDropdown, setShowSortDropdown] = useState(false);
+    const [showSearchModal, setShowSearchModal] = useState(false);
 
     // Filter Area Search
     const [searchInput, setSearchInput] = useState("");
@@ -537,537 +539,94 @@ function SearchPageContent() {
 
             {/* Search Header - Modern Design */}
             <section className="relative md:sticky md:top-0 z-40 bg-gradient-to-b from-white to-gray-50/80 border-b border-gray-100/80 pt-20">
-                {/* Main Search Bar - Modern Pill Design */}
+                {/* Main Search Bar - Clickable Pill Design */}
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px] py-4 md:py-6">
                     {/* Desktop Search Bar */}
-                    <div className="hidden lg:flex bg-white rounded-full py-1.5 px-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1),0_2px_8px_-2px_rgba(0,0,0,0.06)] items-center max-w-5xl mx-auto border border-gray-200/60 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-shadow duration-300">
-
-                        {/* 1. Destination */}
-                        <div ref={destRef} className="relative flex-1">
-                            <div
-                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showDestinations ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
-                                onClick={() => {
-                                    setShowDestinations(!showDestinations);
-                                    setShowCheckIn(false);
-                                    setShowCheckOut(false);
-                                    setShowGuests(false);
-                                    setShowType(false);
-                                }}
-                            >
-                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                                    <MapPin weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Where
-                                </div>
-                                <div className="flex items-center">
-                                    <input
-                                        type="text"
-                                        placeholder="Search destinations"
-                                        value={searchInput || (area ? DUBAI_AREAS.find(a => a.value === area)?.label : "")}
-                                        onChange={(e) => {
-                                            setSearchInput(e.target.value);
-                                            setShowDestinations(true);
-                                        }}
-                                        onFocus={() => setShowDestinations(true)}
-                                        className="w-full bg-transparent border-none text-sm text-gray-900 font-medium outline-none placeholder:text-gray-400 p-0"
-                                    />
-                                    {(searchInput || area) && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setArea("");
-                                                setSearchInput("");
-                                            }}
-                                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-                                        >
-                                            <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
-                                        </button>
-                                    )}
-                                </div>
+                    <div 
+                        className="hidden lg:flex bg-white rounded-full pl-5 pr-2 py-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.1),0_2px_8px_-2px_rgba(0,0,0,0.06)] items-center max-w-5xl mx-auto border border-gray-200/60 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12),0_4px_12px_-2px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer group"
+                        onClick={() => setShowSearchModal(true)}
+                    >
+                        {/* Where Section */}
+                        <div className="flex-1 min-w-0 pr-6 border-r border-gray-200">
+                            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-0.5 flex items-center gap-1.5">
+                                <MapPin weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                Where
                             </div>
-
-                            {/* Destination Dropdown */}
-                            {showDestinations && (
-                                <div className="absolute top-full left-0 mt-3 w-[360px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <div className="p-2 border-b border-gray-100">
-                                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Popular Destinations</div>
-                                    </div>
-                                    <div className="max-h-[300px] overflow-y-auto p-2">
-                                        {filteredAreas.length > 0 ? (
-                                            filteredAreas.map((item) => {
-                                                const IconComponent = item.Icon;
-                                                const isSelected = area === item.value;
-                                                return (
-                                                    <button
-                                                        key={item.value}
-                                                        className={`w-full px-3 py-3 text-left rounded-xl flex items-center gap-3 transition-all ${isSelected ? 'bg-[#F5A623]/10' : 'hover:bg-gray-50'}`}
-                                                        onClick={() => {
-                                                            setArea(item.value);
-                                                            setSearchInput("");
-                                                            setShowDestinations(false);
-                                                        }}
-                                                    >
-                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isSelected ? 'bg-[#F5A623] shadow-md' : 'bg-gradient-to-br from-gray-100 to-gray-50'}`}>
-                                                            <IconComponent weight="duotone" className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-[#F5A623]'}`} />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <span className={`text-sm font-medium ${isSelected ? 'text-[#E09000]' : 'text-gray-900'}`}>{item.label}</span>
-                                                        </div>
-                                                        {isSelected && (
-                                                            <div className="w-5 h-5 rounded-full bg-[#F5A623] flex items-center justify-center">
-                                                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                                                </svg>
-                                                            </div>
-                                                        )}
-                                                    </button>
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="px-4 py-8 text-center">
-                                                <MapPin weight="duotone" className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                                                <p className="text-gray-400 text-sm">No destinations found</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="w-px h-10 bg-gray-200/80" />
-
-                        {/* 2. Check In */}
-                        <div ref={checkInRef} className="relative flex-[0.9]">
-                            <div
-                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showCheckIn ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
-                                onClick={() => {
-                                    setShowCheckIn(!showCheckIn);
-                                    setShowDestinations(false);
-                                    setShowCheckOut(false);
-                                    setShowGuests(false);
-                                    setShowType(false);
-                                }}
-                            >
-                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                                    <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Check In
-                                </div>
-                                <div className={`text-sm font-medium ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
-                                    {formatDateDisplay(checkInDate) || "Add dates"}
-                                </div>
+                            <div className={`text-sm font-medium truncate ${area ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations"}
                             </div>
-
-                            {showCheckIn && (
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <DayPicker
-                                        mode="single"
-                                        selected={checkInDate}
-                                        onSelect={(date) => {
-                                            setCheckInDate(date);
-                                            if (date && (!checkOutDate || date >= checkOutDate)) {
-                                                const nextDay = addDays(date, 1);
-                                                setCheckOutDate(nextDay);
-                                                setShowCheckIn(false);
-                                                setShowCheckOut(true);
-                                            } else if (date) {
-                                                setShowCheckIn(false);
-                                                setShowCheckOut(true);
-                                            }
-                                        }}
-                                        disabled={[{ before: today }]}
-                                        showOutsideDays
-                                        locale={dateLocale}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                                    />
-                                </div>
-                            )}
                         </div>
-
-                        <div className="w-px h-10 bg-gray-200/80" />
-
-                        {/* 3. Check Out */}
-                        <div ref={checkOutRef} className="relative flex-[0.9]">
-                            <div
-                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showCheckOut ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
-                                onClick={() => {
-                                    setShowCheckOut(!showCheckOut);
-                                    setShowDestinations(false);
-                                    setShowCheckIn(false);
-                                    setShowGuests(false);
-                                    setShowType(false);
-                                }}
-                            >
-                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                                    <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Check Out
-                                </div>
-                                <div className={`text-sm font-medium ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
-                                    {formatDateDisplay(checkOutDate) || "Add dates"}
-                                </div>
+                        
+                        {/* Check In Section */}
+                        <div className="flex-shrink-0 px-5 border-r border-gray-200">
+                            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-0.5 flex items-center gap-1.5">
+                                <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                Check In
                             </div>
-
-                            {showCheckOut && (
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <DayPicker
-                                        mode="single"
-                                        selected={checkOutDate}
-                                        onSelect={(date) => {
-                                            setCheckOutDate(date);
-                                            if (date) setShowCheckOut(false);
-                                        }}
-                                        disabled={[
-                                            { before: checkInDate ? addDays(checkInDate, 1) : addDays(today, 1) }
-                                        ]}
-                                        showOutsideDays
-                                        locale={dateLocale}
-                                        dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="w-px h-10 bg-gray-200/80" />
-
-                        {/* 4. Guests */}
-                        <div ref={guestsRef} className="relative flex-[0.7]">
-                            <div
-                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showGuests ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
-                                onClick={() => {
-                                    setShowGuests(!showGuests);
-                                    setShowDestinations(false);
-                                    setShowCheckIn(false);
-                                    setShowCheckOut(false);
-                                    setShowType(false);
-                                }}
-                            >
-                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                                    <UsersThree weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Guests
-                                </div>
-                                <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-gray-900' : 'text-gray-400'}`}>
-                                    {guests > 1 ? `${guests} guests` : "Add guests"}
-                                </div>
+                            <div className={`text-sm font-medium ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {formatDateDisplay(checkInDate) || "Add dates"}
                             </div>
-
-                            {showGuests && (
-                                <div className="absolute top-full right-0 mt-3 w-[320px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    {/* Adults */}
-                                    <div className="flex items-center justify-between py-4 border-b border-gray-100">
-                                        <div>
-                                            <div className="text-sm font-semibold text-gray-900">Adults</div>
-                                            <div className="text-xs text-gray-400 mt-0.5">Ages 13 or above</div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => {
-                                                    const newVal = Math.max(1, adults - 1);
-                                                    setAdults(newVal);
-                                                    setGuests(newVal + children);
-                                                }}
-                                                disabled={adults <= 1}
-                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                            >
-                                                <Minus weight="bold" className="w-3.5 h-3.5" />
-                                            </button>
-                                            <span className="w-8 text-center font-semibold text-gray-900 text-lg">{adults}</span>
-                                            <button
-                                                onClick={() => {
-                                                    const newVal = Math.min(10, adults + 1);
-                                                    setAdults(newVal);
-                                                    setGuests(newVal + children);
-                                                }}
-                                                disabled={adults >= 10}
-                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                            >
-                                                <Plus weight="bold" className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Children */}
-                                    <div className="flex items-center justify-between py-4">
-                                        <div>
-                                            <div className="text-sm font-semibold text-gray-900">Children</div>
-                                            <div className="text-xs text-gray-400 mt-0.5">Ages 2–12</div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => {
-                                                    const newVal = Math.max(0, children - 1);
-                                                    setChildren(newVal);
-                                                    setGuests(adults + newVal);
-                                                }}
-                                                disabled={children <= 0}
-                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                            >
-                                                <Minus weight="bold" className="w-3.5 h-3.5" />
-                                            </button>
-                                            <span className="w-8 text-center font-semibold text-gray-900 text-lg">{children}</span>
-                                            <button
-                                                onClick={() => {
-                                                    const newVal = Math.min(10, children + 1);
-                                                    setChildren(newVal);
-                                                    setGuests(adults + newVal);
-                                                }}
-                                                disabled={children >= 10}
-                                                className="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#F5A623] hover:text-[#F5A623] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                            >
-                                                <Plus weight="bold" className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <button
-                                        onClick={() => setShowGuests(false)}
-                                        className="w-full mt-4 px-4 py-2.5 bg-[#F5A623] text-white rounded-xl text-sm font-semibold hover:bg-[#E09000] transition-all shadow-sm hover:shadow-md"
-                                    >
-                                        Done
-                                    </button>
-                                </div>
-                            )}
                         </div>
-
-                        <div className="w-px h-10 bg-gray-200/80" />
-
-                        {/* 5. Property Type */}
-                        <div ref={typeRef} className="relative flex-[0.7]">
-                            <div
-                                className={`py-3 px-5 rounded-full transition-all duration-200 cursor-pointer ${showType ? 'bg-gray-100 shadow-inner' : 'hover:bg-gray-50'}`}
-                                onClick={() => {
-                                    setShowType(!showType);
-                                    setShowDestinations(false);
-                                    setShowCheckIn(false);
-                                    setShowCheckOut(false);
-                                    setShowGuests(false);
-                                }}
-                            >
-                                <div className="text-[11px] font-bold text-gray-800 uppercase tracking-wide mb-1 flex items-center gap-1.5">
-                                    <House weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
-                                    Type
-                                </div>
-                                <div className={`text-sm font-medium truncate ${propertyType ? 'text-gray-900' : 'text-gray-400'}`}>
-                                    {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any type"}
-                                </div>
+                        
+                        {/* Check Out Section */}
+                        <div className="flex-shrink-0 px-5 border-r border-gray-200">
+                            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-0.5 flex items-center gap-1.5">
+                                <CalendarBlank weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                Check Out
                             </div>
-
-                            {showType && (
-                                <div className="absolute top-full right-0 mt-3 w-[240px] bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    {PROPERTY_TYPES.map((type) => (
-                                        <button
-                                            key={type.value}
-                                            className={`w-full px-4 py-3 text-left text-sm font-medium border-b border-gray-50 last:border-b-0 transition-colors ${propertyType === type.value ? 'bg-[#F5A623]/10 text-[#F5A623]' : 'hover:bg-gray-50 text-gray-900'}`}
-                                            onClick={() => {
-                                                setPropertyType(type.value);
-                                                setShowType(false);
-                                            }}
-                                        >
-                                            {type.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            <div className={`text-sm font-medium ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {formatDateDisplay(checkOutDate) || "Add dates"}
+                            </div>
                         </div>
-
+                        
+                        {/* Guests Section */}
+                        <div className="flex-shrink-0 px-5 border-r border-gray-200">
+                            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-0.5 flex items-center gap-1.5">
+                                <UsersThree weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                Guests
+                            </div>
+                            <div className={`text-sm font-medium ${guests > 1 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {guests > 1 ? `${guests} guests` : "Add guests"}
+                            </div>
+                        </div>
+                        
+                        {/* Type Section */}
+                        <div className="flex-shrink-0 px-5">
+                            <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-0.5 flex items-center gap-1.5">
+                                <House weight="fill" className="w-3.5 h-3.5 text-[#F5A623]" />
+                                Type
+                            </div>
+                            <div className={`text-sm font-medium ${propertyType ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any Type"}
+                            </div>
+                        </div>
+                        
                         {/* Search Button */}
-                        <button
-                            onClick={handleSearch}
-                            className="bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-full h-12 w-12 flex items-center justify-center transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 ml-1"
-                        >
-                            <MagnifyingGlass weight="bold" className="w-5 h-5" />
+                        <button className="ml-2 w-12 h-12 bg-[#F5A623] hover:bg-[#E09000] rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-105 shadow-md">
+                            <MagnifyingGlass weight="bold" className="w-5 h-5 text-white" />
                         </button>
                     </div>
 
                     {/* Mobile Search Bar */}
                     <div className="lg:hidden">
-                        <div className="bg-white rounded-2xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.08)] border border-gray-200/60 p-4 space-y-3">
-                            {/* Location */}
-                            <div className="relative" ref={destRef}>
-                                <div
-                                    onClick={() => {
-                                        setShowDestinations(!showDestinations);
-                                        setShowCheckIn(false);
-                                        setShowCheckOut(false);
-                                        setShowGuests(false);
-                                    }}
-                                    className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-[#F5A623]/10 flex items-center justify-center flex-shrink-0">
-                                        <MapPin weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Where</div>
-                                        <div className={`text-sm font-medium truncate ${area ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations"}
-                                        </div>
-                                    </div>
-                                    {area && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setArea("");
-                                                setSearchInput("");
-                                            }}
-                                            className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
-                                        >
-                                            <X weight="bold" className="w-4 h-4 text-gray-400" />
-                                        </button>
-                                    )}
-                                </div>
-                                {/* Mobile Destination Dropdown */}
-                                {showDestinations && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50 max-h-[250px] overflow-y-auto">
-                                        {filteredAreas.map((item) => {
-                                            const IconComponent = item.Icon;
-                                            return (
-                                                <button
-                                                    key={item.value}
-                                                    className="w-full px-4 py-3 text-left hover:bg-[#F5A623]/5 flex items-center gap-3 border-b border-gray-50 last:border-b-0"
-                                                    onClick={() => {
-                                                        setArea(item.value);
-                                                        setSearchInput("");
-                                                        setShowDestinations(false);
-                                                    }}
-                                                >
-                                                    <IconComponent weight="duotone" className="w-5 h-5 text-[#F5A623]" />
-                                                    <span className="text-sm text-gray-900 font-medium">{item.label}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
+                        <button
+                            onClick={() => setShowSearchModal(true)}
+                            className="w-full bg-white rounded-2xl p-4 flex items-center gap-4 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.08)] border border-gray-200/60 hover:shadow-lg transition-all active:scale-[0.98]"
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E09000] flex items-center justify-center shadow-md flex-shrink-0">
+                                <MagnifyingGlass weight="bold" className="w-6 h-6 text-white" />
                             </div>
-
-                            {/* Dates Row */}
-                            <div className="grid grid-cols-2 gap-2">
-                                <div
-                                    ref={checkInRef}
-                                    onClick={() => {
-                                        setShowCheckIn(!showCheckIn);
-                                        setShowDestinations(false);
-                                        setShowCheckOut(false);
-                                        setShowGuests(false);
-                                    }}
-                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                >
-                                    <CalendarBlank weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Check In</div>
-                                        <div className={`text-sm font-medium truncate ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {formatDateDisplay(checkInDate) || "Add date"}
-                                        </div>
-                                    </div>
-                                    {showCheckIn && (
-                                        <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50">
-                                            <DayPicker
-                                                mode="single"
-                                                selected={checkInDate}
-                                                onSelect={(date) => {
-                                                    setCheckInDate(date);
-                                                    if (date && (!checkOutDate || date >= checkOutDate)) {
-                                                        const nextDay = addDays(date, 1);
-                                                        setCheckOutDate(nextDay);
-                                                        setShowCheckIn(false);
-                                                        setShowCheckOut(true);
-                                                    } else if (date) {
-                                                        setShowCheckIn(false);
-                                                        setShowCheckOut(true);
-                                                    }
-                                                }}
-                                                disabled={[{ before: today }]}
-                                                showOutsideDays
-                                                locale={dateLocale}
-                                                dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                                            />
-                                        </div>
-                                    )}
+                            <div className="flex-1 text-left min-w-0">
+                                <div className="text-base font-semibold text-[#1C1C1C] truncate">
+                                    {area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations"}
                                 </div>
-                                <div
-                                    ref={checkOutRef}
-                                    onClick={() => {
-                                        setShowCheckOut(!showCheckOut);
-                                        setShowDestinations(false);
-                                        setShowCheckIn(false);
-                                        setShowGuests(false);
-                                    }}
-                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                >
-                                    <CalendarBlank weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Check Out</div>
-                                        <div className={`text-sm font-medium truncate ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {formatDateDisplay(checkOutDate) || "Add date"}
-                                        </div>
-                                    </div>
-                                    {showCheckOut && (
-                                        <div className="absolute top-full right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50">
-                                            <DayPicker
-                                                mode="single"
-                                                selected={checkOutDate}
-                                                onSelect={(date) => {
-                                                    setCheckOutDate(date);
-                                                    if (date) setShowCheckOut(false);
-                                                }}
-                                                disabled={[
-                                                    { before: checkInDate ? addDays(checkInDate, 1) : addDays(today, 1) }
-                                                ]}
-                                                showOutsideDays
-                                                locale={dateLocale}
-                                                dir={locale === 'ar' ? 'rtl' : 'ltr'}
-                                            />
-                                        </div>
-                                    )}
+                                <div className="text-sm text-gray-400 flex items-center gap-2 mt-0.5">
+                                    <span>{formatDateDisplay(checkInDate) || "Any dates"}</span>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                    <span>{guests > 1 ? `${guests} guests` : "Add guests"}</span>
                                 </div>
                             </div>
-
-                            {/* Guests & Type Row */}
-                            <div className="grid grid-cols-2 gap-2">
-                                <div
-                                    ref={guestsRef}
-                                    onClick={() => {
-                                        setShowGuests(!showGuests);
-                                        setShowDestinations(false);
-                                        setShowCheckIn(false);
-                                        setShowCheckOut(false);
-                                    }}
-                                    className="relative flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                >
-                                    <UsersThree weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Guests</div>
-                                        <div className={`text-sm font-medium truncate ${guests > 1 ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {guests > 1 ? `${guests} guests` : "Add guests"}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div
-                                    ref={typeRef}
-                                    onClick={() => {
-                                        setShowType(!showType);
-                                        setShowDestinations(false);
-                                        setShowCheckIn(false);
-                                        setShowCheckOut(false);
-                                        setShowGuests(false);
-                                    }}
-                                    className="flex items-center gap-2.5 p-3 rounded-xl bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                                >
-                                    <House weight="fill" className="w-5 h-5 text-[#F5A623]" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Type</div>
-                                        <div className={`text-sm font-medium truncate ${propertyType ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {PROPERTY_TYPES.find(t => t.value === propertyType)?.label || "Any type"}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Mobile Search Button */}
-                            <button
-                                onClick={handleSearch}
-                                className="w-full py-3.5 bg-gradient-to-r from-[#F5A623] to-[#E09000] hover:from-[#E09000] hover:to-[#D08000] text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-                            >
-                                <MagnifyingGlass weight="bold" className="w-5 h-5" />
-                                Search Properties
-                            </button>
-                        </div>
+                        </button>
                     </div>
                 </div>
 
@@ -1421,6 +980,8 @@ function SearchPageContent() {
             )}
 
             <Footer />
+            
+            <SearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
         </div>
     );
 }
