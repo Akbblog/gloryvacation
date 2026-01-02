@@ -343,8 +343,11 @@ function SearchPageContent() {
     const [showFiltersModal, setShowFiltersModal] = useState(false);
     const [showSortDropdown, setShowSortDropdown] = useState(false);
 
-    // Filter Area Search
-    const [searchInput, setSearchInput] = useState("");
+    // Filter Area Search - Initialize from URL param if area is set
+    const initialAreaLabel = searchParams.get("area") 
+        ? DUBAI_AREAS.find(a => a.value === searchParams.get("area"))?.label || searchParams.get("area") || ""
+        : "";
+    const [searchInput, setSearchInput] = useState(initialAreaLabel);
     const [filteredAreas, setFilteredAreas] = useState(DUBAI_AREAS);
 
     // General search query
@@ -392,14 +395,42 @@ function SearchPageContent() {
     // Filter destinations based on input
     useEffect(() => {
         if (searchInput) {
-            const filtered = DUBAI_AREAS.filter(area =>
-                area.label.toLowerCase().includes(searchInput.toLowerCase())
+            const filtered = DUBAI_AREAS.filter(a =>
+                a.label.toLowerCase().includes(searchInput.toLowerCase())
             );
             setFilteredAreas(filtered);
         } else {
             setFilteredAreas(DUBAI_AREAS);
         }
     }, [searchInput]);
+
+    // Update searchInput display when area is selected
+    useEffect(() => {
+        if (area) {
+            const areaLabel = DUBAI_AREAS.find(a => a.value === area)?.label;
+            if (areaLabel) {
+                setSearchInput(areaLabel);
+            }
+        }
+    }, [area]);
+
+    // Auto-update URL when filters change (debounced)
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        // Clear any pending timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        // Debounce the URL update to avoid too many navigations
+        searchTimeoutRef.current = setTimeout(() => {
+            updateURL();
+        }, 300);
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [area, checkInDate, checkOutDate, guests, propertyType, updateURL]);
 
     // Format date for display
     const formatDateDisplay = (date: Date | undefined) => {
@@ -562,9 +593,16 @@ function SearchPageContent() {
                                     <input
                                         type="text"
                                         placeholder="Search destinations"
-                                        value={searchInput || (area ? DUBAI_AREAS.find(a => a.value === area)?.label : "")}
+                                        value={searchInput}
                                         onChange={(e) => {
                                             setSearchInput(e.target.value);
+                                            // Clear area if user is typing something different
+                                            if (area) {
+                                                const currentAreaLabel = DUBAI_AREAS.find(a => a.value === area)?.label || "";
+                                                if (e.target.value !== currentAreaLabel) {
+                                                    setArea("");
+                                                }
+                                            }
                                             setShowDestinations(true);
                                         }}
                                         onFocus={() => setShowDestinations(true)}
@@ -602,7 +640,7 @@ function SearchPageContent() {
                                                         className={`w-full px-3 py-3 text-left rounded-xl flex items-center gap-3 transition-all ${isSelected ? 'bg-[#F5A623]/10' : 'hover:bg-gray-50'}`}
                                                         onClick={() => {
                                                             setArea(item.value);
-                                                            setSearchInput("");
+                                                            setSearchInput(item.label);
                                                             setShowDestinations(false);
                                                         }}
                                                     >
@@ -895,11 +933,11 @@ function SearchPageContent() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Where</div>
-                                        <div className={`text-sm font-medium truncate ${area ? 'text-gray-900' : 'text-gray-400'}`}>
-                                            {area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations"}
+                                        <div className={`text-sm font-medium truncate ${searchInput || area ? 'text-gray-900' : 'text-gray-400'}`}>
+                                            {searchInput || (area ? DUBAI_AREAS.find(a => a.value === area)?.label : "Search destinations")}
                                         </div>
                                     </div>
-                                    {area && (
+                                    {(searchInput || area) && (
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -923,7 +961,7 @@ function SearchPageContent() {
                                                     className="w-full px-4 py-3 text-left hover:bg-[#F5A623]/5 flex items-center gap-3 border-b border-gray-50 last:border-b-0"
                                                     onClick={() => {
                                                         setArea(item.value);
-                                                        setSearchInput("");
+                                                        setSearchInput(item.label);
                                                         setShowDestinations(false);
                                                     }}
                                                 >
