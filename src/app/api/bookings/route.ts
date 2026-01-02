@@ -47,6 +47,18 @@ export async function POST(req: Request) {
                     property.title,
                     guest.name || "Guest"
                 );
+                // Also notify web admins in-app
+                try {
+                    void NotificationService.notifyAdmins({
+                        title: "New Booking Request",
+                        message: `${guest.name || "Guest"} requested to book \"${property.title}\" (property ID: ${propertyId}).`,
+                        type: "info",
+                        relatedType: "booking",
+                        relatedId: booking._id.toString(),
+                    });
+                } catch (e) {
+                    console.error("Error sending admin booking notification:", e);
+                }
             }
         } catch (notificationError) {
             console.error("Error sending new booking notification:", notificationError);

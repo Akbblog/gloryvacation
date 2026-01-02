@@ -1,5 +1,6 @@
 import connectDB from "@/lib/mongodb";
 import Notification from "@/models/Notification";
+import { User } from "@/models/User";
 
 export interface NotificationData {
     title: string;
@@ -35,6 +36,27 @@ export class NotificationService {
         } catch (error) {
             console.error("Error creating bulk notifications:", error);
             throw error;
+        }
+    }
+
+    // Send an in-app notification to all admin/sub-admin users
+    static async notifyAdmins(notificationPartial: Omit<NotificationData, "userId">) {
+        try {
+            await connectDB();
+
+            const admins = await User.find({ role: { $in: ["admin", "sub-admin"] } }).select("_id");
+            if (!admins || admins.length === 0) return [];
+
+            const notifications = admins.map((a) => ({
+                ...notificationPartial,
+                userId: a._id.toString(),
+            } as NotificationData));
+
+            return this.createBulkNotifications(notifications);
+        } catch (error) {
+            console.error("Error notifying admins:", error);
+            // swallow so callers can continue (fire-and-forget)
+            return [];
         }
     }
 

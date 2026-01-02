@@ -4,6 +4,7 @@ import { Reservation } from "@/models/Reservation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import nodemailer from "nodemailer";
+import { NotificationService } from "@/lib/notifications/NotificationService";
 
 export async function POST(req: Request) {
     try {
@@ -38,6 +39,19 @@ export async function POST(req: Request) {
         });
 
         // attempt to notify team via webhook, fallback to SMTP email if configured
+        // also create in-app notifications for web admins
+        try {
+            void NotificationService.notifyAdmins({
+                title: "New Reservation Request",
+                message: `${reservation.guestDetails?.name || 'Guest'} requested a reservation for property ${propertyId}. Reservation ID: ${reservation._id}`,
+                type: "info",
+                relatedType: "reservation",
+                relatedId: reservation._id.toString(),
+            });
+        } catch (err) {
+            console.error("Error creating in-app admin notification:", err);
+        }
+
         const notifyTeam = async () => {
             const webhookUrl = process.env.RESERVATION_WEBHOOK_URL;
             const sendEmailIfConfigured = async (reason?: string) => {
