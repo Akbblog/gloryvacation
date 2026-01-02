@@ -1145,8 +1145,8 @@ function SearchPageContent() {
                                 ))}
                             </select>
 
-                            {/* Search Input - Hidden on mobile */}
-                            <div className="relative hidden md:block flex-1 max-w-xs">
+                            {/* Search Input */}
+                            <div className="relative flex-1 max-w-xs">
                                 <MagnifyingGlass weight="bold" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
@@ -1354,7 +1354,28 @@ function SearchPageContent() {
 
                         {/* Modal Content */}
                         <div className="p-5 space-y-6 overflow-y-auto max-h-[calc(85vh-140px)]">
-                            {/* Price Range */}
+                            {/* Search */}
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-3 text-sm">Search Properties</h3>
+                                <div className="relative">
+                                    <MagnifyingGlass weight="bold" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search properties..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623]/20 transition-all"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery("")}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                        >
+                                            <X weight="bold" className="w-3.5 h-3.5 text-gray-400" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                             <div>
                                 <h3 className="font-semibold text-gray-900 mb-3 text-sm">Price Range</h3>
                                 <div className="grid grid-cols-2 gap-2">
