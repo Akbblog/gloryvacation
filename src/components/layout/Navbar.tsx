@@ -48,7 +48,8 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
     };
 
     const isHome = variant === "home";
-    const showSolid = isScrolledPastHero || !isHome;
+    // Switch to solid small translucent background earlier to avoid overlap while scrolling
+    const showSolid = isScrolledStart || !isHome;
     const showNavButtons = !isScrolledStart && isHome;
 
     useEffect(() => {
@@ -88,9 +89,9 @@ export function Navbar({ variant = "inner" }: NavbarProps) {
             className={cn(
                 "fixed top-0 z-50 w-full transition-all duration-300",
                 showSolid
-                    ? "bg-white shadow-md py-2"
+                    ? "bg-white/95 backdrop-blur-sm shadow-md py-2"
                     : "bg-transparent py-4 md:py-5"
-            )}
+                )}
         >
             <div className="container max-w-[1440px] mx-auto px-4 md:px-6 lg:px-[70px]">
                 <div className="flex items-center justify-between">
