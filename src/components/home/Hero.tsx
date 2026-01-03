@@ -503,8 +503,8 @@ export function Hero() {
                     </div>
                 </div>
 
-                {/* Mobile Search Bar - Compact and intuitive */}
-                <div className="md:hidden mt-6 w-full max-w-sm px-2">
+                {/* Mobile Search Bar - hidden per request */}
+                <div className="hidden mt-6 w-full max-w-sm px-2">
                     <button
                         onClick={handleSearch}
                         className="w-full bg-white rounded-2xl p-3 flex items-center gap-3 shadow-lg border border-neutral-100 hover:shadow-xl transition-all active:scale-[0.98]"
