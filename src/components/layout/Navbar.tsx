@@ -356,16 +356,7 @@ export function Navbar({ variant = "inner", hideSearchBar = false }: NavbarProps
                             </button>
                         </div>
 
-                        {/* Mobile Search Button */}
-                        <div className="px-4 py-3 border-b border-gray-100">
-                            <button
-                                onClick={() => handleMenuItemClick('/listings')}
-                                className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl text-left hover:bg-gray-100 transition-colors"
-                            >
-                                <MagnifyingGlass weight="bold" className="w-5 h-5 text-[#F5A623]" />
-                                <span className="text-sm text-gray-600">{tHero('searchDestinations')}</span>
-                            </button>
-                        </div>
+                        {/* Mobile Search removed to hide search on small screens */}
 
                         {/* Scrollable Content */}
                         <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
