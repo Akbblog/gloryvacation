@@ -10,7 +10,7 @@ import { DestinationsCarousel } from "@/components/home/DestinationsCarousel";
 import { OurServicesSection } from "@/components/home/OurServicesSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { HostCTASection } from "@/components/home/HostCTASection";
-import { BlogsSection } from "@/components/home/BlogsSection";
+// BlogsSection removed from homepage
 // MobileAppSection (coming soon) removed from homepage per request
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { useState, useMemo } from "react";
@@ -127,8 +127,7 @@ export default function Home() {
       {/* 8. Host CTA - "Empty space? We make it pay!" */}
       <HostCTASection />
 
-      {/* 9. Blogs Section */}
-      <BlogsSection />
+      {/* 9. Blogs Section (hidden) */}
 
       {/* 10. Mobile App - hidden (removed) */}
 
