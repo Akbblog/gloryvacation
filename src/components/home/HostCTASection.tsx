@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 export function HostCTASection() {
     const t = useTranslations('HostCTA');
@@ -21,18 +22,7 @@ export function HostCTASection() {
                         <p className="text-lg text-[#7E7E7E] mb-8 max-w-lg leading-relaxed">
                             {t('description')}
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <Link href="/list-your-property">
-                                <button className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full px-8 py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                                    {t('listProperty')}
-                                </button>
-                            </Link>
-                            <Link href="https://app.easygoholidayhomes.com" target="_blank">
-                                <button className="bg-white border-2 border-[#1C1C1C] text-[#1C1C1C] hover:bg-gray-50 rounded-full px-8 py-4 text-base font-semibold transition-all duration-300">
-                                    {t('manageProperty')}
-                                </button>
-                            </Link>
-                        </div>
+                        <ManageButtons t={t} />
                     </div>
 
                     {/* Right Image */}
@@ -52,5 +42,32 @@ export function HostCTASection() {
                 </div>
             </div>
         </section>
+    );
+}
+
+function ManageButtons({ t }: { t: (key: string) => string }) {
+    const router = useRouter();
+    const { data: session } = useSession();
+
+    const handleManageClick = () => {
+        if (session) {
+            const href = (session?.user?.role === 'admin' || session?.user?.role === 'sub-admin') ? "/web-admin" : "/profile";
+            router.push(href);
+        } else {
+            router.push('/auth/signin');
+        }
+    };
+
+    return (
+        <div className="flex flex-col sm:flex-row gap-4">
+            <Link href="/list-your-property">
+                <button className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-full px-8 py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                    {t('listProperty')}
+                </button>
+            </Link>
+            <button onClick={handleManageClick} className="bg-white border-2 border-[#1C1C1C] text-[#1C1C1C] hover:bg-gray-50 rounded-full px-8 py-4 text-base font-semibold transition-all duration-300">
+                {t('manageProperty')}
+            </button>
+        </div>
     );
 }
