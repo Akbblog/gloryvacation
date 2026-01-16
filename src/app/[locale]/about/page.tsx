@@ -66,7 +66,7 @@ export default function AboutPage() {
                         <div>
                             <h2 className="text-3xl md:text-4xl font-bold text-[#1C1C1C] mb-6">Our Story</h2>
                             <p className="text-[#7E7E7E] text-lg leading-relaxed mb-6">
-                                EasyGo Holiday Homes was founded with a simple vision: to transform the holiday rental experience in Dubai. We noticed that property owners struggled to manage their properties effectively, while travelers often faced inconsistent experiences.
+                                Glory Vacation Homes was founded with a simple vision: to transform the holiday rental experience in Dubai. We noticed that property owners struggled to manage their properties effectively, while travelers often faced inconsistent experiences.
                             </p>
                             <p className="text-[#7E7E7E] text-lg leading-relaxed mb-6">
                                 Today, we're proud to be one of Dubai's leading holiday home management companies, fully licensed by the Department of Tourism and Commerce Marketing (DTCM). We've helped hundreds of property owners maximize their returns while providing thousands of guests with memorable stays.
@@ -89,7 +89,7 @@ export default function AboutPage() {
                         <div className="relative h-[400px] rounded-2xl overflow-hidden">
                             <Image
                                 src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop"
-                                alt="EasyGo Team"
+                                alt="Glory Vacation Homes"
                                 fill
                                 className="object-cover"
                             />
@@ -130,7 +130,8 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Team Section */}
+            {/* Team Section - Hidden */}
+            {false && (
             <section className="py-16 md:py-24 bg-[#FAFAFA]">
                 <div className="container mx-auto px-4 md:px-6 max-w-[1440px]">
                     <h2 className="text-3xl md:text-4xl font-bold text-[#1C1C1C] mb-12 text-center">Meet Our Team</h2>
@@ -152,6 +153,7 @@ export default function AboutPage() {
                     </div>
                 </div>
             </section>
+            )}
 
             <Footer />
         </div>
