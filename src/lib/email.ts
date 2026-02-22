@@ -8,6 +8,41 @@ export interface EmailConfig {
     replyTo?: string;
 }
 
+function parseRecipients(raw?: string): string[] {
+    if (!raw) return [];
+    return raw
+        .split(",")
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0);
+}
+
+function uniqueRecipients(recipients: string[]): string[] {
+    const seen = new Set<string>();
+    const result: string[] = [];
+
+    for (const recipient of recipients) {
+        const normalized = recipient.toLowerCase();
+        if (seen.has(normalized)) continue;
+        seen.add(normalized);
+        result.push(recipient);
+    }
+
+    return result;
+}
+
+function getNotificationRecipients(...rawLists: Array<string | undefined>): string[] {
+    return uniqueRecipients(rawLists.flatMap((raw) => parseRecipients(raw)));
+}
+
+function escapeHtml(value: string): string {
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
 // Create reusable transporter
 function createTransporter() {
     const smtpHost = process.env.SMTP_HOST;
@@ -151,6 +186,34 @@ interface ReservationEmailData {
     adminNote?: string;
     totalAmount?: number;
     currency?: string;
+}
+
+interface UserSignupEmailData {
+    userId: string;
+    name: string;
+    email: string;
+    role: string;
+}
+
+interface PropertyListedEmailData {
+    propertyId: string;
+    propertyTitle: string;
+    hostName: string;
+    hostEmail?: string;
+    propertyType?: string;
+    location?: string;
+    bedrooms?: number;
+}
+
+interface PropertySubmissionEmailData {
+    inquiryId: string;
+    ownerName: string;
+    email: string;
+    phone: string;
+    propertyType: string;
+    bedrooms: string;
+    location: string;
+    message?: string;
 }
 
 // Guest notification for status change
@@ -434,6 +497,158 @@ Reservation ID: ${data.reservationId}
     };
 }
 
+export function getNewUserSignupEmailTemplate(data: UserSignupEmailData): { subject: string; html: string; text: string } {
+    const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
+
+    const safeName = escapeHtml(data.name);
+    const safeEmail = escapeHtml(data.email);
+    const safeRole = escapeHtml(data.role);
+    const safeUserId = escapeHtml(data.userId);
+
+    const content = `
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New User Signup</h2>
+        <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
+            A new user registered on Glory Vacation.
+        </p>
+        <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Name:</strong> ${safeName}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Email:</strong> ${safeEmail}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Role:</strong> ${safeRole}</p>
+            <p style="margin: 0; color: #334155; font-size: 14px;"><strong>User ID:</strong> ${safeUserId}</p>
+        </div>
+        <p style="margin: 20px 0 0; color: #64748b; font-size: 13px;">
+            Admin panel: ${siteDomain}/en/admin/users
+        </p>
+    `;
+
+    const text = `
+New User Signup
+
+A new user registered on Glory Vacation.
+
+Name: ${data.name}
+Email: ${data.email}
+Role: ${data.role}
+User ID: ${data.userId}
+
+Admin panel: ${siteDomain}/en/admin/users
+    `.trim();
+
+    return {
+        subject: `New user signup: ${data.name}`,
+        html: baseTemplate(content, "New user signup"),
+        text,
+    };
+}
+
+export function getNewPropertyListedEmailTemplate(data: PropertyListedEmailData): { subject: string; html: string; text: string } {
+    const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
+
+    const safePropertyTitle = escapeHtml(data.propertyTitle);
+    const safeHostName = escapeHtml(data.hostName);
+    const safeHostEmail = escapeHtml(data.hostEmail || "N/A");
+    const safePropertyType = escapeHtml(data.propertyType || "N/A");
+    const safeLocation = escapeHtml(data.location || "N/A");
+    const safeBedrooms = data.bedrooms !== undefined ? String(data.bedrooms) : "N/A";
+    const safePropertyId = escapeHtml(data.propertyId);
+
+    const content = `
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Listed</h2>
+        <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
+            A new property has been created and needs review.
+        </p>
+        <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property:</strong> ${safePropertyTitle}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Host:</strong> ${safeHostName}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Host Email:</strong> ${safeHostEmail}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Type:</strong> ${safePropertyType}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Bedrooms:</strong> ${safeBedrooms}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Location:</strong> ${safeLocation}</p>
+            <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Property ID:</strong> ${safePropertyId}</p>
+        </div>
+        <p style="margin: 20px 0 0; color: #64748b; font-size: 13px;">
+            Admin panel: ${siteDomain}/en/admin/listings
+        </p>
+    `;
+
+    const text = `
+New Property Listed
+
+A new property has been created and needs review.
+
+Property: ${data.propertyTitle}
+Host: ${data.hostName}
+Host Email: ${data.hostEmail || "N/A"}
+Type: ${data.propertyType || "N/A"}
+Bedrooms: ${data.bedrooms ?? "N/A"}
+Location: ${data.location || "N/A"}
+Property ID: ${data.propertyId}
+
+Admin panel: ${siteDomain}/en/admin/listings
+    `.trim();
+
+    return {
+        subject: `New property listed: ${data.propertyTitle}`,
+        html: baseTemplate(content, "New property listed"),
+        text,
+    };
+}
+
+export function getPropertySubmissionEmailTemplate(data: PropertySubmissionEmailData): { subject: string; html: string; text: string } {
+    const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
+
+    const safeOwnerName = escapeHtml(data.ownerName);
+    const safeEmail = escapeHtml(data.email);
+    const safePhone = escapeHtml(data.phone);
+    const safePropertyType = escapeHtml(data.propertyType);
+    const safeBedrooms = escapeHtml(data.bedrooms);
+    const safeLocation = escapeHtml(data.location);
+    const safeMessage = data.message ? escapeHtml(data.message) : "";
+    const safeInquiryId = escapeHtml(data.inquiryId);
+
+    const content = `
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Submission</h2>
+        <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
+            A new owner submitted the "List Your Property" form.
+        </p>
+        <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Owner Name:</strong> ${safeOwnerName}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Email:</strong> ${safeEmail}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Phone:</strong> ${safePhone}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property Type:</strong> ${safePropertyType}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Bedrooms:</strong> ${safeBedrooms}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Location:</strong> ${safeLocation}</p>
+            ${safeMessage ? `<p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Message:</strong> ${safeMessage}</p>` : ""}
+            <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Inquiry ID:</strong> ${safeInquiryId}</p>
+        </div>
+        <p style="margin: 20px 0 0; color: #64748b; font-size: 13px;">
+            Admin panel: ${siteDomain}/en/admin/messages
+        </p>
+    `;
+
+    const text = `
+New Property Submission
+
+A new owner submitted the "List Your Property" form.
+
+Owner Name: ${data.ownerName}
+Email: ${data.email}
+Phone: ${data.phone}
+Property Type: ${data.propertyType}
+Bedrooms: ${data.bedrooms}
+Location: ${data.location}
+${data.message ? `Message: ${data.message}\n` : ""}Inquiry ID: ${data.inquiryId}
+
+Admin panel: ${siteDomain}/en/admin/messages
+    `.trim();
+
+    return {
+        subject: `New property submission: ${data.ownerName}`,
+        html: baseTemplate(content, "New property submission"),
+        text,
+    };
+}
+
 // Send status change notification to guest
 export async function sendReservationStatusEmail(data: ReservationEmailData): Promise<boolean> {
     const { subject, html, text } = getStatusChangeEmailTemplate(data);
@@ -447,18 +662,89 @@ export async function sendReservationStatusEmail(data: ReservationEmailData): Pr
 
 // Send new reservation notification to admin
 export async function sendNewReservationNotification(data: ReservationEmailData): Promise<boolean> {
-    const adminEmail = process.env.RESERVATION_NOTIFY_TO || process.env.ADMIN_EMAIL;
-    if (!adminEmail) {
+    const recipients = getNotificationRecipients(
+        process.env.RESERVATION_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+    if (recipients.length === 0) {
         console.warn("No admin email configured for reservation notifications");
         return false;
     }
 
     const { subject, html, text } = getNewReservationEmailTemplate(data);
     return sendEmail({
-        to: adminEmail,
+        to: recipients.join(", "),
         subject,
         html,
         text,
         replyTo: data.guestEmail,
+    });
+}
+
+export async function sendNewUserSignupNotification(data: UserSignupEmailData): Promise<boolean> {
+    const recipients = getNotificationRecipients(
+        process.env.SIGNUP_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+
+    if (recipients.length === 0) {
+        console.warn("No admin email configured for signup notifications");
+        return false;
+    }
+
+    const { subject, html, text } = getNewUserSignupEmailTemplate(data);
+    return sendEmail({
+        to: recipients.join(", "),
+        subject,
+        html,
+        text,
+        replyTo: data.email,
+    });
+}
+
+export async function sendNewPropertyListedNotification(data: PropertyListedEmailData): Promise<boolean> {
+    const recipients = getNotificationRecipients(
+        process.env.PROPERTY_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+
+    if (recipients.length === 0) {
+        console.warn("No admin email configured for property listing notifications");
+        return false;
+    }
+
+    const { subject, html, text } = getNewPropertyListedEmailTemplate(data);
+    return sendEmail({
+        to: recipients.join(", "),
+        subject,
+        html,
+        text,
+        replyTo: data.hostEmail,
+    });
+}
+
+export async function sendPropertySubmissionNotification(data: PropertySubmissionEmailData): Promise<boolean> {
+    const recipients = getNotificationRecipients(
+        process.env.PROPERTY_SUBMISSION_NOTIFY_TO,
+        process.env.PROPERTY_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+
+    if (recipients.length === 0) {
+        console.warn("No admin email configured for property submission notifications");
+        return false;
+    }
+
+    const { subject, html, text } = getPropertySubmissionEmailTemplate(data);
+    return sendEmail({
+        to: recipients.join(", "),
+        subject,
+        html,
+        text,
+        replyTo: data.email,
     });
 }

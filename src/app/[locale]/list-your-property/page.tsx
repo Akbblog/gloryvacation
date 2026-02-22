@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Check, Upload, Home, DollarSign, Shield, Users } from "lucide-react";
@@ -40,19 +41,32 @@ export default function ListYourPropertyPage() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSubmitError("");
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        try {
+            const response = await fetch("/api/property-inquiries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        // Here you would submit to MongoDB
-        console.log("Form submitted:", formData);
+            if (!response.ok) {
+                const data = await response.json().catch(() => null) as { message?: string } | null;
+                throw new Error(data?.message || "Failed to submit your property. Please try again.");
+            }
 
-        setIsSubmitting(false);
-        setIsSubmitted(true);
+            setIsSubmitted(true);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to submit your property. Please try again.";
+            setSubmitError(message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -72,12 +86,12 @@ export default function ListYourPropertyPage() {
                         <p className="text-[#7E7E7E] mb-8">
                             Your property listing request has been submitted successfully. Our team will contact you within 24 hours.
                         </p>
-                        <a
+                        <Link
                             href="/"
                             className="inline-block bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-3 rounded-full font-semibold transition-all shadow-lg hover:shadow-xl"
                         >
                             Back to Home
-                        </a>
+                        </Link>
                     </div>
                 </main>
                 <Footer />
@@ -259,6 +273,12 @@ export default function ListYourPropertyPage() {
                                     placeholder="Tell us more about your property..."
                                 />
                             </div>
+
+                            {submitError && (
+                                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                    {submitError}
+                                </div>
+                            )}
 
                             <button
                                 type="submit"

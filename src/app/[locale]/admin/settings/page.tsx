@@ -272,6 +272,7 @@ export default function SettingsPage() {
                     smtpUsername: settings.email.smtpUsername,
                     smtpPassword: settings.email.smtpPassword,
                     fromEmail: settings.email.fromEmail,
+                    testEmail: session?.user?.email || settings.general.contactEmail,
                 }),
             });
 

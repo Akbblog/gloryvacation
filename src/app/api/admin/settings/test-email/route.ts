@@ -10,17 +10,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { smtpHost, smtpPort, smtpUsername, smtpPassword, fromEmail, testEmail } = body;
+    const body = await request.json() as {
+      smtpHost?: string;
+      smtpPort?: string;
+      smtpUsername?: string;
+      smtpPassword?: string;
+      fromEmail?: string;
+      testEmail?: string;
+    };
 
-    if (!smtpHost || !smtpPort || !smtpUsername || !smtpPassword || !fromEmail || !testEmail) {
-      return NextResponse.json({ error: "All email settings are required" }, { status: 400 });
+    const smtpHost = body.smtpHost?.trim();
+    const smtpPort = body.smtpPort?.trim();
+    const smtpUsername = body.smtpUsername?.trim();
+    const smtpPassword = body.smtpPassword?.trim();
+    const fromEmail = body.fromEmail?.trim();
+    const testEmail = body.testEmail?.trim();
+
+    if (!smtpHost || !smtpPort || !smtpUsername || !smtpPassword || !fromEmail) {
+      return NextResponse.json({ error: "All SMTP settings are required" }, { status: 400 });
     }
+
+    const recipientEmail = testEmail || session.user.email || fromEmail;
 
     // Create transporter
     const transporter = nodemailer.createTransport({
       host: smtpHost,
-      port: parseInt(smtpPort),
+      port: parseInt(smtpPort, 10),
       secure: smtpPort === "465", // true for 465, false for other ports
       auth: {
         user: smtpUsername,
@@ -34,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Send test email
     const mailOptions = {
       from: fromEmail,
-      to: testEmail,
+      to: recipientEmail,
       subject: "Glory Vacation - Email Test",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -52,13 +67,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Test email sent successfully!"
+      message: `Test email sent successfully to ${recipientEmail}!`
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error sending test email:", error);
+    const message = error instanceof Error
+      ? error.message
+      : "Failed to send test email. Please check your SMTP settings.";
+
     return NextResponse.json({
-      error: error.message || "Failed to send test email. Please check your SMTP settings."
+      error: message
     }, { status: 500 });
   }
 }

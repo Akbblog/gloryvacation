@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import connectDB from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { NotificationService } from "@/lib/notifications/NotificationService";
+import { sendNewUserSignupNotification } from "@/lib/email";
 
 export async function POST(req: Request) {
     try {
@@ -50,6 +51,14 @@ export async function POST(req: Request) {
             console.error("Error sending new user registration notification:", notificationError);
             // Don't fail registration if notification fails
         }
+
+        // Send SMTP email notification to admins about new signup
+        void sendNewUserSignupNotification({
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        });
 
         return NextResponse.json(
             { message: "User created successfully", user: { id: user._id, name: user.name, email: user.email, role: user.role } },

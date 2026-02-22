@@ -5,6 +5,7 @@ import { User } from "@/models/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NotificationService } from "@/lib/notifications/NotificationService";
+import { sendNewPropertyListedNotification } from "@/lib/email";
 
 const VALID_IMAGE_URL_PATTERN = /^(https?:\/\/|\/)/i;
 
@@ -225,6 +226,17 @@ export async function POST(req: Request) {
             console.error("Error sending new property listing notification:", notificationError);
             // Don't fail property creation if notification fails
         }
+
+        // Send SMTP email notification to admins about new property listing
+        void sendNewPropertyListedNotification({
+            propertyId: property._id.toString(),
+            propertyTitle: property.title || "Property",
+            hostName: session.user.name || "Property Owner",
+            hostEmail: session.user.email || "",
+            propertyType: property.propertyType,
+            bedrooms: property.bedrooms,
+            location: [property?.location?.area, property?.location?.city].filter(Boolean).join(", "),
+        });
 
         return NextResponse.json(property, { status: 201 });
     } catch (error) {
