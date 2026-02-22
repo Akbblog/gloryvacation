@@ -6,6 +6,7 @@ export interface EmailConfig {
     html: string;
     text?: string;
     replyTo?: string;
+    bcc?: string;
 }
 
 function parseRecipients(raw?: string): string[] {
@@ -72,17 +73,43 @@ export async function sendEmail(config: EmailConfig): Promise<boolean> {
 
         const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER;
         const fromName = process.env.FROM_NAME || "Glory Vacation";
+        const bccRecipients = uniqueRecipients([
+            ...parseRecipients(config.bcc),
+            ...parseRecipients(process.env.NOTIFICATION_BCC),
+        ]);
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
             from: `"${fromName}" <${fromEmail}>`,
             to: config.to,
+            bcc: bccRecipients.length > 0 ? bccRecipients.join(", ") : undefined,
             subject: config.subject,
             html: config.html,
             text: config.text,
             replyTo: config.replyTo,
         });
 
-        return true;
+        const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+        const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+        if (rejected.length > 0) {
+            console.warn("Email rejected by SMTP server", {
+                rejected,
+                to: config.to,
+                bcc: bccRecipients,
+                messageId: info.messageId,
+            });
+        }
+
+        if (accepted.length === 0) {
+            console.warn("SMTP server did not accept any recipients", {
+                to: config.to,
+                bcc: bccRecipients,
+                messageId: info.messageId,
+            });
+            return false;
+        }
+
+        return rejected.length === 0;
     } catch (error) {
         console.error("Failed to send email:", error);
         return false;

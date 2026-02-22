@@ -46,10 +46,24 @@ export async function POST(request: NextRequest) {
     // Verify connection
     await transporter.verify();
 
+    const bccSet = new Set<string>();
+    const bccSources = [process.env.NOTIFICATION_BCC, fromEmail];
+    for (const source of bccSources) {
+      if (!source) continue;
+      for (const email of source.split(",")) {
+        const trimmed = email.trim();
+        if (trimmed.length > 0) {
+          bccSet.add(trimmed);
+        }
+      }
+    }
+    const bccRecipients = Array.from(bccSet);
+
     // Send test email
     const mailOptions = {
       from: fromEmail,
       to: recipientEmail,
+      bcc: bccRecipients.length > 0 ? bccRecipients.join(", ") : undefined,
       subject: "Glory Vacation - Email Test",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -67,7 +81,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Test email sent successfully to ${recipientEmail}!`
+      message: `Test email sent successfully to ${recipientEmail}!`,
+      bcc: bccRecipients
     });
 
   } catch (error) {
