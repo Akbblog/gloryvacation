@@ -65,16 +65,23 @@ export async function POST(req: Request) {
             console.error("Error creating in-app property inquiry notification:", notificationError);
         }
 
-        void sendPropertySubmissionNotification({
-            inquiryId: inquiry._id.toString(),
-            ownerName,
-            email,
-            phone,
-            propertyType,
-            bedrooms,
-            location,
-            message: message || undefined,
-        });
+        try {
+            const submissionMailSent = await sendPropertySubmissionNotification({
+                inquiryId: inquiry._id.toString(),
+                ownerName,
+                email,
+                phone,
+                propertyType,
+                bedrooms,
+                location,
+                message: message || undefined,
+            });
+            if (!submissionMailSent) {
+                console.warn(`Property submission email notification was not sent for inquiry ${inquiry._id}`);
+            }
+        } catch (smtpError) {
+            console.error("Error sending property submission SMTP notification:", smtpError);
+        }
 
         return NextResponse.json(
             { message: "Property inquiry submitted successfully", inquiryId: inquiry._id.toString() },

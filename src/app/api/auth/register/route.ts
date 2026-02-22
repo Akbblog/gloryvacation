@@ -52,13 +52,21 @@ export async function POST(req: Request) {
             // Don't fail registration if notification fails
         }
 
-        // Send SMTP email notification to admins about new signup
-        void sendNewUserSignupNotification({
-            userId: user._id.toString(),
-            name: user.name,
-            email: user.email,
-            role: user.role,
-        });
+        // Send SMTP email notification to admins about new signup.
+        // Await here so the request lifecycle does not end before send completion.
+        try {
+            const signupMailSent = await sendNewUserSignupNotification({
+                userId: user._id.toString(),
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            });
+            if (!signupMailSent) {
+                console.warn(`Signup email notification was not sent for user ${user._id}`);
+            }
+        } catch (smtpError) {
+            console.error("Error sending signup SMTP notification:", smtpError);
+        }
 
         return NextResponse.json(
             { message: "User created successfully", user: { id: user._id, name: user.name, email: user.email, role: user.role } },

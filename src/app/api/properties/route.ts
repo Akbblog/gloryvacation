@@ -227,16 +227,24 @@ export async function POST(req: Request) {
             // Don't fail property creation if notification fails
         }
 
-        // Send SMTP email notification to admins about new property listing
-        void sendNewPropertyListedNotification({
-            propertyId: property._id.toString(),
-            propertyTitle: property.title || "Property",
-            hostName: session.user.name || "Property Owner",
-            hostEmail: session.user.email || "",
-            propertyType: property.propertyType,
-            bedrooms: property.bedrooms,
-            location: [property?.location?.area, property?.location?.city].filter(Boolean).join(", "),
-        });
+        // Send SMTP email notification to admins about new property listing.
+        // Await to avoid losing sends on short-lived runtimes.
+        try {
+            const propertyMailSent = await sendNewPropertyListedNotification({
+                propertyId: property._id.toString(),
+                propertyTitle: property.title || "Property",
+                hostName: session.user.name || "Property Owner",
+                hostEmail: session.user.email || "",
+                propertyType: property.propertyType,
+                bedrooms: property.bedrooms,
+                location: [property?.location?.area, property?.location?.city].filter(Boolean).join(", "),
+            });
+            if (!propertyMailSent) {
+                console.warn(`Property listing email notification was not sent for property ${property._id}`);
+            }
+        } catch (smtpError) {
+            console.error("Error sending property listing SMTP notification:", smtpError);
+        }
 
         return NextResponse.json(property, { status: 201 });
     } catch (error) {

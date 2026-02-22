@@ -106,8 +106,8 @@ export async function POST(req: Request) {
             }
         };
 
-        // Fire-and-forget notification tasks.
-        void notifyTeam();
+        // Await notification tasks so SMTP/webhook work is completed reliably.
+        await notifyTeam();
 
         return NextResponse.json({ message: "Reservation created", reservation }, { status: 201 });
     } catch (error) {
