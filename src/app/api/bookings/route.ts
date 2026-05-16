@@ -6,6 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NotificationService } from "@/lib/notifications/NotificationService";
 import { Property } from "@/models/Property";
 import { User } from "@/models/User";
+import { sendNewBookingNotification } from "@/lib/email";
 
 export async function POST(req: Request) {
     try {
@@ -59,6 +60,24 @@ export async function POST(req: Request) {
                 } catch (e) {
                     console.error("Error sending admin booking notification:", e);
                 }
+
+                const bookingMailSent = await sendNewBookingNotification({
+                    bookingId: booking._id.toString(),
+                    guestName: guestDetails.name || guest.name || "Guest",
+                    guestEmail: guestDetails.email || guest.email || "",
+                    guestPhone: guestDetails.phone || "",
+                    propertyTitle: property.title || "Property",
+                    propertyId,
+                    checkIn: booking.checkIn ? new Date(booking.checkIn).toISOString().slice(0, 10) : String(checkIn),
+                    checkOut: booking.checkOut ? new Date(booking.checkOut).toISOString().slice(0, 10) : String(checkOut),
+                    guests: booking.guests || guests,
+                    totalPrice: booking.totalPrice || totalPrice,
+                    status: booking.status || "pending",
+                });
+
+                if (!bookingMailSent) {
+                    console.warn(`Booking email notification was not sent for booking ${booking._id}`);
+                }
             }
         } catch (notificationError) {
             console.error("Error sending new booking notification:", notificationError);
@@ -72,7 +91,7 @@ export async function POST(req: Request) {
     }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
     try {
         const session = await getServerSession(authOptions);
 

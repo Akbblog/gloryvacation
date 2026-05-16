@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export interface EmailConfig {
     to: string;
@@ -44,23 +45,54 @@ function escapeHtml(value: string): string {
         .replaceAll("'", "&#39;");
 }
 
+function cleanSubjectPart(value: string, fallback: string = "Notification"): string {
+    const cleaned = value.replace(/\s+/g, " ").trim();
+    return cleaned.length > 0 ? cleaned.slice(0, 90) : fallback;
+}
+
+function inferSmtpHeloName(): string | undefined {
+    const explicit = process.env.SMTP_HELO?.trim();
+    if (explicit) return explicit;
+
+    const siteDomain = process.env.SITE_DOMAIN?.trim();
+    if (!siteDomain) return undefined;
+
+    try {
+        return new URL(siteDomain).hostname;
+    } catch {
+        return undefined;
+    }
+}
+
 // Create reusable transporter
 function createTransporter() {
     const smtpHost = process.env.SMTP_HOST;
     const smtpPort = process.env.SMTP_PORT;
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
+    const smtpTlsServername = process.env.SMTP_TLS_SERVERNAME?.trim();
+    const smtpHeloName = inferSmtpHeloName();
 
     if (!smtpHost || !smtpPort || !smtpUser || !smtpPass) {
         return null;
     }
 
-    return nodemailer.createTransport({
+    const transportConfig: SMTPTransport.Options = {
         host: smtpHost,
         port: Number(smtpPort),
         secure: Number(smtpPort) === 465,
         auth: { user: smtpUser, pass: smtpPass },
-    });
+    };
+
+    if (smtpHeloName) {
+        transportConfig.name = smtpHeloName;
+    }
+
+    if (smtpTlsServername) {
+        transportConfig.tls = { servername: smtpTlsServername };
+    }
+
+    return nodemailer.createTransport(transportConfig);
 }
 
 export async function sendEmail(config: EmailConfig): Promise<boolean> {
@@ -73,43 +105,58 @@ export async function sendEmail(config: EmailConfig): Promise<boolean> {
 
         const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER;
         const fromName = process.env.FROM_NAME || "Glory Vacation";
-        const bccRecipients = uniqueRecipients([
+        const toRecipients = uniqueRecipients(parseRecipients(config.to));
+        if (toRecipients.length === 0) {
+            console.warn("No recipients provided to sendEmail");
+            return false;
+        }
+
+        const globalBccRecipients = uniqueRecipients([
             ...parseRecipients(config.bcc),
             ...parseRecipients(process.env.NOTIFICATION_BCC),
         ]);
 
-        const info = await transporter.sendMail({
-            from: `"${fromName}" <${fromEmail}>`,
-            to: config.to,
-            bcc: bccRecipients.length > 0 ? bccRecipients.join(", ") : undefined,
-            subject: config.subject,
-            html: config.html,
-            text: config.text,
-            replyTo: config.replyTo,
-        });
+        let allSent = true;
 
-        const accepted = Array.isArray(info.accepted) ? info.accepted : [];
-        const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+        for (const recipient of toRecipients) {
+            const bccRecipients = globalBccRecipients.filter(
+                (bcc) => bcc.toLowerCase() !== recipient.toLowerCase()
+            );
 
-        if (rejected.length > 0) {
-            console.warn("Email rejected by SMTP server", {
-                rejected,
-                to: config.to,
-                bcc: bccRecipients,
-                messageId: info.messageId,
+            const info = await transporter.sendMail({
+                from: `"${fromName}" <${fromEmail}>`,
+                to: recipient,
+                bcc: bccRecipients.length > 0 ? bccRecipients.join(", ") : undefined,
+                subject: config.subject,
+                html: config.html,
+                text: config.text,
+                replyTo: config.replyTo,
             });
+
+            const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+            const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+            if (rejected.length > 0) {
+                console.warn("Email rejected by SMTP server", {
+                    rejected,
+                    to: recipient,
+                    bcc: bccRecipients,
+                    messageId: info.messageId,
+                });
+                allSent = false;
+            }
+
+            if (accepted.length === 0) {
+                console.warn("SMTP server did not accept any recipients", {
+                    to: recipient,
+                    bcc: bccRecipients,
+                    messageId: info.messageId,
+                });
+                allSent = false;
+            }
         }
 
-        if (accepted.length === 0) {
-            console.warn("SMTP server did not accept any recipients", {
-                to: config.to,
-                bcc: bccRecipients,
-                messageId: info.messageId,
-            });
-            return false;
-        }
-
-        return rejected.length === 0;
+        return allSent;
     } catch (error) {
         console.error("Failed to send email:", error);
         return false;
@@ -243,6 +290,31 @@ interface PropertySubmissionEmailData {
     message?: string;
 }
 
+interface BookingNotificationEmailData {
+    bookingId: string;
+    guestName: string;
+    guestEmail: string;
+    guestPhone?: string;
+    propertyTitle: string;
+    propertyId: string;
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    totalPrice?: number;
+    status: string;
+}
+
+interface ContactMessageEmailData {
+    messageId: string;
+    name: string;
+    email: string;
+    phone?: string;
+    subject: string;
+    message: string;
+    propertyTitle?: string;
+    propertyId?: string;
+}
+
 // Guest notification for status change
 export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subject: string; html: string; text: string } {
     const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
@@ -258,11 +330,11 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
             message: "Our team has reviewed your reservation request and has sent you additional information. Please check your inbox and respond at your earliest convenience.",
         },
         approved: {
-            title: "Reservation Approved! 🎉",
+            title: "Reservation Approved",
             message: "Great news! Your reservation has been approved. Please proceed with the confirmation to secure your booking.",
         },
         confirmed: {
-            title: "Booking Confirmed! ✨",
+            title: "Booking Confirmed",
             message: "Your booking is now confirmed! We're excited to host you and look forward to making your stay memorable.",
         },
         rejected: {
@@ -280,7 +352,7 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
     const content = `
         <!-- Greeting -->
         <h2 style="margin: 0 0 20px; color: #1e293b; font-size: 24px; font-weight: 600;">
-            Hello ${data.guestName}! 👋
+            Hello ${data.guestName},
         </h2>
         
         <!-- Status Badge -->
@@ -313,7 +385,7 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 15px;">
                 <tr>
                     <td width="40" valign="top">
-                        <div style="width: 36px; height: 36px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 36px; font-size: 18px;">🏠</div>
+                        <div style="width: 36px; height: 36px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 36px; font-size: 12px; font-weight: 700; color: #1e40af;">P</div>
                     </td>
                     <td style="padding-left: 12px;">
                         <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Property</p>
@@ -326,12 +398,12 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 15px;">
                 <tr>
                     <td width="40" valign="top">
-                        <div style="width: 36px; height: 36px; background-color: #dcfce7; border-radius: 8px; text-align: center; line-height: 36px; font-size: 18px;">📅</div>
+                        <div style="width: 36px; height: 36px; background-color: #dcfce7; border-radius: 8px; text-align: center; line-height: 36px; font-size: 12px; font-weight: 700; color: #166534;">D</div>
                     </td>
                     <td style="padding-left: 12px;">
                         <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Dates</p>
                         <p style="margin: 4px 0 0; color: #1e293b; font-size: 15px; font-weight: 500;">
-                            ${data.checkIn}${data.checkOut ? ` → ${data.checkOut}` : ""}
+                            ${data.checkIn}${data.checkOut ? ` to ${data.checkOut}` : ""}
                         </p>
                     </td>
                 </tr>
@@ -341,7 +413,7 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                     <td width="40" valign="top">
-                        <div style="width: 36px; height: 36px; background-color: #fef3c7; border-radius: 8px; text-align: center; line-height: 36px; font-size: 18px;">👥</div>
+                        <div style="width: 36px; height: 36px; background-color: #fef3c7; border-radius: 8px; text-align: center; line-height: 36px; font-size: 12px; font-weight: 700; color: #92400e;">G</div>
                     </td>
                     <td style="padding-left: 12px;">
                         <p style="margin: 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Guests</p>
@@ -388,7 +460,7 @@ export function getStatusChangeEmailTemplate(data: ReservationEmailData): { subj
     const text = `
 ${title}
 
-Hello ${data.guestName}!
+Hello ${data.guestName},
 
 ${message}
 
@@ -412,7 +484,7 @@ ${siteDomain}
     `.trim();
 
     return {
-        subject: `${title} - Glory Vacation`,
+        subject: `Glory Vacation: ${title} - ${cleanSubjectPart(data.propertyTitle, "Reservation")}`,
         html: baseTemplate(content, message.slice(0, 100)),
         text,
     };
@@ -426,7 +498,7 @@ export function getNewReservationEmailTemplate(data: ReservationEmailData): { su
         <!-- Alert Header -->
         <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); margin: -40px -40px 30px; padding: 25px 40px; text-align: center;">
             <h2 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 600;">
-                🔔 New Reservation Request
+                New Reservation Request
             </h2>
         </div>
         
@@ -450,7 +522,7 @@ export function getNewReservationEmailTemplate(data: ReservationEmailData): { su
         
         <!-- Guest Information -->
         <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 16px; font-weight: 600;">👤 Guest Information</h3>
+            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 16px; font-weight: 600;">Guest Information</h3>
             <table role="presentation" width="100%" cellspacing="0" cellpadding="5">
                 <tr>
                     <td width="100" style="color: #64748b; font-size: 14px;">Name:</td>
@@ -465,7 +537,7 @@ export function getNewReservationEmailTemplate(data: ReservationEmailData): { su
         
         <!-- Property & Dates -->
         <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
-            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 16px; font-weight: 600;">🏠 Reservation Details</h3>
+            <h3 style="margin: 0 0 15px; color: #1e293b; font-size: 16px; font-weight: 600;">Reservation Details</h3>
             <table role="presentation" width="100%" cellspacing="0" cellpadding="5">
                 <tr>
                     <td width="100" style="color: #64748b; font-size: 14px;">Property:</td>
@@ -518,7 +590,7 @@ Reservation ID: ${data.reservationId}
     `.trim();
 
     return {
-        subject: `🔔 New Reservation: ${data.propertyTitle}`,
+        subject: `Glory Vacation: New reservation request - ${cleanSubjectPart(data.propertyTitle, "Property")}`,
         html: baseTemplate(content, `New reservation from ${data.guestName}`),
         text,
     };
@@ -533,9 +605,9 @@ export function getNewUserSignupEmailTemplate(data: UserSignupEmailData): { subj
     const safeUserId = escapeHtml(data.userId);
 
     const content = `
-        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New User Signup</h2>
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New User Registration</h2>
         <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
-            A new user registered on Glory Vacation.
+            A new user account was created on Glory Vacation. Review the account details below.
         </p>
         <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
             <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Name:</strong> ${safeName}</p>
@@ -549,9 +621,9 @@ export function getNewUserSignupEmailTemplate(data: UserSignupEmailData): { subj
     `;
 
     const text = `
-New User Signup
+New User Registration
 
-A new user registered on Glory Vacation.
+A new user account was created on Glory Vacation. Review the account details below.
 
 Name: ${data.name}
 Email: ${data.email}
@@ -562,8 +634,8 @@ Admin panel: ${siteDomain}/en/admin/users
     `.trim();
 
     return {
-        subject: `New user signup: ${data.name}`,
-        html: baseTemplate(content, "New user signup"),
+        subject: `Glory Vacation: New user registration - ${cleanSubjectPart(data.name, "User")}`,
+        html: baseTemplate(content, "New user registration"),
         text,
     };
 }
@@ -580,9 +652,9 @@ export function getNewPropertyListedEmailTemplate(data: PropertyListedEmailData)
     const safePropertyId = escapeHtml(data.propertyId);
 
     const content = `
-        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Listed</h2>
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Listing</h2>
         <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
-            A new property has been created and needs review.
+            A host added a property listing on Glory Vacation. Review the listing details below.
         </p>
         <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
             <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property:</strong> ${safePropertyTitle}</p>
@@ -599,9 +671,9 @@ export function getNewPropertyListedEmailTemplate(data: PropertyListedEmailData)
     `;
 
     const text = `
-New Property Listed
+New Property Listing
 
-A new property has been created and needs review.
+A host added a property listing on Glory Vacation. Review the listing details below.
 
 Property: ${data.propertyTitle}
 Host: ${data.hostName}
@@ -615,8 +687,8 @@ Admin panel: ${siteDomain}/en/admin/listings
     `.trim();
 
     return {
-        subject: `New property listed: ${data.propertyTitle}`,
-        html: baseTemplate(content, "New property listed"),
+        subject: `Glory Vacation: New property listing - ${cleanSubjectPart(data.propertyTitle, "Property")}`,
+        html: baseTemplate(content, "New property listing"),
         text,
     };
 }
@@ -634,9 +706,9 @@ export function getPropertySubmissionEmailTemplate(data: PropertySubmissionEmail
     const safeInquiryId = escapeHtml(data.inquiryId);
 
     const content = `
-        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Submission</h2>
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Property Inquiry</h2>
         <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
-            A new owner submitted the "List Your Property" form.
+            A property owner submitted the "List Your Property" form. Follow up using the contact details below.
         </p>
         <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
             <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Owner Name:</strong> ${safeOwnerName}</p>
@@ -654,9 +726,9 @@ export function getPropertySubmissionEmailTemplate(data: PropertySubmissionEmail
     `;
 
     const text = `
-New Property Submission
+New Property Inquiry
 
-A new owner submitted the "List Your Property" form.
+A property owner submitted the "List Your Property" form. Follow up using the contact details below.
 
 Owner Name: ${data.ownerName}
 Email: ${data.email}
@@ -670,8 +742,127 @@ Admin panel: ${siteDomain}/en/admin/messages
     `.trim();
 
     return {
-        subject: `New property submission: ${data.ownerName}`,
-        html: baseTemplate(content, "New property submission"),
+        subject: `Glory Vacation: New property inquiry - ${cleanSubjectPart(data.ownerName, "Owner")}`,
+        html: baseTemplate(content, "New property inquiry"),
+        text,
+    };
+}
+
+export function getNewBookingEmailTemplate(data: BookingNotificationEmailData): { subject: string; html: string; text: string } {
+    const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
+
+    const safeGuestName = escapeHtml(data.guestName);
+    const safeGuestEmail = escapeHtml(data.guestEmail);
+    const safeGuestPhone = escapeHtml(data.guestPhone || "N/A");
+    const safePropertyTitle = escapeHtml(data.propertyTitle);
+    const safePropertyId = escapeHtml(data.propertyId);
+    const safeBookingId = escapeHtml(data.bookingId);
+    const safeCheckIn = escapeHtml(data.checkIn);
+    const safeCheckOut = escapeHtml(data.checkOut);
+    const safeStatus = escapeHtml(data.status);
+    const totalPrice = typeof data.totalPrice === "number" ? `AED ${data.totalPrice.toLocaleString()}` : "N/A";
+
+    const content = `
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Booking Request</h2>
+        <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
+            A guest submitted a booking request on Glory Vacation. Review the stay details and contact the guest if needed.
+        </p>
+        <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Guest:</strong> ${safeGuestName}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Email:</strong> ${safeGuestEmail}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Phone:</strong> ${safeGuestPhone}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property:</strong> ${safePropertyTitle}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Check-in:</strong> ${safeCheckIn}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Check-out:</strong> ${safeCheckOut}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Guests:</strong> ${data.guests}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Total:</strong> ${totalPrice}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Status:</strong> ${safeStatus}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property ID:</strong> ${safePropertyId}</p>
+            <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Booking ID:</strong> ${safeBookingId}</p>
+        </div>
+        <p style="margin: 20px 0 0; color: #64748b; font-size: 13px;">
+            Admin panel: ${siteDomain}/en/admin/bookings
+        </p>
+    `;
+
+    const text = `
+New Booking Request
+
+A guest submitted a booking request on Glory Vacation. Review the stay details and contact the guest if needed.
+
+Guest: ${data.guestName}
+Email: ${data.guestEmail}
+Phone: ${data.guestPhone || "N/A"}
+Property: ${data.propertyTitle}
+Check-in: ${data.checkIn}
+Check-out: ${data.checkOut}
+Guests: ${data.guests}
+Total: ${totalPrice}
+Status: ${data.status}
+Property ID: ${data.propertyId}
+Booking ID: ${data.bookingId}
+
+Admin panel: ${siteDomain}/en/admin/bookings
+    `.trim();
+
+    return {
+        subject: `Glory Vacation: New booking request - ${cleanSubjectPart(data.propertyTitle, "Property")}`,
+        html: baseTemplate(content, "New booking request"),
+        text,
+    };
+}
+
+export function getNewContactMessageEmailTemplate(data: ContactMessageEmailData): { subject: string; html: string; text: string } {
+    const siteDomain = process.env.SITE_DOMAIN || "https://gloryvacation.com";
+
+    const safeName = escapeHtml(data.name);
+    const safeEmail = escapeHtml(data.email);
+    const safePhone = escapeHtml(data.phone || "N/A");
+    const safeSubject = escapeHtml(data.subject);
+    const safeMessage = escapeHtml(data.message);
+    const safeMessageId = escapeHtml(data.messageId);
+    const safePropertyTitle = data.propertyTitle ? escapeHtml(data.propertyTitle) : "";
+    const safePropertyId = data.propertyId ? escapeHtml(data.propertyId) : "";
+
+    const content = `
+        <h2 style="margin: 0 0 18px; color: #1e293b; font-size: 22px; font-weight: 600;">New Contact Message</h2>
+        <p style="margin: 0 0 20px; color: #475569; font-size: 15px; line-height: 1.6;">
+            A visitor submitted a contact message on Glory Vacation. Reply directly to this email or review it in the admin panel.
+        </p>
+        <div style="background-color: #f8fafc; border-radius: 12px; padding: 20px;">
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Name:</strong> ${safeName}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Email:</strong> ${safeEmail}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Phone:</strong> ${safePhone}</p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Subject:</strong> ${safeSubject}</p>
+            ${safePropertyTitle ? `<p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property:</strong> ${safePropertyTitle}</p>` : ""}
+            ${safePropertyId ? `<p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Property ID:</strong> ${safePropertyId}</p>` : ""}
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px;"><strong>Message:</strong></p>
+            <p style="margin: 0 0 8px; color: #334155; font-size: 14px; white-space: pre-wrap;">${safeMessage}</p>
+            <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Message ID:</strong> ${safeMessageId}</p>
+        </div>
+        <p style="margin: 20px 0 0; color: #64748b; font-size: 13px;">
+            Admin panel: ${siteDomain}/en/admin/messages
+        </p>
+    `;
+
+    const text = `
+New Contact Message
+
+A visitor submitted a contact message on Glory Vacation. Reply directly to this email or review it in the admin panel.
+
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone || "N/A"}
+Subject: ${data.subject}
+${data.propertyTitle ? `Property: ${data.propertyTitle}\n` : ""}${data.propertyId ? `Property ID: ${data.propertyId}\n` : ""}Message: ${data.message}
+Message ID: ${data.messageId}
+
+Admin panel: ${siteDomain}/en/admin/messages
+    `.trim();
+
+    return {
+        subject: `Glory Vacation: New message - ${cleanSubjectPart(data.subject, "Contact form")}`,
+        html: baseTemplate(content, "New contact message"),
         text,
     };
 }
@@ -767,6 +958,51 @@ export async function sendPropertySubmissionNotification(data: PropertySubmissio
     }
 
     const { subject, html, text } = getPropertySubmissionEmailTemplate(data);
+    return sendEmail({
+        to: recipients.join(", "),
+        subject,
+        html,
+        text,
+        replyTo: data.email,
+    });
+}
+
+export async function sendNewBookingNotification(data: BookingNotificationEmailData): Promise<boolean> {
+    const recipients = getNotificationRecipients(
+        process.env.BOOKING_NOTIFY_TO,
+        process.env.RESERVATION_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+
+    if (recipients.length === 0) {
+        console.warn("No admin email configured for booking notifications");
+        return false;
+    }
+
+    const { subject, html, text } = getNewBookingEmailTemplate(data);
+    return sendEmail({
+        to: recipients.join(", "),
+        subject,
+        html,
+        text,
+        replyTo: data.guestEmail,
+    });
+}
+
+export async function sendNewContactMessageNotification(data: ContactMessageEmailData): Promise<boolean> {
+    const recipients = getNotificationRecipients(
+        process.env.CONTACT_NOTIFY_TO,
+        process.env.NOTIFICATION_EMAILS,
+        process.env.ADMIN_EMAIL
+    );
+
+    if (recipients.length === 0) {
+        console.warn("No admin email configured for contact message notifications");
+        return false;
+    }
+
+    const { subject, html, text } = getNewContactMessageEmailTemplate(data);
     return sendEmail({
         to: recipients.join(", "),
         subject,

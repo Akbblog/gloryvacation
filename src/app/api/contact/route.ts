@@ -3,6 +3,20 @@ import connectDB from "@/lib/mongodb";
 import { ContactMessage } from "@/models/ContactMessage";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Property } from "@/models/Property";
+import { sendNewContactMessageNotification } from "@/lib/email";
+
+type ContactMessageFilter = {
+    status?: string;
+    property?: { $exists: boolean; $ne?: null } | null;
+    $or?: Array<
+        | { name: { $regex: string; $options: string } }
+        | { email: { $regex: string; $options: string } }
+        | { subject: { $regex: string; $options: string } }
+        | { message: { $regex: string; $options: string } }
+        | { property: { $exists: boolean } | null }
+    >;
+};
 
 export async function POST(req: Request) {
     try {
@@ -24,6 +38,29 @@ export async function POST(req: Request) {
             property: propertyId || undefined,
             status: "new",
         });
+
+        try {
+            const property = propertyId
+                ? await Property.findById(propertyId).select("title").lean<{ title?: string }>()
+                : null;
+
+            const contactMailSent = await sendNewContactMessageNotification({
+                messageId: doc._id.toString(),
+                name,
+                email,
+                phone: phone || undefined,
+                subject: subject || "Property Inquiry",
+                message,
+                propertyTitle: property?.title,
+                propertyId: propertyId || undefined,
+            });
+
+            if (!contactMailSent) {
+                console.warn(`Contact message email notification was not sent for message ${doc._id}`);
+            }
+        } catch (smtpError) {
+            console.error("Error sending contact message SMTP notification:", smtpError);
+        }
 
         return NextResponse.json({ message: "Message received", doc }, { status: 201 });
     } catch (error) {
@@ -72,7 +109,7 @@ export async function GET(req: Request) {
         }
 
         // Build filter
-        const filter: any = {};
+        const filter: ContactMessageFilter = {};
 
         if (status && status !== "all") {
             filter.status = status;
